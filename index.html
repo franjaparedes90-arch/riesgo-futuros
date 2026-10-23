@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Riesgo Futuros</title>
+<!-- Riesgo Futuros · app multiusuario (Firebase) · v1 (23/10/2026)
+     Misma lógica que la app de Apps Script (Real_Codigo.gs): Tabla maestra para Funded, regla v7 para challenges,
+     rotación (SL → siguiente cuenta), plan B y registro rápido. Cada usuario ve solo sus cuentas y trades.
+     La Tabla maestra es compartida (config/tablaMaestra) y solo la edita el admin. -->
+<style>
+:root{color-scheme:light;--bg:#d4e5fa;--card:#eaf3ff;--card-2:#fff;--line:#c5d8f1;--line-2:#a8c3e8;--text:#12223b;--text-2:#36506f;--muted:#5a6f90;--pos:#0e8a5c;--neg:#c23b3b;--real:#2f6fd1;--sel:#185FA5;--warn:#7a5200;--warn-bg:#fdf1d6;--warn-line:#e6c272;--mono:ui-monospace,Menlo,Consolas,monospace}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 Inter,system-ui,'Segoe UI',sans-serif}
+.wrap{max-width:1100px;margin:0 auto;padding:18px 16px 60px}
+header{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+h1{margin:0;font-size:22px}.sub{color:var(--muted);font:12px var(--mono);margin-top:2px}
+nav{display:flex;gap:6px;flex-wrap:wrap}
+button,a.btn{font:600 13px Inter,system-ui,sans-serif;color:var(--text);background:var(--card-2);border:1px solid var(--line-2);border-radius:8px;padding:8px 14px;cursor:pointer;text-decoration:none;display:inline-block}
+button.pri{background:var(--real);border-color:var(--real);color:#fff}
+button.tab.on{background:var(--sel);border-color:var(--sel);color:#fff}
+button.link{background:none;border:none;color:var(--real);padding:2px 4px}
+button:disabled{opacity:.5;cursor:default}
+input,select{background:var(--card-2);color:var(--text);border:1px solid var(--line-2);border-radius:7px;padding:7px 9px;font:14px Inter,sans-serif;max-width:100%}
+.sec{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:22px 0 10px}
+.sec h2{font:600 11px var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--text-2);margin:0;padding-left:9px;border-left:3px solid var(--real)}
+.sec .hint{color:var(--muted);font-size:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.accs{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:10px}
+.acc{background:var(--card-2);border:1px solid var(--line-2);border-left:4px solid var(--pos);border-radius:10px;padding:10px 12px}
+.acc.turno{border:2px solid var(--real);border-left-width:6px;box-shadow:0 2px 10px rgba(0,0,0,.12)}
+.acc:not(.turno){opacity:.45}
+.acc .top{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:baseline}.acc .nm{font-weight:700}.acc .tg{font:11px var(--mono);color:var(--muted)}
+.acc .hero{display:flex;flex-wrap:wrap;gap:6px 18px;align-items:baseline;margin:8px 0 6px;padding:8px 10px;border-radius:8px;background:var(--card)}
+.acc .hero span{font:700 11px var(--mono);letter-spacing:.06em;color:var(--real)}.acc .hero b{font-size:22px}
+.kv{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
+.kv div{font:10px var(--mono);color:var(--muted);text-transform:uppercase}.kv b{display:block;font:700 14px var(--mono);color:var(--text);text-transform:none;margin-top:2px}
+.pb{margin-top:10px;padding:8px 10px;border-radius:8px;background:var(--card);font-size:13px}
+.pb .pbl,.qr .ql{font:11px var(--mono);color:var(--muted);letter-spacing:.06em;margin-bottom:4px}
+.qr{border-top:1px solid var(--line-2);margin-top:10px;padding-top:10px}
+.qr .qb{display:flex;gap:6px;flex-wrap:wrap;align-items:center}.qr input[type=number]{width:120px}
+.qr .qm{font-size:13px;margin-top:6px;color:var(--muted)}
+.ck{border:1px solid #EF9F27;border-radius:10px;padding:10px 12px;margin:0 0 10px;background:var(--card-2)}
+.ck.ok{border-color:#1D9E75}
+.ck .ch{display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-weight:700}
+.ck .bar{height:4px;background:var(--line-2);border-radius:2px;margin-top:8px}.ck .bar i{display:block;height:4px;border-radius:2px;background:#EF9F27}.ck.ok .bar i{background:#1D9E75}
+.ck label{display:flex;gap:8px;align-items:center;padding:3px 0;cursor:pointer}
+.tbl{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+th{text-align:left;font:500 10px var(--mono);text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding:7px 8px;border-bottom:1px solid var(--line-2);white-space:nowrap}
+td{padding:7px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+td.num,th.num{text-align:right}
+.pos{color:var(--pos)}.neg{color:var(--neg)}.mut{color:var(--muted)}
+.pill{display:inline-block;font:11px var(--mono);padding:1px 7px;border-radius:99px;border:1px solid var(--line-2);color:var(--text-2);background:#fff}
+.pill.tp{color:var(--pos);border-color:#8fd3b6}.pill.sl{color:var(--neg);border-color:#eba3a3}
+.form{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.form label{display:flex;flex-direction:column;gap:4px;font:10px var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.empty{padding:30px 10px;text-align:center;color:var(--muted)}
+.msg{margin-top:8px;font-size:13px}.msg.err{color:var(--neg)}.msg.ok{color:var(--pos)}
+.warn{background:var(--warn-bg);border:1px solid var(--warn-line);color:var(--warn);border-radius:10px;padding:8px 12px;font-size:13px;margin-bottom:10px}
+#login{max-width:420px;margin:12vh auto;text-align:center}
+#login .card{padding:28px 22px}
+#login p{color:var(--text-2)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+@media(max-width:560px){.kv{grid-template-columns:repeat(2,1fr)}.acc .hero b{font-size:19px}}
+</style></head><body>
+<div class="wrap">
+  <div id="login" hidden><div class="card">
+    <h1>Riesgo Futuros</h1>
+    <p>Riesgo diario, rotación de cuentas y registro rápido · estrategia Nasdaq.</p>
+    <button class="pri" id="btnLogin" type="button">Entrar con Google</button>
+    <div class="msg err" id="loginMsg"></div>
+  </div></div>
+  <div id="app" hidden>
+    <header>
+      <div><h1>Riesgo Futuros</h1><div class="sub" id="who"></div></div>
+      <nav>
+        <button class="tab on" data-tab="hoy" type="button">Hoy</button>
+        <button class="tab" data-tab="cuentas" type="button">Mis cuentas</button>
+        <button class="tab" data-tab="trades" type="button">Trades</button>
+        <button class="tab" data-tab="admin" type="button" id="tabAdmin" hidden>Admin</button>
+        <button type="button" id="btnSalir">Salir</button>
+      </nav>
+    </header>
+    <section id="v-hoy">
+      <div id="chkBox"></div>
+      <div id="avisos"></div>
+      <div class="accs" id="cards"></div>
+    </section>
+    <section id="v-cuentas" hidden>
+      <div class="sec"><h2>Mis cuentas</h2><span class="hint">Orden = rotación. Balance y mínimo se copian de la firma (Lucid) al sincronizar.</span></div>
+      <div class="card tbl" id="ctaTabla"></div>
+      <div class="sec"><h2 id="ctaFormTit">Agregar cuenta</h2></div>
+      <div class="card">
+        <div class="form">
+          <label>Nombre<input id="fNombre" placeholder="Lucid 25K #1"></label>
+          <label>ID en la firma<input id="fId" placeholder="LFE025-…"></label>
+          <label>Firma<input id="fFirma" value="Lucid"></label>
+          <label>Fase<select id="fFase"><option>Evaluación</option><option>Funded</option></select></label>
+          <label>Tamaño ($)<input id="fTam" type="number" value="25000"></label>
+          <label>DD inicial ($)<input id="fDd" type="number" value="1000"></label>
+          <label>Daily loss limit ($, vacío = sin tope)<input id="fDll" type="number"></label>
+          <label>Balance actual ($)<input id="fBal" type="number" step="0.01"></label>
+          <label>Mínimo actual ($)<input id="fMin" type="number" step="0.01"></label>
+          <label>Tipo de DD<select id="fTipo"><option>Trailing EOD</option><option>Estático</option></select></label>
+          <label>Mínimo bloqueado en ($)<input id="fLockMin" type="number" value="25100"></label>
+          <label>Se bloquea con un cierre de ($)<input id="fLockCierre" type="number" value="26100"></label>
+          <label>Objetivo evaluación ($)<input id="fObj" type="number" value="1250"></label>
+          <label>Orden<input id="fOrden" type="number"></label>
+          <label>Activa<select id="fActiva"><option>Sí</option><option>No</option></select></label>
+        </div>
+        <div class="row" style="margin-top:12px"><button class="pri" type="button" id="btnCta">Guardar cuenta</button><button type="button" id="btnCtaNueva" hidden>Cancelar edición</button></div>
+        <div class="msg" id="ctaMsg"></div>
+      </div>
+    </section>
+    <section id="v-trades" hidden>
+      <div class="sec"><h2>Trades</h2><span class="hint">Registrados desde el registro rápido. Los más recientes arriba.</span></div>
+      <div class="card tbl" id="trTabla"></div>
+    </section>
+    <section id="v-admin" hidden>
+      <div class="sec"><h2>Usuarios autorizados</h2><span class="hint">Solo estos correos pueden entrar.</span></div>
+      <div class="card">
+        <div id="allowList"></div>
+        <div class="row" style="margin-top:10px"><input id="aEmail" type="email" placeholder="correo@gmail.com"><input id="aNombre" placeholder="Nombre"><button class="pri" type="button" id="btnAllow">Autorizar</button></div>
+        <div class="msg" id="allowMsg"></div>
+      </div>
+      <div class="sec"><h2>Tabla maestra (cuentas Funded)</h2><span class="hint" id="tmFuente"></span></div>
+      <div class="card tbl" id="tmEdit"></div>
+    </section>
+  </div>
+</div>
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, getDocs, writeBatch, query, orderBy } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+const app = initializeApp({
+  apiKey: 'AIzaSyBzJa8A1AEs1L0oxk0wN8JTefOHxpks7nk',
+  authDomain: 'riesgo-futuros.firebaseapp.com',
+  projectId: 'riesgo-futuros',
+  storageBucket: 'riesgo-futuros.firebasestorage.app',
+  messagingSenderId: '498493415418',
+  appId: '1:498493415418:web:5a95db0043966539360e43'
+});
+const auth = getAuth(app), db = getFirestore(app);
+const ADMIN = 'franjaparedes90@gmail.com';
+const SEED_ALLOW = { 'franjaparedes90@gmail.com': 'Javier', 'agustinpar92@gmail.com': 'José', 'pedropar0595@gmail.com': 'Pedro' };
+const ESTADOS = ['Aceleración', 'Normal', 'Defensa', 'Crítica'];
+const ICON = { 'Aceleración': '🚀', 'Normal': '🟢', 'Defensa': '🟡', 'Crítica': '🔴', 'Challenge': '🎯' };
+// Tabla maestra del BT 17/10/2026 (107 trades) · la mantiene bt-nasdaq
+const SEED_TM = { filas: {
+  'Aceleración': { regla: '≥ 60 % y DD desde peak < 10 %', riesgo: 0.01, target: '1,5R + BE en 1R' },
+  'Normal': { regla: '≥ 60 %', riesgo: 0.008, target: '1,5R + BE en 1R' },
+  'Defensa': { regla: 'umbral a 60 % (regla de los 2 disparos)', riesgo: 0.006, target: '1,5R + BE en 1R' },
+  'Crítica': { regla: '< umbral · máx. 1 trade/día · solo A+', riesgo: 0.004, target: '1,5R + BE en 1R' }
+}, fuente: 'BT 17/10/2026 · 107 trades' };
+const UMBRAL_NORMAL = 0.60, ACEL_DD_PEAK = 0.10, CIERRE_NY = 17;
+const CH_R_PCT = 0.01, CH_MIN_PCT = 0.004;
+const CHK_ITEMS = ['Noticias y festivos de EE. UU. revisados', 'Sentado como tarde a las 15:15', 'Riesgo listo y Tradesea abierto en la cuenta en turno', 'Niveles marcados antes de las 15:25'];
+
+let U = null, IS_ADMIN = false, TM = null, CUENTAS = [], TRADES = [], CHK = CHK_ITEMS.map(() => false), CHK_OPEN = true, QR_SAL = null, QR_MSG = '', EDIT_ID = null;
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const money = x => (x == null || isNaN(x)) ? '—' : (x < 0 ? '−' : '') + Math.abs(Math.round(x)).toLocaleString('es-ES') + ' $';
+const pct = x => (x * 100).toFixed(1).replace('.', ',') + ' %';
+const num = v => { const n = parseFloat(String(v ?? '').replace(',', '.')); return isNaN(n) ? 0 : n; };
+const fmtTz = (d, tz, o) => new Intl.DateTimeFormat('en-CA', Object.assign({ timeZone: tz, hour12: false }, o)).format(d);
+const diaTz = (d, tz) => fmtTz(d, tz, { year: 'numeric', month: '2-digit', day: '2-digit' });
+const horaTz = (d, tz) => fmtTz(d, tz, { hour: '2-digit', minute: '2-digit' });
+const hoyES = () => diaTz(new Date(), 'Europe/Madrid');
+const uref = (...p) => doc(db, 'users', U.uid, ...p);
+const ucol = (...p) => collection(db, 'users', U.uid, ...p);
+
+// ---------- cálculo (port de Real_Codigo.gs) ----------
+function pnlCuenta(id, syncAt) {
+  const r = { postSync: 0, hoy: 0, operoHoy: false, tpHoy: 0, dias: {} }, hoy = hoyES();
+  TRADES.forEach(t => {
+    if (t.cuenta !== id) return;
+    const usd = num(t.usd);
+    if (t.fecha === hoy) { r.hoy += usd; r.operoHoy = true; if (usd > 0) r.tpHoy++; }
+    if (!syncAt || t.registrado > syncAt) { r.postSync += usd; r.dias[t.fecha] = (r.dias[t.fecha] || 0) + usd; }
+  });
+  return r;
+}
+function calcMinimo(c, dias, syncDia, cerrado) {
+  let mejor = c.minimo + c.dd, bal = c.balance;
+  const porDia = {};
+  Object.keys(dias || {}).forEach(k => { const kk = k < syncDia ? syncDia : k; porDia[kk] = (porDia[kk] || 0) + dias[k]; });
+  const lista = [syncDia].concat(Object.keys(porDia)).filter((k, i, a) => k && a.indexOf(k) === i).sort();
+  lista.forEach(k => { bal += porDia[k] || 0; if (cerrado(k)) mejor = Math.max(mejor, bal); });
+  let minimo = Math.max(c.minimo, mejor - c.dd), bloqueado = false;
+  if (c.lockMin > 0 && (c.minimo >= c.lockMin || (c.lockCierre > 0 && mejor >= c.lockCierre) || minimo >= c.lockMin)) { bloqueado = true; minimo = Math.max(c.lockMin, c.minimo); }
+  return { minimo: Math.round(minimo * 100) / 100, bloqueado };
+}
+function calcEstado(c, pnl, tm) {
+  const balance = c.balance + (pnl.postSync || 0), margen = balance - c.minimo;
+  const quedaDia = c.dll > 0 ? c.dll - Math.max(0, -(pnl.hoy || 0)) : Infinity;
+  const efectivo = Math.max(0, Math.min(margen, quedaDia)), p = c.dd > 0 ? efectivo / c.dd : 0;
+  const ddPeak = Math.max(0, c.minimo + c.dd - balance);
+  const umbral = (tm['Defensa'].riesgo + 2 * tm['Crítica'].riesgo) / (c.dd / c.tam);
+  let estado;
+  if (p >= UMBRAL_NORMAL - 1e-9 && ddPeak < ACEL_DD_PEAK * c.dd) estado = 'Aceleración';
+  else if (p >= UMBRAL_NORMAL - 1e-9) estado = 'Normal';
+  else if (p >= umbral - 1e-9) estado = 'Defensa';
+  else estado = 'Crítica';
+  const riesgo = Math.round(tm[estado].riesgo * c.tam);
+  return { balance, margen, efectivo, pct: p, ddPeak, umbral, estado, riesgoPct: tm[estado].riesgo, riesgo, target: tm[estado].target, aguanta: riesgo > 0 ? Math.floor(efectivo / riesgo) : 0 };
+}
+function aplicarChallenge(e, c, pnl) {
+  const R = c.tam * CH_R_PCT, min = c.tam * CH_MIN_PCT, ef = Math.max(0, e.efectivo);
+  let r, reset = false;
+  if (ef > R) r = R; else if (ef >= min) r = Math.max(ef / 2, min); else { r = ef; reset = true; }
+  e.estado = 'Challenge'; e.riesgo = Math.floor(r); e.riesgoPct = c.tam > 0 ? e.riesgo / c.tam : 0; e.resetRec = reset;
+  const obj = c.objetivo > 0 ? c.objetivo : null;
+  e.objetivo = obj;
+  e.faltan = obj ? Math.max(0, obj - (e.balance - c.tam)) : null;
+  e.tpMaxHoy = obj ? Math.max(0, obj * 0.5 - Math.max(0, pnl.hoy || 0)) : null;
+  if (obj) e.target = (1.5 * e.riesgo <= e.tpMaxHoy) ? '1,5R fijo' : '1R fijo';
+  else e.target = pnl.tpHoy > 0 ? '1R fijo' : '1,5R fijo';
+  e.avisoCons = (obj && e.riesgo > e.tpMaxHoy) ? 'TP máx. hoy ' + Math.round(e.tpMaxHoy) + ' $' : '';
+  e.aguanta = e.riesgo > 0 ? Math.floor(ef / e.riesgo) : 0;
+}
+function estadoCuentas() {
+  const ahora = new Date(), hoyNY = diaTz(ahora, 'America/New_York'), horaNY = parseInt(horaTz(ahora, 'America/New_York'), 10);
+  const cerrado = d => d < hoyNY || (d === hoyNY && horaNY >= CIERRE_NY);
+  return CUENTAS.filter(c => c.activa).map(c => {
+    const pnl = pnlCuenta(c.id, c.syncAt);
+    const syncDia = c.syncAt ? diaTz(new Date(c.syncAt), 'Europe/Madrid') : '';
+    const m = (syncDia && c.tipoDD !== 'Estático') ? calcMinimo(c, pnl.dias, syncDia, cerrado) : { minimo: c.minimo, bloqueado: false };
+    const e = calcEstado(Object.assign({}, c, { minimo: m.minimo }), pnl, TM);
+    if (c.fase === 'Evaluación') aplicarChallenge(e, c, pnl);
+    return Object.assign(e, { c, minimo: m.minimo, bloqueado: m.bloqueado, pnl, syncDias: c.syncAt ? Math.floor((ahora - c.syncAt) / 86400000) : 999 });
+  });
+}
+
+// ---------- carga ----------
+async function cargar() {
+  const tm = await getDoc(doc(db, 'config', 'tablaMaestra'));
+  TM = tm.exists() ? tm.data().filas : null;
+  if (!TM && IS_ADMIN) { await setDoc(doc(db, 'config', 'tablaMaestra'), Object.assign({ actualizado: Date.now() }, SEED_TM)); TM = SEED_TM.filas; }
+  if (IS_ADMIN) {
+    const al = await getDocs(collection(db, 'allow'));
+    if (al.empty) { const b = writeBatch(db); Object.entries(SEED_ALLOW).forEach(([e, n]) => b.set(doc(db, 'allow', e), { nombre: n, agregado: Date.now() })); await b.commit(); }
+  }
+  const cs = await getDocs(ucol('cuentas'));
+  CUENTAS = cs.docs.map(d => normCuenta(d.data())).sort((a, b) => a.orden - b.orden);
+  const ts = await getDocs(query(ucol('trades'), orderBy('registrado', 'desc')));
+  TRADES = ts.docs.map(d => Object.assign({ _id: d.id }, d.data()));
+  const ck = await getDoc(uref('meta', 'checklist'));
+  CHK = (ck.exists() && ck.data().fecha === hoyES() && Array.isArray(ck.data().m) && ck.data().m.length === CHK_ITEMS.length) ? ck.data().m : CHK_ITEMS.map(() => false);
+  render();
+}
+function normCuenta(d) {
+  return { id: String(d.id), nombre: d.nombre || d.id, firma: d.firma || '', fase: d.fase || 'Evaluación', tam: num(d.tam), dd: num(d.dd), dll: num(d.dll),
+    balance: num(d.balance), minimo: num(d.minimo), orden: num(d.orden), enTurno: !!d.enTurno, activa: d.activa !== false, syncAt: d.syncAt || 0,
+    tipoDD: d.tipoDD || 'Trailing EOD', lockMin: num(d.lockMin), lockCierre: num(d.lockCierre), objetivo: num(d.objetivo) };
+}
+
+// ---------- vistas ----------
+function render() { renderHoy(); renderCuentas(); renderTrades(); if (IS_ADMIN) renderAdmin(); }
+function renderHoy() {
+  renderChk();
+  if (!TM) { $('cards').innerHTML = '<div class="empty">Falta la Tabla maestra. Avisale a Javier.</div>'; return; }
+  const E = estadoCuentas();
+  const viejas = E.filter(e => e.syncDias > 7);
+  $('avisos').innerHTML = (E.length && !E.some(e => e.c.enTurno) ? '<div class="warn">Ninguna cuenta está en turno: marcá una en Mis cuentas.</div>' : '')
+    + (viejas.length ? '<div class="warn">Hace más de 7 días que no sincronizás con la firma: ' + viejas.map(e => esc(e.c.nombre)).join(', ') + '. Actualizá balance y mínimo en Mis cuentas.</div>' : '');
+  if (!E.length) { $('cards').innerHTML = '<div class="empty">Todavía no cargaste cuentas. Andá a <b>Mis cuentas</b> y agregá la primera.</div>'; return; }
+  $('cards').innerHTML = E.slice().sort((a, b) => (b.c.enTurno ? 1 : 0) - (a.c.enTurno ? 1 : 0)).map(e => {
+    const c = e.c, t = c.enTurno;
+    return '<div class="acc' + (t ? ' turno' : '') + '"><div class="top"><span class="nm">' + esc(c.nombre) + '</span><span class="tg">' + (t ? 'EN TURNO · ' : '') + esc(c.fase) + (c.fase === 'Funded' ? ' · umbral Crítica ' + Math.round(e.umbral * 100) + ' %' : '') + '</span></div>'
+      + (t ? '<div class="hero"><span>OPERAR HOY</span><b>Riesgo ' + money(e.riesgo) + ' · ' + pct(e.riesgoPct) + '</b><b>' + esc(e.target) + '</b></div>' : '')
+      + '<div class="kv"><div>Balance<b>' + money(e.balance) + '</b></div><div>Mínimo<b>' + (e.bloqueado ? '🔒 ' : '') + money(e.minimo) + '</b></div><div>Margen efectivo<b>' + money(e.efectivo) + ' · ' + Math.round(e.pct * 100) + ' %</b></div>'
+      + '<div>Estado<b>' + ICON[e.estado] + ' ' + e.estado + '</b></div><div>Riesgo<b>' + money(e.riesgo) + ' · ' + pct(e.riesgoPct) + '</b></div><div>Target<b>' + esc(e.target) + '</b></div><div>SLs que aguanta<b>' + e.aguanta + '</b></div>'
+      + (e.objetivo ? '<div>TP máx. hoy<b>' + money(e.tpMaxHoy) + '</b></div><div>Faltan para pasar<b>' + money(e.faltan) + '</b></div>' : '')
+      + (e.avisoCons ? '<div>Consistencia<b>' + esc(e.avisoCons) + '</b></div>' : '') + (e.resetRec ? '<div>Aviso<b>Reset recomendado</b></div>' : '') + '</div>'
+      + (t ? planB(E, e) + qrHtml() : '') + '</div>';
+  }).join('');
+}
+function planB(E, e) {
+  const i = E.indexOf(e); if (E.length < 2 || i < 0) return '';
+  const b = E[(i + 1) % E.length];
+  return '<div class="pb"><div class="pbl">PLAN B · SI NO ENTRA EN ESTA CUENTA</div><b>' + esc(b.c.nombre) + '</b> · ' + esc(b.c.fase) + ' · riesgo ' + money(b.riesgo) + ' · ' + esc(b.target)
+    + (b.objetivo ? ' · TP máx. hoy ' + money(b.tpMaxHoy) + ' · faltan ' + money(b.faltan) + ' para pasar' : '') + (b.resetRec ? ' · reset recomendado' : '') + '</div>';
+}
+function qrHtml() {
+  return '<div class="qr"><div class="ql">REGISTRAR OPERACIÓN</div><div class="qb">' + ['TP', 'SL', 'BE'].map(s => '<button type="button" data-qr="' + s + '">' + s + '</button>').join('')
+    + '<input id="qrAmt" type="number" step="0.5" placeholder="Monto $"></div><input id="qrNota" type="text" placeholder="Nota rápida (opcional)" style="width:100%;margin-top:8px">'
+    + '<div style="display:flex;justify-content:flex-end;margin-top:8px"><button type="button" class="pri" id="qrGo">Guardar</button></div><div class="qm" id="qrMsg">' + esc(QR_MSG) + '</div></div>';
+}
+function pintarQr() {
+  document.querySelectorAll('[data-qr]').forEach(x => { const on = x.dataset.qr === QR_SAL; x.style.setProperty('background', on ? '#185FA5' : '', 'important'); x.style.setProperty('color', on ? '#fff' : '', 'important'); x.style.setProperty('border-color', on ? '#185FA5' : '', 'important'); });
+}
+async function qrGuardar() {
+  const msg = t => { QR_MSG = t; if ($('qrMsg')) $('qrMsg').textContent = t; };
+  if (!QR_SAL) return msg('Elegí TP, SL o BE.');
+  let usd = parseFloat($('qrAmt').value);
+  if (isNaN(usd)) return msg('Poné el monto.');
+  if (QR_SAL === 'SL') usd = -Math.abs(usd); else if (QR_SAL === 'TP') usd = Math.abs(usd);
+  const E = estadoCuentas(), e = E.find(x => x.c.enTurno);
+  if (!e) return msg('No hay cuenta en turno.');
+  $('qrGo').disabled = true;
+  try {
+    const ahora = new Date(), n = TRADES.reduce((m, t) => Math.max(m, num(t.num)), 0) + 1;
+    const nota = $('qrNota').value.trim(), prep = CHK.every(Boolean);
+    const t = { num: n, fecha: diaTz(ahora, 'Europe/Madrid'), hora: horaTz(ahora, 'Europe/Madrid'), cuenta: e.c.id, estado: e.estado, salida: QR_SAL, usd, riesgo: e.riesgo, target: e.target,
+      nota: 'Registro rápido: ' + (nota ? nota + ' · ' : '') + 'sesión preparada: ' + (prep ? 'Sí' : 'No'), registrado: ahora.getTime(), rapido: true };
+    const b = writeBatch(db);
+    b.set(doc(ucol('trades')), t);
+    let rot = 'Turno: sigue la misma cuenta.';
+    if (QR_SAL === 'SL') {
+      const act = CUENTAS.filter(c => c.activa);
+      if (act.length > 1) {
+        const sig = act[(act.findIndex(c => c.id === e.c.id) + 1) % act.length];
+        act.forEach(c => b.set(uref('cuentas', c.id), { enTurno: c.id === sig.id }, { merge: true }));
+        rot = 'Turno: SL → pasa a ' + sig.nombre + '.';
+      } else rot = 'Turno: SL, pero no hay otra cuenta activa; sigue la misma.';
+    }
+    await b.commit();
+    QR_SAL = null;
+    QR_MSG = 'Guardado #' + n + ' · ' + e.c.nombre + ' · ' + t.salida + ' ' + usd + ' $. ' + rot;
+    await cargar();
+  } catch (err) { msg('Error: ' + err.message); if ($('qrGo')) $('qrGo').disabled = false; }
+}
+function renderChk() {
+  const n = CHK.filter(Boolean).length, ok = n === CHK.length;
+  $('chkBox').innerHTML = '<div class="ck' + (ok ? ' ok' : '') + '"><div class="ch" id="chkHead"><span>' + (ok ? '✓ Sesión preparada' : '○ Checklist preoperativa pendiente') + '</span><span>' + n + '/' + CHK.length + ' ' + (CHK_OPEN ? '▾' : '▸') + '</span></div><div class="bar"><i style="width:' + Math.round(n / CHK.length * 100) + '%"></i></div>'
+    + (CHK_OPEN ? CHK_ITEMS.map((t, k) => '<label><input type="checkbox" data-chk="' + k + '"' + (CHK[k] ? ' checked' : '') + '>' + esc(t) + '</label>').join('') : '') + '</div>';
+}
+function renderCuentas() {
+  $('ctaTabla').innerHTML = CUENTAS.length ? '<table><thead><tr><th>Orden</th><th>Cuenta</th><th>Fase</th><th class="num">Tamaño</th><th class="num">Balance firma</th><th class="num">Mínimo firma</th><th>Sincronizada</th><th>Turno</th><th>Activa</th><th></th></tr></thead><tbody>'
+    + CUENTAS.map(c => '<tr><td>' + c.orden + '</td><td><b>' + esc(c.nombre) + '</b><div class="mut" style="font:11px var(--mono)">' + esc(c.id) + '</div></td><td>' + esc(c.fase) + '</td><td class="num">' + money(c.tam) + '</td><td class="num">' + money(c.balance) + '</td><td class="num">' + money(c.minimo) + '</td><td class="mut">' + (c.syncAt ? new Date(c.syncAt).toLocaleString('es-ES', { timeZone: 'Europe/Madrid', dateStyle: 'short', timeStyle: 'short' }) : '—') + '</td>'
+      + '<td>' + (c.enTurno ? '<b style="color:var(--real)">● En turno</b>' : '<button class="link" type="button" data-turno="' + esc(c.id) + '">Poner en turno</button>') + '</td><td>' + (c.activa ? 'Sí' : 'No') + '</td><td><button class="link" type="button" data-edit="' + esc(c.id) + '">✎ Editar / sincronizar</button></td></tr>').join('') + '</tbody></table>'
+    : '<div class="empty">Sin cuentas todavía.</div>';
+}
+function renderTrades() {
+  $('trTabla').innerHTML = TRADES.length ? '<table><thead><tr><th>Nº</th><th>Fecha</th><th>Hora</th><th>Cuenta</th><th>Estado</th><th>Salida</th><th class="num">Resultado</th><th class="num">Riesgo</th><th class="num">R</th><th>Nota</th><th></th></tr></thead><tbody>'
+    + TRADES.map(t => { const c = CUENTAS.find(x => x.id === t.cuenta), s = String(t.salida).toLowerCase(), r = t.riesgo > 0 ? t.usd / t.riesgo : null;
+      return '<tr><td>' + t.num + '</td><td>' + esc(t.fecha.split('-').reverse().join('/')) + '</td><td>' + esc(t.hora) + '</td><td>' + esc(c ? c.nombre : t.cuenta) + '</td><td>' + (ICON[t.estado] || '') + ' ' + esc(t.estado) + '</td><td><span class="pill ' + s + '">' + esc(t.salida) + '</span></td>'
+        + '<td class="num ' + (t.usd > 0 ? 'pos' : t.usd < 0 ? 'neg' : '') + '">' + money(t.usd) + '</td><td class="num">' + money(t.riesgo) + '</td><td class="num">' + (r == null ? '—' : (r > 0 ? '+' : '') + r.toFixed(2).replace('.', ',') + 'R') + '</td><td class="mut" style="white-space:normal;min-width:160px">' + esc(t.nota) + '</td>'
+        + '<td><button class="link" type="button" data-del="' + esc(t._id) + '" title="Borrar">🗑</button></td></tr>'; }).join('') + '</tbody></table>'
+    : '<div class="empty">Sin trades todavía.</div>';
+}
+async function renderAdmin() {
+  const al = await getDocs(collection(db, 'allow'));
+  $('allowList').innerHTML = al.docs.map(d => '<div class="row" style="justify-content:space-between;border-bottom:1px solid var(--line);padding:6px 0"><span><b>' + esc(d.data().nombre || '') + '</b> · ' + esc(d.id) + '</span>' + (d.id === ADMIN ? '<span class="mut">admin</span>' : '<button class="link" type="button" data-unallow="' + esc(d.id) + '">Quitar</button>') + '</div>').join('') || '<div class="mut">Nadie autorizado.</div>';
+  const tm = await getDoc(doc(db, 'config', 'tablaMaestra')), d = tm.exists() ? tm.data() : SEED_TM;
+  $('tmFuente').textContent = (d.fuente || '') + (d.actualizado ? ' · guardada ' + new Date(d.actualizado).toLocaleString('es-ES', { timeZone: 'Europe/Madrid', dateStyle: 'short', timeStyle: 'short' }) : '');
+  $('tmEdit').innerHTML = '<table><thead><tr><th>Estado</th><th>Margen efectivo (regla)</th><th>Riesgo (% de la cuenta)</th><th>Target</th></tr></thead><tbody>'
+    + ESTADOS.map(s => { const f = d.filas[s]; return '<tr><td>' + ICON[s] + ' ' + s + '</td><td class="mut">' + esc(f.regla || '') + '</td><td><input data-tmr="' + s + '" type="number" step="0.1" value="' + (f.riesgo * 100).toFixed(1) + '" style="width:90px"> %</td><td><input data-tmt="' + s + '" value="' + esc(f.target) + '"></td></tr>'; }).join('')
+    + '</tbody></table><div class="row" style="margin-top:10px"><input id="tmFuenteIn" placeholder="Fuente (ej. BT 30/10/2026 · 120 trades)" style="min-width:280px"><button class="pri" type="button" id="btnTm">Guardar tabla</button></div><div class="msg" id="tmMsg"></div>';
+}
+
+// ---------- acciones ----------
+function llenarForm(c) {
+  EDIT_ID = c ? c.id : null;
+  $('ctaFormTit').textContent = c ? 'Editar / sincronizar · ' + c.nombre : 'Agregar cuenta';
+  $('btnCtaNueva').hidden = !c; $('fId').disabled = !!c;
+  const v = (id, x) => { $(id).value = x == null ? '' : x; };
+  v('fNombre', c?.nombre ?? ''); v('fId', c?.id ?? ''); v('fFirma', c?.firma ?? 'Lucid'); v('fFase', c?.fase ?? 'Evaluación'); v('fTam', c?.tam ?? 25000); v('fDd', c?.dd ?? 1000);
+  v('fDll', c && c.dll ? c.dll : ''); v('fBal', c?.balance ?? ''); v('fMin', c?.minimo ?? ''); v('fTipo', c?.tipoDD ?? 'Trailing EOD'); v('fLockMin', c ? (c.lockMin || '') : 25100); v('fLockCierre', c ? (c.lockCierre || '') : 26100);
+  v('fObj', c ? (c.objetivo || '') : 1250); v('fOrden', c?.orden ?? (CUENTAS.reduce((m, x) => Math.max(m, x.orden), 0) + 1)); v('fActiva', c && !c.activa ? 'No' : 'Sí');
+  $('ctaMsg').textContent = c ? 'Para sincronizar: copiá balance y mínimo de la firma y guardá.' : ''; $('ctaMsg').className = 'msg';
+}
+async function guardarCuenta() {
+  const m = (t, ok) => { $('ctaMsg').textContent = t; $('ctaMsg').className = 'msg ' + (ok ? 'ok' : 'err'); };
+  const id = $('fId').value.trim();
+  if (!id) return m('Falta el ID de la cuenta.');
+  if (!EDIT_ID && CUENTAS.some(c => c.id === id)) return m('Ya existe una cuenta con ese ID.');
+  if (/[\/]/.test(id)) return m('El ID no puede tener "/".');
+  const tam = num($('fTam').value), dd = num($('fDd').value), bal = num($('fBal').value), min = num($('fMin').value);
+  if (!(tam > 0 && dd > 0 && bal > 0 && min > 0)) return m('Completá tamaño, DD inicial, balance y mínimo.');
+  const prev = CUENTAS.find(c => c.id === EDIT_ID);
+  const d = { id, nombre: $('fNombre').value.trim() || id, firma: $('fFirma').value.trim(), fase: $('fFase').value, tam, dd, dll: num($('fDll').value), balance: bal, minimo: min,
+    tipoDD: $('fTipo').value, lockMin: num($('fLockMin').value), lockCierre: num($('fLockCierre').value), objetivo: num($('fObj').value), orden: num($('fOrden').value), activa: $('fActiva').value === 'Sí',
+    enTurno: prev ? prev.enTurno : !CUENTAS.some(c => c.enTurno) };
+  if (!prev || prev.balance !== bal || prev.minimo !== min || !prev.syncAt) d.syncAt = Date.now(); else d.syncAt = prev.syncAt;
+  if (prev && (prev.balance !== bal || prev.minimo !== min)) d.syncAt = Date.now();
+  try { await setDoc(uref('cuentas', id), d, { merge: true }); m('Cuenta guardada.', true); llenarForm(null); await cargar(); } catch (e) { m('Error: ' + e.message); }
+}
+async function ponerTurno(id) {
+  const b = writeBatch(db); CUENTAS.forEach(c => b.set(uref('cuentas', c.id), { enTurno: c.id === id }, { merge: true })); await b.commit(); await cargar();
+}
+
+document.addEventListener('click', async ev => {
+  const el = ev.target.closest('button,[data-chk],.ch'); if (!el) return;
+  if (el.dataset.tab) { document.querySelectorAll('.tab').forEach(b => b.classList.toggle('on', b === el)); ['hoy', 'cuentas', 'trades', 'admin'].forEach(v => $('v-' + v).hidden = v !== el.dataset.tab); return; }
+  if (el.dataset.qr) { QR_SAL = el.dataset.qr; pintarQr(); return; }
+  if (el.id === 'qrGo') return qrGuardar();
+  if (el.id === 'chkHead') { CHK_OPEN = !CHK_OPEN; renderChk(); return; }
+  if (el.id === 'btnCta') return guardarCuenta();
+  if (el.id === 'btnCtaNueva') return llenarForm(null);
+  if (el.dataset.edit) { llenarForm(CUENTAS.find(c => c.id === el.dataset.edit)); $('ctaFormTit').scrollIntoView({ behavior: 'smooth' }); return; }
+  if (el.dataset.turno) return ponerTurno(el.dataset.turno);
+  if (el.dataset.del) { if (!confirm('¿Borrar este trade? No se deshace el cambio de turno.')) return; await deleteDoc(uref('trades', el.dataset.del)); return cargar(); }
+  if (el.id === 'btnAllow') {
+    const e = $('aEmail').value.trim().toLowerCase(); if (!/^\S+@\S+\.\S+$/.test(e)) { $('allowMsg').textContent = 'Correo inválido.'; return; }
+    await setDoc(doc(db, 'allow', e), { nombre: $('aNombre').value.trim(), agregado: Date.now() }); $('aEmail').value = ''; $('aNombre').value = ''; $('allowMsg').textContent = 'Autorizado: ' + e; return renderAdmin();
+  }
+  if (el.dataset.unallow) { if (!confirm('¿Quitar acceso a ' + el.dataset.unallow + '?')) return; await deleteDoc(doc(db, 'allow', el.dataset.unallow)); return renderAdmin(); }
+  if (el.id === 'btnTm') {
+    const filas = {};
+    for (const s of ESTADOS) { const r = num(document.querySelector('[data-tmr="' + s + '"]').value) / 100, t = document.querySelector('[data-tmt="' + s + '"]').value.trim();
+      if (!(r > 0 && r < 0.05) || !t) { $('tmMsg').textContent = 'Revisá ' + s + ': riesgo entre 0 y 5 % y target.'; return; }
+      filas[s] = { regla: SEED_TM.filas[s].regla, riesgo: r, target: t }; }
+    const f = $('tmFuenteIn').value.trim();
+    await setDoc(doc(db, 'config', 'tablaMaestra'), Object.assign({ filas, actualizado: Date.now() }, f ? { fuente: f } : {}), { merge: true });
+    $('tmMsg').textContent = 'Tabla guardada.'; await cargar(); return;
+  }
+});
+document.addEventListener('change', ev => {
+  const k = ev.target.dataset && ev.target.dataset.chk; if (k == null) return;
+  CHK[+k] = ev.target.checked; renderChk();
+  setDoc(uref('meta', 'checklist'), { fecha: hoyES(), m: CHK }).catch(() => {});
+});
+$('btnLogin').onclick = () => signInWithPopup(auth, new GoogleAuthProvider()).catch(e => { $('loginMsg').textContent = e.message; });
+$('btnSalir').onclick = () => signOut(auth);
+
+onAuthStateChanged(auth, async user => {
+  $('loginMsg').textContent = '';
+  if (!user) { U = null; $('app').hidden = true; $('login').hidden = false; return; }
+  const email = (user.email || '').toLowerCase();
+  IS_ADMIN = email === ADMIN;
+  let ok = IS_ADMIN;
+  if (!ok) { try { ok = (await getDoc(doc(db, 'allow', email))).exists(); } catch (e) { ok = false; } }
+  if (!ok) { await signOut(auth); $('login').hidden = false; $('app').hidden = true; $('loginMsg').textContent = email + ' no está autorizado. Pedile acceso a Javier.'; return; }
+  U = user;
+  $('who').textContent = (user.displayName || '') + ' · ' + email;
+  $('tabAdmin').hidden = !IS_ADMIN;
+  $('login').hidden = true; $('app').hidden = false;
+  llenarForm(null);
+  try { await setDoc(uref(), { email, nombre: user.displayName || '', ultimoAcceso: Date.now() }, { merge: true }); await cargar(); }
+  catch (e) { $('cards').innerHTML = '<div class="empty">Error al leer datos: ' + esc(e.message) + '</div>'; }
+});
+</script>
+</body></html>
