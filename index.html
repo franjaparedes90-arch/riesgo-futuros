@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Riesgo Futuros</title>
-<!-- Riesgo Futuros · app multiusuario (Firebase) · v1 (23/10/2026)
+<!-- Riesgo Futuros · app multiusuario (Firebase) · v2 (23/10/2026) · v2: consistencia por cuenta
      Misma lógica que la app de Apps Script (Real_Codigo.gs): Tabla maestra para Funded, regla v7 para challenges,
      rotación (SL → siguiente cuenta), plan B y registro rápido. Cada usuario ve solo sus cuentas y trades.
      La Tabla maestra es compartida (config/tablaMaestra) y solo la edita el admin. -->
@@ -102,6 +102,7 @@ td.num,th.num{text-align:right}
           <label>Mínimo bloqueado en ($)<input id="fLockMin" type="number" value="25100"></label>
           <label>Se bloquea con un cierre de ($)<input id="fLockCierre" type="number" value="26100"></label>
           <label>Objetivo evaluación ($)<input id="fObj" type="number" value="1250"></label>
+          <label>Consistencia (%)<input id="fCons" type="number" value="50"></label>
           <label>Orden<input id="fOrden" type="number"></label>
           <label>Activa<select id="fActiva"><option>Sí</option><option>No</option></select></label>
         </div>
@@ -210,7 +211,7 @@ function aplicarChallenge(e, c, pnl) {
   const obj = c.objetivo > 0 ? c.objetivo : null;
   e.objetivo = obj;
   e.faltan = obj ? Math.max(0, obj - (e.balance - c.tam)) : null;
-  e.tpMaxHoy = obj ? Math.max(0, obj * 0.5 - Math.max(0, pnl.hoy || 0)) : null;
+  e.tpMaxHoy = obj ? Math.max(0, obj * (c.consistencia > 0 ? c.consistencia / 100 : 0.5) - Math.max(0, pnl.hoy || 0)) : null;
   if (obj) e.target = (1.5 * e.riesgo <= e.tpMaxHoy) ? '1,5R fijo' : '1R fijo';
   else e.target = pnl.tpHoy > 0 ? '1R fijo' : '1,5R fijo';
   e.avisoCons = (obj && e.riesgo > e.tpMaxHoy) ? 'TP máx. hoy ' + Math.round(e.tpMaxHoy) + ' $' : '';
@@ -249,7 +250,7 @@ async function cargar() {
 function normCuenta(d) {
   return { id: String(d.id), nombre: d.nombre || d.id, firma: d.firma || '', fase: d.fase || 'Evaluación', tam: num(d.tam), dd: num(d.dd), dll: num(d.dll),
     balance: num(d.balance), minimo: num(d.minimo), orden: num(d.orden), enTurno: !!d.enTurno, activa: d.activa !== false, syncAt: d.syncAt || 0,
-    tipoDD: d.tipoDD || 'Trailing EOD', lockMin: num(d.lockMin), lockCierre: num(d.lockCierre), objetivo: num(d.objetivo) };
+    tipoDD: d.tipoDD || 'Trailing EOD', lockMin: num(d.lockMin), lockCierre: num(d.lockCierre), objetivo: num(d.objetivo), consistencia: num(d.consistencia) || 50 };
 }
 
 // ---------- vistas ----------
@@ -355,7 +356,7 @@ function llenarForm(c) {
   const v = (id, x) => { $(id).value = x == null ? '' : x; };
   v('fNombre', c?.nombre ?? ''); v('fId', c?.id ?? ''); v('fFirma', c?.firma ?? 'Lucid'); v('fFase', c?.fase ?? 'Evaluación'); v('fTam', c?.tam ?? 25000); v('fDd', c?.dd ?? 1000);
   v('fDll', c && c.dll ? c.dll : ''); v('fBal', c?.balance ?? ''); v('fMin', c?.minimo ?? ''); v('fTipo', c?.tipoDD ?? 'Trailing EOD'); v('fLockMin', c ? (c.lockMin || '') : 25100); v('fLockCierre', c ? (c.lockCierre || '') : 26100);
-  v('fObj', c ? (c.objetivo || '') : 1250); v('fOrden', c?.orden ?? (CUENTAS.reduce((m, x) => Math.max(m, x.orden), 0) + 1)); v('fActiva', c && !c.activa ? 'No' : 'Sí');
+  v('fObj', c ? (c.objetivo || '') : 1250); v('fCons', c ? (c.consistencia || 50) : 50); v('fOrden', c?.orden ?? (CUENTAS.reduce((m, x) => Math.max(m, x.orden), 0) + 1)); v('fActiva', c && !c.activa ? 'No' : 'Sí');
   $('ctaMsg').textContent = c ? 'Para sincronizar: copiá balance y mínimo de la firma y guardá.' : ''; $('ctaMsg').className = 'msg';
 }
 async function guardarCuenta() {
@@ -368,7 +369,7 @@ async function guardarCuenta() {
   if (!(tam > 0 && dd > 0 && bal > 0 && min > 0)) return m('Completá tamaño, DD inicial, balance y mínimo.');
   const prev = CUENTAS.find(c => c.id === EDIT_ID);
   const d = { id, nombre: $('fNombre').value.trim() || id, firma: $('fFirma').value.trim(), fase: $('fFase').value, tam, dd, dll: num($('fDll').value), balance: bal, minimo: min,
-    tipoDD: $('fTipo').value, lockMin: num($('fLockMin').value), lockCierre: num($('fLockCierre').value), objetivo: num($('fObj').value), orden: num($('fOrden').value), activa: $('fActiva').value === 'Sí',
+    tipoDD: $('fTipo').value, lockMin: num($('fLockMin').value), lockCierre: num($('fLockCierre').value), objetivo: num($('fObj').value), consistencia: num($('fCons').value) || 50, orden: num($('fOrden').value), activa: $('fActiva').value === 'Sí',
     enTurno: prev ? prev.enTurno : !CUENTAS.some(c => c.enTurno) };
   if (!prev || prev.balance !== bal || prev.minimo !== min || !prev.syncAt) d.syncAt = Date.now(); else d.syncAt = prev.syncAt;
   if (prev && (prev.balance !== bal || prev.minimo !== min)) d.syncAt = Date.now();
