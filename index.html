@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Riesgo Futuros</title>
-<!-- Riesgo Futuros · app multiusuario (Firebase) · v2 (23/10/2026) · v2: consistencia por cuenta
+<!-- Riesgo Futuros · app multiusuario (Firebase) · v3 (23/10/2026) · v3: Cuentas y contabilidad (equity, retiros, compras, resets, reserva, inactividad, caducidad) · v2: consistencia por cuenta
      Misma lógica que la app de Apps Script (Real_Codigo.gs): Tabla maestra para Funded, regla v7 para challenges,
      rotación (SL → siguiente cuenta), plan B y registro rápido. Cada usuario ve solo sus cuentas y trades.
      La Tabla maestra es compartida (config/tablaMaestra) y solo la edita el admin. -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 :root{color-scheme:light;--bg:#d4e5fa;--card:#eaf3ff;--card-2:#fff;--line:#c5d8f1;--line-2:#a8c3e8;--text:#12223b;--text-2:#36506f;--muted:#5a6f90;--pos:#0e8a5c;--neg:#c23b3b;--real:#2f6fd1;--sel:#185FA5;--warn:#7a5200;--warn-bg:#fdf1d6;--warn-line:#e6c272;--mono:ui-monospace,Menlo,Consolas,monospace}
 *{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 Inter,system-ui,'Segoe UI',sans-serif}
@@ -58,6 +59,22 @@ td.num,th.num{text-align:right}
 #login .card{padding:28px 22px}
 #login p{color:var(--text-2)}
 .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}
+.kpi{background:var(--card-2);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.kpi .l{font:10px var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}.kpi .v{font-size:21px;font-weight:700;margin-top:3px;font-variant-numeric:tabular-nums}.kpi .d{font:11px var(--mono);color:var(--text-2);margin-top:2px}
+.grp{font:600 11px var(--mono);letter-spacing:.08em;color:var(--text-2);margin:14px 0 6px;text-transform:uppercase}
+.cc{background:var(--card-2);border:1px solid var(--line-2);border-radius:10px;padding:10px 12px;cursor:pointer}
+.cc.turno{border:2px solid var(--real)}.cc.res{border-style:dashed}.cc.sel{box-shadow:0 0 0 3px rgba(47,111,209,.35)}
+.cc .top{display:flex;justify-content:space-between;gap:6px;align-items:baseline}.cc .eq{font-size:20px;font-weight:700;font-variant-numeric:tabular-nums}
+.tag{font:11px var(--mono);padding:1px 7px;border-radius:99px;border:1px solid var(--line-2);background:#fff;color:var(--text-2)}
+.tag.f{background:#dbe9fc;color:#185FA5;border-color:#9cbbe8}.tag.c{background:var(--warn-bg);color:var(--warn);border-color:var(--warn-line)}.tag.r{background:#eef2f7}.tag.q{color:var(--neg);border-color:#eba3a3}.tag.p{color:var(--pos);border-color:#8fd3b6}
+.mini{display:block;width:100%;height:34px;margin:4px 0}
+.pbar{height:6px;background:#dbe6f5;border-radius:99px;overflow:hidden;margin-top:4px}.pbar i{display:block;height:100%}
+.acts{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}.acts button{padding:4px 9px;font-size:12px}
+.chartBox{position:relative;height:240px}
+.inl{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;align-items:end;margin-top:8px}
+.inl label{display:flex;flex-direction:column;gap:3px;font:10px var(--mono);text-transform:uppercase;color:var(--muted)}
+.warn.bad{background:#fde6e6;border-color:#eba3a3;color:#9b2222}
 @media(max-width:560px){.kv{grid-template-columns:repeat(2,1fr)}.acc .hero b{font-size:19px}}
 </style></head><body>
 <div class="wrap">
@@ -72,7 +89,8 @@ td.num,th.num{text-align:right}
       <div><h1>Riesgo Futuros</h1><div class="sub" id="who"></div></div>
       <nav>
         <button class="tab on" data-tab="hoy" type="button">Hoy</button>
-        <button class="tab" data-tab="cuentas" type="button">Mis cuentas</button>
+        <button class="tab" data-tab="cuentas" type="button">Cuentas</button>
+        <button class="tab" data-tab="conta" type="button">Contabilidad</button>
         <button class="tab" data-tab="trades" type="button">Trades</button>
         <button class="tab" data-tab="admin" type="button" id="tabAdmin" hidden>Admin</button>
         <button type="button" id="btnSalir">Salir</button>
@@ -84,7 +102,12 @@ td.num,th.num{text-align:right}
       <div class="accs" id="cards"></div>
     </section>
     <section id="v-cuentas" hidden>
-      <div class="sec"><h2>Mis cuentas</h2><span class="hint">Orden = rotación. Balance y mínimo se copian de la firma (Lucid) al sincronizar.</span></div>
+      <div class="kpis" id="ctaKpis"></div>
+      <div class="sec"><h2>Evolución del equity</h2><span class="hint">Suma de cuentas fondeadas activas · cada trade mueve la curva, los retiros son caídas</span></div>
+      <div class="card"><div class="chartBox"><canvas id="chCartera"></canvas></div></div>
+      <div id="ctaGrupos"></div>
+      <div id="ctaDet"></div>
+      <div class="sec"><h2>Tabla de cuentas</h2><span class="hint">Orden = rotación. Balance y mínimo se copian de la firma (Lucid) al sincronizar.</span></div>
       <div class="card tbl" id="ctaTabla"></div>
       <div class="sec"><h2 id="ctaFormTit">Agregar cuenta</h2></div>
       <div class="card">
@@ -104,10 +127,36 @@ td.num,th.num{text-align:right}
           <label>Objetivo evaluación ($)<input id="fObj" type="number" value="1250"></label>
           <label>Consistencia (%)<input id="fCons" type="number" value="50"></label>
           <label>Orden<input id="fOrden" type="number"></label>
-          <label>Activa<select id="fActiva"><option>Sí</option><option>No</option></select></label>
+          <label>En rotación<select id="fActiva"><option>Sí</option><option>No</option></select></label>
+          <label>Estado<select id="fEstado"><option>Activa</option><option>Pasada</option><option>Quemada</option></select></label>
+          <label>Fecha de alta<input id="fAlta" type="date"></label>
+          <label>Coste ($)<input id="fCoste" type="number" step="0.01"></label>
+          <label>Aviso inactividad (días)<input id="fInact" type="number" value="30"></label>
+          <label>Caducidad del challenge (opcional)<input id="fCad" type="date"></label>
         </div>
         <div class="row" style="margin-top:12px"><button class="pri" type="button" id="btnCta">Guardar cuenta</button><button type="button" id="btnCtaNueva" hidden>Cancelar edición</button></div>
         <div class="msg" id="ctaMsg"></div>
+      </div>
+    </section>
+    <section id="v-conta" hidden>
+      <div class="kpis" id="coKpis"></div>
+      <div class="sec"><h2>Evolución mensual</h2><span class="hint">Gastos (compras y resets) vs payouts netos</span></div>
+      <div class="card"><div class="chartBox"><canvas id="chMes"></canvas></div></div>
+      <div class="sec"><h2>Por firma</h2></div>
+      <div class="card tbl" id="coFirmas"></div>
+      <div class="sec"><h2>Movimientos</h2><span class="hint">Compras, resets y retiros</span></div>
+      <div class="card">
+        <div class="tbl" id="coMovs"></div>
+        <div class="inl">
+          <label>Tipo<select id="mTipo"><option>Compra</option><option>Reset</option><option>Retiro</option></select></label>
+          <label>Cuenta<select id="mCta"></select></label>
+          <label>Fecha<input id="mFecha" type="date"></label>
+          <label>Importe ($) · en retiro, bruto<input id="mImp" type="number" step="0.01"></label>
+          <label>Split trader (%) · solo retiro<input id="mSplit" type="number" value="90"></label>
+          <label>Nota<input id="mNota" placeholder="cupón, pedido…"></label>
+          <button class="pri" type="button" id="btnMov">Agregar</button>
+        </div>
+        <div class="msg" id="movMsg"></div>
       </div>
     </section>
     <section id="v-trades" hidden>
@@ -155,10 +204,11 @@ const UMBRAL_NORMAL = 0.60, ACEL_DD_PEAK = 0.10, CIERRE_NY = 17;
 const CH_R_PCT = 0.01, CH_MIN_PCT = 0.004;
 const CHK_ITEMS = ['Noticias y festivos de EE. UU. revisados', 'Sentado como tarde a las 15:15', 'Riesgo listo y Tradesea abierto en la cuenta en turno', 'Niveles marcados antes de las 15:25'];
 
-let U = null, IS_ADMIN = false, TM = null, CUENTAS = [], TRADES = [], CHK = CHK_ITEMS.map(() => false), CHK_OPEN = true, QR_SAL = null, QR_MSG = '', EDIT_ID = null;
+let U = null, IS_ADMIN = false, TM = null, CUENTAS = [], TRADES = [], CHK = CHK_ITEMS.map(() => false), CHK_OPEN = true, QR_SAL = null, QR_MSG = '', EDIT_ID = null, MOVS = [], SEL_CTA = null, CHARTS = {};
 const $ = id => document.getElementById(id);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const money = x => (x == null || isNaN(x)) ? '—' : (x < 0 ? '−' : '') + Math.abs(Math.round(x)).toLocaleString('es-ES') + ' $';
+const money2 = x => (x == null || isNaN(x)) ? '—' : (x < 0 ? '−' : '') + Math.abs(x).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' $';
 const pct = x => (x * 100).toFixed(1).replace('.', ',') + ' %';
 const num = v => { const n = parseFloat(String(v ?? '').replace(',', '.')); return isNaN(n) ? 0 : n; };
 const fmtTz = (d, tz, o) => new Intl.DateTimeFormat('en-CA', Object.assign({ timeZone: tz, hour12: false }, o)).format(d);
@@ -220,7 +270,7 @@ function aplicarChallenge(e, c, pnl) {
 function estadoCuentas() {
   const ahora = new Date(), hoyNY = diaTz(ahora, 'America/New_York'), horaNY = parseInt(horaTz(ahora, 'America/New_York'), 10);
   const cerrado = d => d < hoyNY || (d === hoyNY && horaNY >= CIERRE_NY);
-  return CUENTAS.filter(c => c.activa).map(c => {
+  return CUENTAS.filter(c => c.activa && c.estado === 'Activa').map(c => {
     const pnl = pnlCuenta(c.id, c.syncAt);
     const syncDia = c.syncAt ? diaTz(new Date(c.syncAt), 'Europe/Madrid') : '';
     const m = (syncDia && c.tipoDD !== 'Estático') ? calcMinimo(c, pnl.dias, syncDia, cerrado) : { minimo: c.minimo, bloqueado: false };
@@ -243,6 +293,8 @@ async function cargar() {
   CUENTAS = cs.docs.map(d => normCuenta(d.data())).sort((a, b) => a.orden - b.orden);
   const ts = await getDocs(query(ucol('trades'), orderBy('registrado', 'desc')));
   TRADES = ts.docs.map(d => Object.assign({ _id: d.id }, d.data()));
+  const ms = await getDocs(ucol('movimientos'));
+  MOVS = ms.docs.map(d => Object.assign({ _id: d.id }, d.data()));
   const ck = await getDoc(uref('meta', 'checklist'));
   CHK = (ck.exists() && ck.data().fecha === hoyES() && Array.isArray(ck.data().m) && ck.data().m.length === CHK_ITEMS.length) ? ck.data().m : CHK_ITEMS.map(() => false);
   render();
@@ -250,19 +302,22 @@ async function cargar() {
 function normCuenta(d) {
   return { id: String(d.id), nombre: d.nombre || d.id, firma: d.firma || '', fase: d.fase || 'Evaluación', tam: num(d.tam), dd: num(d.dd), dll: num(d.dll),
     balance: num(d.balance), minimo: num(d.minimo), orden: num(d.orden), enTurno: !!d.enTurno, activa: d.activa !== false, syncAt: d.syncAt || 0,
-    tipoDD: d.tipoDD || 'Trailing EOD', lockMin: num(d.lockMin), lockCierre: num(d.lockCierre), objetivo: num(d.objetivo), consistencia: num(d.consistencia) || 50 };
+    tipoDD: d.tipoDD || 'Trailing EOD', lockMin: num(d.lockMin), lockCierre: num(d.lockCierre), objetivo: num(d.objetivo), consistencia: num(d.consistencia) || 50,
+    estado: d.estado || 'Activa', alta: d.alta || d.fechaPago || '', coste: num(d.coste), fechaPago: d.fechaPago || '', costeNota: d.costeNota || '',
+    inactividad: num(d.inactividad) || 30, caducidad: d.caducidad || '' };
 }
 
 // ---------- vistas ----------
-function render() { renderHoy(); renderCuentas(); renderTrades(); if (IS_ADMIN) renderAdmin(); }
+function render() { renderHoy(); renderCuentas(); renderCtaPage(); renderConta(); renderTrades(); if (IS_ADMIN) renderAdmin(); }
 function renderHoy() {
   renderChk();
   if (!TM) { $('cards').innerHTML = '<div class="empty">Falta la Tabla maestra. Avisale a Javier.</div>'; return; }
   const E = estadoCuentas();
   const viejas = E.filter(e => e.syncDias > 7);
-  $('avisos').innerHTML = (E.length && !E.some(e => e.c.enTurno) ? '<div class="warn">Ninguna cuenta está en turno: marcá una en Mis cuentas.</div>' : '')
-    + (viejas.length ? '<div class="warn">Hace más de 7 días que no sincronizás con la firma: ' + viejas.map(e => esc(e.c.nombre)).join(', ') + '. Actualizá balance y mínimo en Mis cuentas.</div>' : '');
-  if (!E.length) { $('cards').innerHTML = '<div class="empty">Todavía no cargaste cuentas. Andá a <b>Mis cuentas</b> y agregá la primera.</div>'; return; }
+  $('avisos').innerHTML = (E.length && !E.some(e => e.c.enTurno) ? '<div class="warn">Ninguna cuenta está en turno: marcá una en Cuentas.</div>' : '')
+    + (viejas.length ? '<div class="warn">Hace más de 7 días que no sincronizás con la firma: ' + viejas.map(e => esc(e.c.nombre)).join(', ') + '. Actualizá balance y mínimo en Cuentas.</div>' : '')
+    + avisosCuentas().map(a => '<div class="warn' + (a.bad ? ' bad' : '') + '">' + a.t + '</div>').join('');
+  if (!E.length) { $('cards').innerHTML = '<div class="empty">Todavía no cargaste cuentas. Andá a <b>Cuentas</b> y agregá la primera.</div>'; return; }
   $('cards').innerHTML = E.slice().sort((a, b) => (b.c.enTurno ? 1 : 0) - (a.c.enTurno ? 1 : 0)).map(e => {
     const c = e.c, t = c.enTurno;
     return '<div class="acc' + (t ? ' turno' : '') + '"><div class="top"><span class="nm">' + esc(c.nombre) + '</span><span class="tg">' + (t ? 'EN TURNO · ' : '') + esc(c.fase) + (c.fase === 'Funded' ? ' · umbral Crítica ' + Math.round(e.umbral * 100) + ' %' : '') + '</span></div>'
@@ -356,7 +411,7 @@ function llenarForm(c) {
   const v = (id, x) => { $(id).value = x == null ? '' : x; };
   v('fNombre', c?.nombre ?? ''); v('fId', c?.id ?? ''); v('fFirma', c?.firma ?? 'Lucid'); v('fFase', c?.fase ?? 'Evaluación'); v('fTam', c?.tam ?? 25000); v('fDd', c?.dd ?? 1000);
   v('fDll', c && c.dll ? c.dll : ''); v('fBal', c?.balance ?? ''); v('fMin', c?.minimo ?? ''); v('fTipo', c?.tipoDD ?? 'Trailing EOD'); v('fLockMin', c ? (c.lockMin || '') : 25100); v('fLockCierre', c ? (c.lockCierre || '') : 26100);
-  v('fObj', c ? (c.objetivo || '') : 1250); v('fCons', c ? (c.consistencia || 50) : 50); v('fOrden', c?.orden ?? (CUENTAS.reduce((m, x) => Math.max(m, x.orden), 0) + 1)); v('fActiva', c && !c.activa ? 'No' : 'Sí');
+  v('fObj', c ? (c.objetivo || '') : 1250); v('fCons', c ? (c.consistencia || 50) : 50); v('fOrden', c?.orden ?? (CUENTAS.reduce((m, x) => Math.max(m, x.orden), 0) + 1)); v('fActiva', c && !c.activa ? 'No' : 'Sí'); v('fEstado', c ? c.estado : 'Activa'); v('fAlta', c ? c.alta : hoyES()); v('fCoste', c ? (c.coste || '') : ''); v('fInact', c ? c.inactividad : 30); v('fCad', c ? c.caducidad : '');
   $('ctaMsg').textContent = c ? 'Para sincronizar: copiá balance y mínimo de la firma y guardá.' : ''; $('ctaMsg').className = 'msg';
 }
 async function guardarCuenta() {
@@ -369,7 +424,8 @@ async function guardarCuenta() {
   if (!(tam > 0 && dd > 0 && bal > 0 && min > 0)) return m('Completá tamaño, DD inicial, balance y mínimo.');
   const prev = CUENTAS.find(c => c.id === EDIT_ID);
   const d = { id, nombre: $('fNombre').value.trim() || id, firma: $('fFirma').value.trim(), fase: $('fFase').value, tam, dd, dll: num($('fDll').value), balance: bal, minimo: min,
-    tipoDD: $('fTipo').value, lockMin: num($('fLockMin').value), lockCierre: num($('fLockCierre').value), objetivo: num($('fObj').value), consistencia: num($('fCons').value) || 50, orden: num($('fOrden').value), activa: $('fActiva').value === 'Sí',
+    tipoDD: $('fTipo').value, lockMin: num($('fLockMin').value), lockCierre: num($('fLockCierre').value), objetivo: num($('fObj').value), consistencia: num($('fCons').value) || 50, orden: num($('fOrden').value), activa: $('fActiva').value === 'Sí' && $('fEstado').value === 'Activa',
+    estado: $('fEstado').value, alta: $('fAlta').value, coste: num($('fCoste').value), inactividad: num($('fInact').value) || 30, caducidad: $('fCad').value,
     enTurno: prev ? prev.enTurno : !CUENTAS.some(c => c.enTurno) };
   if (!prev || prev.balance !== bal || prev.minimo !== min || !prev.syncAt) d.syncAt = Date.now(); else d.syncAt = prev.syncAt;
   if (prev && (prev.balance !== bal || prev.minimo !== min)) d.syncAt = Date.now();
@@ -379,9 +435,178 @@ async function ponerTurno(id) {
   const b = writeBatch(db); CUENTAS.forEach(c => b.set(uref('cuentas', c.id), { enTurno: c.id === id }, { merge: true })); await b.commit(); await cargar();
 }
 
+// ---------- cuentas y contabilidad (v3) ----------
+const diasEntre = (a, b) => Math.floor((Date.parse(b) - Date.parse(a)) / 86400000);
+const fmtF = d => d ? d.split('-').reverse().join('/') : '—';
+const netoMov = m => m.tipo === 'Retiro' ? num(m.importe) * (num(m.split) || 100) / 100 : num(m.importe);
+function compras() {
+  const L = CUENTAS.filter(c => c.coste > 0).map(c => ({ _id: '', fecha: c.fechaPago || c.alta, tipo: 'Compra', cuenta: c.id, importe: c.coste, nota: c.costeNota || 'alta de la cuenta', fija: true }));
+  return L.concat(MOVS).sort((a, b) => String(b.fecha).localeCompare(String(a.fecha)));
+}
+function ultimaActividad(c) {
+  const t = TRADES.filter(x => x.cuenta === c.id).map(x => x.fecha).sort().pop();
+  return [t, c.alta].filter(Boolean).sort().pop() || '';
+}
+function avisosCuentas() {
+  const out = [], hoy = hoyES();
+  CUENTAS.filter(c => c.estado === 'Activa').forEach(c => {
+    const u = ultimaActividad(c);
+    if (u) {
+      const d = diasEntre(u, hoy), q = c.inactividad - d;
+      if (q <= 7) out.push({ bad: q <= 3, t: '⏳ <b>' + esc(c.nombre) + '</b>: ' + d + ' días sin operar' + (q > 0 ? ' · quedan ' + q + ' para la regla de inactividad (' + c.inactividad + ' días)' : ' · pasó el límite de inactividad (' + c.inactividad + ' días): revisalo en la firma') + (c.activa ? '' : ' · está en reserva') + '.' });
+    }
+    if (c.caducidad && c.fase === 'Evaluación') {
+      const q = diasEntre(hoy, c.caducidad);
+      if (q <= 7) out.push({ bad: q <= 2, t: '📅 <b>' + esc(c.nombre) + '</b>: el challenge caduca el ' + fmtF(c.caducidad) + (q >= 0 ? ' (quedan ' + q + ' días).' : ' (ya caducó).') });
+    }
+  });
+  return out;
+}
+function serieCuenta(c) {
+  const ev = TRADES.filter(t => t.cuenta === c.id).map(t => ({ f: t.fecha + ' ' + (t.hora || ''), v: num(t.usd) }))
+    .concat(MOVS.filter(m => m.cuenta === c.id && m.tipo === 'Retiro').map(m => ({ f: m.fecha + ' 23:59', v: -num(m.importe), r: true })))
+    .concat(MOVS.filter(m => m.cuenta === c.id && m.tipo === 'Reset').map(m => ({ f: m.fecha + ' 00:00', reset: true })))
+    .sort((a, b) => a.f.localeCompare(b.f));
+  let bal = c.tam; const pts = [{ x: c.alta || (ev[0] ? ev[0].f.slice(0, 10) : hoyES()), y: bal }];
+  ev.forEach(e => { if (e.reset) bal = c.tam; else bal += e.v; pts.push({ x: e.f.slice(0, 10), y: Math.round(bal * 100) / 100, r: e.r }); });
+  const actual = c.estado === 'Activa' ? (estadoCuentas().find(x => x.c.id === c.id)?.balance ?? c.balance) : bal;
+  if (c.estado === 'Activa' && Math.abs(actual - bal) > 0.5) pts.push({ x: hoyES(), y: actual, ajuste: Math.round((actual - bal) * 100) / 100 });
+  return pts;
+}
+function spark(pts, color) {
+  if (pts.length < 2) return '<svg class="mini" viewBox="0 0 200 34"><line x1="0" y1="17" x2="200" y2="17" stroke="#9cbbe8" stroke-dasharray="3 3"/></svg>';
+  const ys = pts.map(p => p.y), mn = Math.min(...ys), mx = Math.max(...ys), r = mx - mn || 1;
+  return '<svg class="mini" viewBox="0 0 200 34" preserveAspectRatio="none"><polyline fill="none" stroke="' + color + '" stroke-width="1.6" points="' + pts.map((p, i) => (i / (pts.length - 1) * 200).toFixed(1) + ',' + (31 - (p.y - mn) / r * 28).toFixed(1)).join(' ') + '"/></svg>';
+}
+function statsCuenta(c) {
+  const T = TRADES.filter(t => t.cuenta === c.id), tp = T.filter(t => t.salida === 'TP').length, sl = T.filter(t => t.salida === 'SL').length;
+  const g = T.filter(t => t.usd > 0).reduce((a, t) => a + num(t.usd), 0), p = -T.filter(t => t.usd < 0).reduce((a, t) => a + num(t.usd), 0);
+  const ret = MOVS.filter(m => m.cuenta === c.id && m.tipo === 'Retiro'), inv = c.coste + MOVS.filter(m => m.cuenta === c.id && m.tipo !== 'Retiro').reduce((a, m) => a + num(m.importe), 0);
+  return { n: T.length, tp, sl, be: T.length - tp - sl, wr: tp + sl ? tp / (tp + sl) : null, pf: p ? g / p : null, bruto: ret.reduce((a, m) => a + num(m.importe), 0), neto: ret.reduce((a, m) => a + netoMov(m), 0), nRet: ret.length, inv };
+}
+function grupoDe(c) { return c.estado === 'Quemada' ? 'Quemadas' : c.estado === 'Pasada' ? 'Pasadas' : !c.activa ? 'Reserva' : c.fase === 'Funded' ? 'Fondeadas' : 'Challenges'; }
+function renderCtaPage() {
+  if (!$('ctaKpis')) return;
+  const E = TM ? estadoCuentas() : [], act = CUENTAS.filter(c => c.estado === 'Activa'), fund = act.filter(c => c.fase === 'Funded'), ch = act.filter(c => c.fase !== 'Funded');
+  const balAct = c => E.find(x => x.c.id === c.id)?.balance ?? c.balance;
+  const profitF = fund.reduce((a, c) => a + balAct(c) - c.tam, 0), C = compras(), gast = C.filter(m => m.tipo !== 'Retiro').reduce((a, m) => a + num(m.importe), 0), pay = C.filter(m => m.tipo === 'Retiro').reduce((a, m) => a + netoMov(m), 0);
+  $('ctaKpis').innerHTML = [['Capital fondeado', money(fund.reduce((a, c) => a + c.tam, 0)), fund.length + ' funded activa' + (fund.length === 1 ? '' : 's')],
+    ['En challenge', money(ch.reduce((a, c) => a + c.tam, 0)), ch.filter(c => c.activa).length + ' en rotación · ' + ch.filter(c => !c.activa).length + ' en reserva'],
+    ['Profit fondeado', '<span class="' + (profitF < 0 ? 'neg' : 'pos') + '">' + money(profitF) + '</span>', 'desde el alta · cuentas activas'],
+    ['Invertido / retirado', money2(gast) + ' / ' + money2(pay), 'neto ' + money2(pay - gast)]].map(k => '<div class="kpi"><div class="l">' + k[0] + '</div><div class="v">' + k[1] + '</div><div class="d">' + k[2] + '</div></div>').join('');
+  // cartera
+  const serF = fund.map(serieCuenta), fechas = [...new Set(serF.flat().map(p => p.x))].sort();
+  const tot = fechas.map(f => serF.reduce((a, s) => { const q = s.filter(p => p.x <= f).pop(); return a + (q ? q.y : s[0].y); }, 0));
+  dibujar('chCartera', fechas.map(fmtF), [{ data: tot, borderColor: '#2f6fd1', backgroundColor: 'rgba(47,111,209,.12)', fill: true, tension: .25, pointRadius: 0 }]);
+  // grupos
+  const orden = ['Fondeadas', 'Challenges', 'Reserva', 'Pasadas', 'Quemadas'];
+  $('ctaGrupos').innerHTML = orden.map(g => {
+    const L = CUENTAS.filter(c => grupoDe(c) === g); if (!L.length) return '';
+    return '<div class="grp">' + g + ' · ' + L.length + '</div><div class="accs">' + L.map(c => tarjeta(c, E.find(x => x.c.id === c.id))).join('') + '</div>';
+  }).join('') || '<div class="empty">Sin cuentas todavía. Agregá la primera abajo.</div>';
+  // detalle
+  const c = CUENTAS.find(x => x.id === SEL_CTA);
+  if (!c) { $('ctaDet').innerHTML = ''; return; }
+  const st = statsCuenta(c), pts = serieCuenta(c), eq = pts[pts.length - 1].y, T = TRADES.filter(t => t.cuenta === c.id), R = MOVS.filter(m => m.cuenta === c.id && m.tipo === 'Retiro');
+  const mes = {}; T.forEach(t => { const k = t.fecha.slice(0, 7); mes[k] = (mes[k] || 0) + num(t.usd); });
+  $('ctaDet').innerHTML = '<div class="sec"><h2>' + esc(c.nombre) + '</h2><span class="hint">' + esc(c.id) + ' · ' + esc(c.firma) + ' · alta ' + fmtF(c.alta) + (c.caducidad ? ' · caduca ' + fmtF(c.caducidad) : '') + '</span><button class="link" type="button" data-edit="' + esc(c.id) + '">✎ Editar / sincronizar</button></div>'
+    + '<div class="kpis">' + [['Equity', money(eq)], ['Profit', '<span class="' + (eq - c.tam < 0 ? 'neg' : 'pos') + '">' + money(eq - c.tam + st.bruto) + '</span>'], ['Trades', st.n + ' · ' + st.tp + ' TP · ' + st.sl + ' SL · ' + st.be + ' BE'], ['Winrate', st.wr == null ? '—' : Math.round(st.wr * 100) + ' %'], ['Profit factor', st.pf == null ? '—' : st.pf.toFixed(2).replace('.', ',')], ['Retirado (neto)', money(st.neto) + ' · ' + st.nRet + ' retiro' + (st.nRet === 1 ? '' : 's')], ['Invertido', money2(st.inv)]].map(k => '<div class="kpi"><div class="l">' + k[0] + '</div><div class="v" style="font-size:17px">' + k[1] + '</div></div>').join('') + '</div>'
+    + '<div class="card" style="margin-top:10px"><div class="chartBox"><canvas id="chCta"></canvas></div>' + (pts[pts.length - 1].ajuste ? '<div class="note mut" style="font-size:12px;margin-top:6px">Último punto = balance de la firma; diferencia con los trades cargados: ' + money(pts[pts.length - 1].ajuste) + ' (comisiones o trades sin cargar).</div>' : '') + '</div>'
+    + '<div class="card" style="margin-top:10px"><div class="chartBox" style="height:180px"><canvas id="chCtaMes"></canvas></div></div>'
+    + '<div class="card tbl" style="margin-top:10px"><b>Retiros</b> ' + (R.length ? '<table><thead><tr><th>Fecha</th><th class="num">Bruto</th><th class="num">Split</th><th class="num">Neto</th><th>Nota</th></tr></thead><tbody>' + R.map(m => '<tr><td>' + fmtF(m.fecha) + '</td><td class="num">' + money(m.importe) + '</td><td class="num">' + (m.split || 100) + ' %</td><td class="num pos">' + money(netoMov(m)) + '</td><td class="mut">' + esc(m.nota) + '</td></tr>').join('') + '</tbody></table>' : '<span class="mut">sin retiros todavía · se cargan en Contabilidad → Movimientos</span>') + '</div>'
+    + '<div class="card tbl" style="margin-top:10px"><b>Trades de la cuenta (' + T.length + ')</b><table><thead><tr><th>Nº</th><th>Fecha</th><th>Salida</th><th class="num">Resultado</th><th>Nota</th></tr></thead><tbody>' + T.map(t => '<tr><td>' + esc(t.num) + '</td><td>' + fmtF(t.fecha) + ' ' + esc(t.hora || '') + '</td><td><span class="pill ' + String(t.salida).toLowerCase() + '">' + esc(t.salida) + '</span></td><td class="num ' + (t.usd > 0 ? 'pos' : t.usd < 0 ? 'neg' : '') + '">' + money(t.usd) + '</td><td class="mut" style="white-space:normal;min-width:180px">' + esc(String(t.nota || '').slice(0, 140)) + '</td></tr>').join('') + '</tbody></table></div>';
+  dibujar('chCta', pts.map(p => fmtF(p.x)), [{ data: pts.map(p => p.y), borderColor: '#0e8a5c', tension: .2, pointRadius: 2 }]);
+  const ks = Object.keys(mes).sort();
+  dibujar('chCtaMes', ks.map(k => k.slice(5) + '/' + k.slice(2, 4)), [{ data: ks.map(k => Math.round(mes[k])), backgroundColor: ks.map(k => mes[k] >= 0 ? '#0e8a5c' : '#c23b3b') }], 'bar');
+}
+function tarjeta(c, e) {
+  const st = statsCuenta(c), pts = serieCuenta(c), eq = e ? e.balance : pts[pts.length - 1].y, pc = (eq - c.tam) / c.tam * 100;
+  const tg = c.estado === 'Quemada' ? '<span class="tag q">Quemada</span>' : c.estado === 'Pasada' ? '<span class="tag p">Pasada</span>' : !c.activa ? '<span class="tag r">Reserva</span>' : c.fase === 'Funded' ? '<span class="tag f">Funded' + (c.enTurno ? ' · en turno' : '') + '</span>' : '<span class="tag c">Challenge' + (c.enTurno ? ' · en turno' : '') + '</span>';
+  let barra = '';
+  if (c.estado === 'Activa' && c.fase === 'Evaluación' && c.objetivo) { const g = Math.max(0, eq - c.tam); barra = '<div class="mut" style="font-size:12px">Objetivo ' + money(g) + ' de ' + money(c.objetivo) + ' · consistencia ' + c.consistencia + ' %</div><div class="pbar"><i style="width:' + Math.min(100, g / c.objetivo * 100) + '%;background:var(--pos)"></i></div>'; }
+  else if (c.estado === 'Activa' && e) { const cons = Math.max(0, c.dd - e.margen); barra = '<div class="mut" style="font-size:12px">DD consumido ' + money(cons) + ' de ' + money(c.dd) + ' · margen ' + money(e.margen) + '</div><div class="pbar"><i style="width:' + Math.min(100, cons / c.dd * 100) + '%;background:' + (cons / c.dd > .7 ? 'var(--neg)' : '#EF9F27') + '"></i></div>'; }
+  const u = ultimaActividad(c), sin = u ? diasEntre(u, hoyES()) : null;
+  const acc = c.estado !== 'Activa' ? '' : '<div class="acts">' + (c.fase === 'Evaluación' ? '<button type="button" data-act="fondear" data-id="' + esc(c.id) + '">★ Pasar a funded</button>' : '<button type="button" data-act="retiro" data-id="' + esc(c.id) + '">💵 Retiro</button>')
+    + '<button type="button" data-act="' + (c.activa ? 'reserva' : 'activar') + '" data-id="' + esc(c.id) + '">' + (c.activa ? 'A reserva' : '▶ Activar en rotación') + '</button>'
+    + '<button type="button" data-act="reset" data-id="' + esc(c.id) + '">↺ Reset</button><button type="button" data-act="quemada" data-id="' + esc(c.id) + '">✗ Quemada</button></div>';
+  return '<div class="cc' + (c.enTurno ? ' turno' : '') + (!c.activa && c.estado === 'Activa' ? ' res' : '') + (SEL_CTA === c.id ? ' sel' : '') + '" data-cc="' + esc(c.id) + '"><div class="top"><b>' + esc(c.nombre) + '</b>' + tg + '</div>'
+    + '<div class="top" style="margin-top:4px"><span class="eq">' + money(eq) + '</span><span class="' + (pc < 0 ? 'neg' : pc > 0 ? 'pos' : 'mut') + '">' + (pc > 0 ? '+' : '') + pc.toFixed(2).replace('.', ',') + ' %</span></div>'
+    + spark(pts, pc < 0 ? '#c23b3b' : '#0e8a5c') + barra
+    + '<div class="mut" style="font-size:12px;margin-top:6px">' + st.n + ' trades' + (st.wr == null ? '' : ' · ' + Math.round(st.wr * 100) + ' % WR') + ' · coste ' + money2(st.inv) + (st.neto ? ' · retirado ' + money(st.neto) : '') + (sin != null && c.estado === 'Activa' ? ' · ' + sin + ' días sin operar' : '') + '</div>' + acc + '</div>';
+}
+function dibujar(id, labels, datasets, type) {
+  const el = $(id); if (!el || typeof Chart === 'undefined') return;
+  if (CHARTS[id]) CHARTS[id].destroy();
+  CHARTS[id] = new Chart(el, { type: type || 'line', data: { labels, datasets }, options: { maintainAspectRatio: false, animation: false, plugins: { legend: { display: datasets.length > 1 } }, scales: { x: { ticks: { maxTicksLimit: 8 } }, y: { ticks: { callback: v => v.toLocaleString('es-ES') } } } } });
+}
+async function accionCuenta(a, id) {
+  const c = CUENTAS.find(x => x.id === id); if (!c) return;
+  const ref = uref('cuentas', id), hoy = hoyES();
+  if (a === 'reserva' || a === 'activar') {
+    const upd = { activa: a === 'activar' };
+    if (a === 'activar') upd.orden = CUENTAS.reduce((m, x) => Math.max(m, x.activa ? x.orden : 0), 0) + 0.5;
+    if (a === 'reserva' && c.enTurno) return alert('Es la cuenta en turno: pasá el turno a otra antes de mandarla a reserva.');
+    await setDoc(ref, upd, { merge: true });
+    if (a === 'activar') await renumerar(id);
+  } else if (a === 'quemada') {
+    if (!confirm('¿Marcar ' + c.nombre + ' como quemada? Sale de la rotación.')) return;
+    await setDoc(ref, { estado: 'Quemada', activa: false, enTurno: false, fechaFin: hoy }, { merge: true });
+    if (c.enTurno) await pasarTurno(id);
+  } else if (a === 'reset') {
+    const imp = prompt('Coste del reset en $ (lo que pagaste):'); if (imp == null) return;
+    if (!(num(imp) >= 0)) return alert('Importe inválido');
+    const b = writeBatch(db);
+    b.set(doc(ucol('movimientos')), { tipo: 'Reset', cuenta: id, fecha: hoy, importe: num(imp), split: 0, nota: 'reset', registrado: Date.now() });
+    b.set(ref, { balance: c.tam, minimo: c.tam - c.dd, syncAt: Date.now() }, { merge: true });
+    await b.commit();
+  } else if (a === 'fondear') {
+    if (!confirm('¿Pasar ' + c.nombre + ' a Funded? Después sincronizá balance y mínimo con la firma.')) return;
+    await setDoc(ref, { fase: 'Funded', fechaFunded: hoy }, { merge: true });
+    await cargar(); llenarForm(CUENTAS.find(x => x.id === id)); $('ctaFormTit').scrollIntoView({ behavior: 'smooth' }); return;
+  } else if (a === 'retiro') {
+    document.querySelector('[data-tab=conta]').click(); $('mTipo').value = 'Retiro'; $('mCta').value = id; $('mImp').focus(); return;
+  }
+  await cargar();
+}
+async function renumerar() {
+  const cs = await getDocs(ucol('cuentas')), L = cs.docs.map(d => normCuenta(d.data())).sort((a, b) => (b.activa - a.activa) || (a.orden - b.orden));
+  const b = writeBatch(db); L.forEach((c, i) => b.set(uref('cuentas', c.id), { orden: i + 1 }, { merge: true })); await b.commit();
+}
+async function pasarTurno(id) {
+  const act = CUENTAS.filter(c => c.activa && c.id !== id); if (!act.length) return;
+  const i = CUENTAS.findIndex(c => c.id === id), sig = CUENTAS.slice(i + 1).concat(CUENTAS.slice(0, i)).find(c => c.activa && c.id !== id) || act[0];
+  await setDoc(uref('cuentas', sig.id), { enTurno: true }, { merge: true });
+}
+function renderConta() {
+  if (!$('coKpis')) return;
+  const C = compras(), gastos = C.filter(m => m.tipo !== 'Retiro'), ret = C.filter(m => m.tipo === 'Retiro');
+  const G = gastos.reduce((a, m) => a + num(m.importe), 0), P = ret.reduce((a, m) => a + netoMov(m), 0), Pb = ret.reduce((a, m) => a + num(m.importe), 0);
+  const nEval = CUENTAS.length, nFund = CUENTAS.filter(c => c.fase === 'Funded').length;
+  $('coKpis').innerHTML = [['Gastos totales', '<span class="neg">' + money2(-G) + '</span>', gastos.length + ' compras y resets'], ['Payouts', '<span class="pos">' + money(P) + '</span>', 'neto · bruto ' + money(Pb)], ['Beneficio neto', '<span class="' + (P - G < 0 ? 'neg' : 'pos') + '">' + money(P - G) + '</span>', 'payouts netos − gastos'],
+    ['ROI', G ? Math.round((P - G) / G * 100) + ' %' : '—', 'beneficio ÷ gastos'], ['Funding ratio', nEval ? Math.round(nFund / nEval * 100) + ' %' : '—', nFund + ' fondeadas de ' + nEval], ['Coste medio / cuenta', money2(nEval ? G / nEval : 0), 'gastos ÷ cuentas'], ['Coste por fondeada', nFund ? money2(G / nFund) : '—', 'incluye las falladas']]
+    .map(k => '<div class="kpi"><div class="l">' + k[0] + '</div><div class="v">' + k[1] + '</div><div class="d">' + k[2] + '</div></div>').join('');
+  const mes = {}; C.forEach(m => { const k = String(m.fecha).slice(0, 7); mes[k] = mes[k] || { g: 0, p: 0 }; if (m.tipo === 'Retiro') mes[k].p += netoMov(m); else mes[k].g += num(m.importe); });
+  const ks = Object.keys(mes).filter(Boolean).sort();
+  dibujar('chMes', ks.map(k => k.slice(5) + '/' + k.slice(2, 4)), [{ label: 'Gastos', data: ks.map(k => Math.round(mes[k].g)), backgroundColor: '#c23b3b' }, { label: 'Payouts', data: ks.map(k => Math.round(mes[k].p)), backgroundColor: '#0e8a5c' }], 'bar');
+  const F = {}; CUENTAS.forEach(c => { const f = c.firma || '—'; F[f] = F[f] || { n: 0, fund: 0, g: 0, p: 0 }; F[f].n++; if (c.fase === 'Funded') F[f].fund++; });
+  C.forEach(m => { const c = CUENTAS.find(x => x.id === m.cuenta), f = c ? c.firma || '—' : '—'; F[f] = F[f] || { n: 0, fund: 0, g: 0, p: 0 }; if (m.tipo === 'Retiro') F[f].p += netoMov(m); else F[f].g += num(m.importe); });
+  $('coFirmas').innerHTML = '<table><thead><tr><th>Firma</th><th class="num">Cuentas</th><th class="num">Fondeadas</th><th class="num">Coste</th><th class="num">Retirado (neto)</th><th class="num">Beneficio</th></tr></thead><tbody>' + Object.entries(F).sort((a, b) => (b[1].p - b[1].g) - (a[1].p - a[1].g)).map(([f, x]) => '<tr><td><b>' + esc(f) + '</b></td><td class="num">' + x.n + '</td><td class="num">' + x.fund + '</td><td class="num">' + money2(x.g) + '</td><td class="num">' + money(x.p) + '</td><td class="num ' + (x.p - x.g < 0 ? 'neg' : 'pos') + '">' + money(x.p - x.g) + '</td></tr>').join('') + '</tbody></table>';
+  const nom = id => (CUENTAS.find(c => c.id === id) || {}).nombre || id;
+  $('coMovs').innerHTML = C.length ? '<table><thead><tr><th>Fecha</th><th>Tipo</th><th>Cuenta</th><th class="num">Importe</th><th>Nota</th><th></th></tr></thead><tbody>' + C.map(m => '<tr><td>' + fmtF(m.fecha) + '</td><td>' + esc(m.tipo) + '</td><td>' + esc(nom(m.cuenta)) + '</td><td class="num ' + (m.tipo === 'Retiro' ? 'pos' : 'neg') + '">' + (m.tipo === 'Retiro' ? money2(netoMov(m)) + ' <span class="mut">(bruto ' + money2(m.importe) + ')</span>' : money2(-num(m.importe))) + '</td><td class="mut" style="white-space:normal">' + esc(m.nota || '') + '</td><td>' + (m.fija ? '<span class="mut" title="Se edita en la cuenta (campo Coste)">alta</span>' : '<button class="link" type="button" data-delmov="' + esc(m._id) + '">🗑</button>') + '</td></tr>').join('') + '</tbody></table>' : '<div class="empty">Sin movimientos.</div>';
+  const sel = $('mCta').value; $('mCta').innerHTML = CUENTAS.map(c => '<option value="' + esc(c.id) + '">' + esc(c.nombre) + '</option>').join(''); if (sel) $('mCta').value = sel;
+  if (!$('mFecha').value) $('mFecha').value = hoyES();
+}
+async function guardarMov() {
+  const m = { tipo: $('mTipo').value, cuenta: $('mCta').value, fecha: $('mFecha').value, importe: num($('mImp').value), split: $('mTipo').value === 'Retiro' ? (num($('mSplit').value) || 100) : 0, nota: $('mNota').value.trim(), registrado: Date.now() };
+  if (!m.cuenta || !m.fecha || !(m.importe > 0)) { $('movMsg').textContent = 'Completá cuenta, fecha e importe.'; $('movMsg').className = 'msg err'; return; }
+  await setDoc(doc(ucol('movimientos')), m);
+  $('mImp').value = ''; $('mNota').value = ''; $('movMsg').textContent = m.tipo + ' guardado.'; $('movMsg').className = 'msg ok';
+  await cargar();
+}
+
 document.addEventListener('click', async ev => {
   const el = ev.target.closest('button,[data-chk],.ch'); if (!el) return;
-  if (el.dataset.tab) { document.querySelectorAll('.tab').forEach(b => b.classList.toggle('on', b === el)); ['hoy', 'cuentas', 'trades', 'admin'].forEach(v => $('v-' + v).hidden = v !== el.dataset.tab); return; }
+  if (el.dataset.tab) { document.querySelectorAll('.tab').forEach(b => b.classList.toggle('on', b === el)); ['hoy', 'cuentas', 'conta', 'trades', 'admin'].forEach(v => $('v-' + v).hidden = v !== el.dataset.tab); render(); return; }
   if (el.dataset.qr) { QR_SAL = el.dataset.qr; pintarQr(); return; }
   if (el.id === 'qrGo') return qrGuardar();
   if (el.id === 'chkHead') { CHK_OPEN = !CHK_OPEN; renderChk(); return; }
@@ -389,6 +614,9 @@ document.addEventListener('click', async ev => {
   if (el.id === 'btnCtaNueva') return llenarForm(null);
   if (el.dataset.edit) { llenarForm(CUENTAS.find(c => c.id === el.dataset.edit)); $('ctaFormTit').scrollIntoView({ behavior: 'smooth' }); return; }
   if (el.dataset.turno) return ponerTurno(el.dataset.turno);
+  if (el.dataset.act) { ev.stopPropagation(); return accionCuenta(el.dataset.act, el.dataset.id); }
+  if (el.dataset.delmov) { if (!confirm('¿Borrar este movimiento?')) return; await deleteDoc(uref('movimientos', el.dataset.delmov)); return cargar(); }
+  if (el.id === 'btnMov') return guardarMov();
   if (el.dataset.del) { if (!confirm('¿Borrar este trade? No se deshace el cambio de turno.')) return; await deleteDoc(uref('trades', el.dataset.del)); return cargar(); }
   if (el.id === 'btnAllow') {
     const e = $('aEmail').value.trim().toLowerCase(); if (!/^\S+@\S+\.\S+$/.test(e)) { $('allowMsg').textContent = 'Correo inválido.'; return; }
@@ -404,6 +632,12 @@ document.addEventListener('click', async ev => {
     await setDoc(doc(db, 'config', 'tablaMaestra'), Object.assign({ filas, actualizado: Date.now() }, f ? { fuente: f } : {}), { merge: true });
     $('tmMsg').textContent = 'Tabla guardada.'; await cargar(); return;
   }
+});
+document.addEventListener('click', ev => {
+  if (ev.target.closest('button')) return;
+  const cc = ev.target.closest('[data-cc]'); if (!cc) return;
+  SEL_CTA = SEL_CTA === cc.dataset.cc ? null : cc.dataset.cc; renderCtaPage();
+  if (SEL_CTA) $('ctaDet').scrollIntoView({ behavior: 'smooth', block: 'start' });
 });
 document.addEventListener('change', ev => {
   const k = ev.target.dataset && ev.target.dataset.chk; if (k == null) return;
