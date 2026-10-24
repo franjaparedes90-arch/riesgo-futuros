@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Riesgo Futuros</title>
-<!-- Riesgo Futuros · app multiusuario (Firebase) · v7 (24/10/2026) · v7: P0 "¿Sesión preparada?" automática desde la checklist del día (vigente desde 26/10/2026), checklist guardada por fecha, KPI Sesión preparada · v6 (24/10/2026) · v6: formulario completo de trade (Nasdaq) igual al de la app vieja, editar/completar trades y journal en Trades (sin R plan) · v5 (24/10/2026) · v5: tabla de cuentas: quemadas/pasadas/reserva sin "Poner en turno" · v4 (24/10/2026) · v4: riesgo en rojo si supera el margen; checklist con bots VPS solo para el admin · v3 (23/10/2026) · v3: Cuentas y contabilidad (equity, retiros, compras, resets, reserva, inactividad, caducidad) · v2: consistencia por cuenta
+<!-- Riesgo Futuros · app multiusuario (Firebase) · v8 (24/10/2026) · v8: alerta de reset del trader (3 días perdedores seguidos → pausa 3 días naturales; 2.º seguido con errores → 1 semana), aviso al registrar en reset (P5), ítem de checklist "No estoy en reset" · v7 (24/10/2026) · v7: P0 "¿Sesión preparada?" automática desde la checklist del día (vigente desde 26/10/2026), checklist guardada por fecha, KPI Sesión preparada · v6 (24/10/2026) · v6: formulario completo de trade (Nasdaq) igual al de la app vieja, editar/completar trades y journal en Trades (sin R plan) · v5 (24/10/2026) · v5: tabla de cuentas: quemadas/pasadas/reserva sin "Poner en turno" · v4 (24/10/2026) · v4: riesgo en rojo si supera el margen; checklist con bots VPS solo para el admin · v3 (23/10/2026) · v3: Cuentas y contabilidad (equity, retiros, compras, resets, reserva, inactividad, caducidad) · v2: consistencia por cuenta
      Misma lógica que la app de Apps Script (Real_Codigo.gs): Tabla maestra para Funded, regla v7 para challenges,
      rotación (SL → siguiente cuenta), plan B y registro rápido. Cada usuario ve solo sus cuentas y trades.
      La Tabla maestra es compartida (config/tablaMaestra) y solo la edita el admin. -->
@@ -217,7 +217,7 @@ const SEED_TM = { filas: {
 const UMBRAL_NORMAL = 0.60, ACEL_DD_PEAK = 0.10, CIERRE_NY = 17;
 const CH_R_PCT = 0.01, CH_MIN_PCT = 0.004;
 const CHK_BOTS = ['MT5 del challenge abierto y bot ORB activo', 'MT5 de Pepperstone abierto y bot ORB activo'];
-let CHK_ITEMS = ['Noticias y festivos de EE. UU. revisados', 'Sentado como tarde a las 15:15', 'Riesgo listo y Tradesea abierto en la cuenta en turno', 'Niveles marcados antes de las 15:25'];
+let CHK_ITEMS = ['No estoy en reset', 'Noticias y festivos de EE. UU. revisados', 'Sentado como tarde a las 15:15', 'Riesgo listo y Tradesea abierto en la cuenta en turno', 'Niveles marcados antes de las 15:25'];
 
 let U = null, IS_ADMIN = false, TM = null, CUENTAS = [], TRADES = [], CHK = CHK_ITEMS.map(() => false), CHK_OPEN = true, QR_SAL = null, QR_MSG = '', EDIT_ID = null, MOVS = [], SEL_CTA = null, CHARTS = {};
 const $ = id => document.getElementById(id);
@@ -312,8 +312,10 @@ async function cargar() {
   MOVS = ms.docs.map(d => Object.assign({ _id: d.id }, d.data()));
   const cks = await getDocs(ucol('checklists'));
   CHKS = {}; cks.docs.forEach(d => { CHKS[d.id] = d.data(); });
+  const rs = await getDoc(uref('meta', 'reset'));
+  RESET_OV = rs.exists() ? rs.data() : {};
   const ck = await getDoc(uref('meta', 'checklist'));
-  if (IS_ADMIN && CHK_ITEMS.length === 4) CHK_ITEMS = CHK_BOTS.concat(CHK_ITEMS);
+  if (IS_ADMIN && CHK_ITEMS.length === 5) CHK_ITEMS = CHK_BOTS.concat(CHK_ITEMS);
   CHK = (ck.exists() && ck.data().fecha === hoyES() && Array.isArray(ck.data().m) && ck.data().m.length === CHK_ITEMS.length) ? ck.data().m : CHK_ITEMS.map(() => false);
   render();
 }
@@ -332,7 +334,7 @@ function renderHoy() {
   if (!TM) { $('cards').innerHTML = '<div class="empty">Falta la Tabla maestra. Avisale a Javier.</div>'; return; }
   const E = estadoCuentas();
   const viejas = E.filter(e => e.syncDias > 7);
-  $('avisos').innerHTML = (E.length && !E.some(e => e.c.enTurno) ? '<div class="warn">Ninguna cuenta está en turno: marcá una en Cuentas.</div>' : '')
+  $('avisos').innerHTML = resetHtml() + (E.length && !E.some(e => e.c.enTurno) ? '<div class="warn">Ninguna cuenta está en turno: marcá una en Cuentas.</div>' : '')
     + (viejas.length ? '<div class="warn">Hace más de 7 días que no sincronizás con la firma: ' + viejas.map(e => esc(e.c.nombre)).join(', ') + '. Actualizá balance y mínimo en Cuentas.</div>' : '')
     + avisosCuentas().map(a => '<div class="warn' + (a.bad ? ' bad' : '') + '">' + a.t + '</div>').join('');
   if (!E.length) { $('cards').innerHTML = '<div class="empty">Todavía no cargaste cuentas. Andá a <b>Cuentas</b> y agregá la primera.</div>'; return; }
@@ -362,7 +364,7 @@ function qrHtml() {
 function pintarQr() {
   document.querySelectorAll('[data-qr]').forEach(x => { const on = x.dataset.qr === QR_SAL; x.style.setProperty('background', on ? '#185FA5' : '', 'important'); x.style.setProperty('color', on ? '#fff' : '', 'important'); x.style.setProperty('border-color', on ? '#185FA5' : '', 'important'); });
 }
-async function qrGuardar() {
+async function qrGuardar(enReset) {
   const msg = t => { QR_MSG = t; if ($('qrMsg')) $('qrMsg').textContent = t; };
   if (!QR_SAL) return msg('Elegí TP, SL o BE.');
   let usd = parseFloat($('qrAmt').value);
@@ -370,12 +372,14 @@ async function qrGuardar() {
   if (QR_SAL === 'SL') usd = -Math.abs(usd); else if (QR_SAL === 'TP') usd = Math.abs(usd);
   const E = estadoCuentas(), e = E.find(x => x.c.enTurno);
   if (!e) return msg('No hay cuenta en turno.');
+  if (enReset === undefined) return avisoReset(hoyES(), x => qrGuardar(x));
   $('qrGo').disabled = true;
   try {
     const ahora = new Date(), n = TRADES.reduce((m, t) => Math.max(m, num(t.num)), 0) + 1;
     const nota = $('qrNota').value.trim(), prep = CHK.every(Boolean);
     const t = { num: n, fecha: diaTz(ahora, 'Europe/Madrid'), hora: horaTz(ahora, 'Europe/Madrid'), cuenta: e.c.id, estado: e.estado, salida: QR_SAL, usd, riesgo: e.riesgo, target: e.target,
       nota: 'Registro rápido: ' + (nota ? nota + ' · ' : '') + 'sesión preparada: ' + (prep ? 'Sí' : 'No'), registrado: ahora.getTime(), rapido: true };
+    if (enReset) { t.plan = 'No'; t.preguntas = ['P5']; t.enReset = true; t.nota = NOTA_RESET + t.nota; }
     const b = writeBatch(db);
     b.set(doc(ucol('trades')), t);
     let rot = 'Turno: sigue la misma cuenta.';
@@ -416,9 +420,54 @@ const CAT = {
   preguntas: ['P0', 'P1', 'P2', 'P3', 'P4', 'P5', 'P6'], fvgTf: ['H4', 'H1', 'M15'],
   fvgUb: ['Dentro', 'Saliendo (reacción)', 'En el camino'], fvgDir: ['A favor', 'En contra'], fvgRe: ['Sí', 'No', 'No llegó']
 };
+// ---------- reset del trader (protocolo Tradinverso · 01-Trading Plan/Reset del Trader) ----------
+const RESET_DIAS = 3, RESET_SEMANA = 7, RESET_PERD = -0.2;
+const sumDias = (f, n) => { const d = new Date(f + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
+const fmtDia = f => new Intl.DateTimeFormat('es-ES', { weekday: 'long', day: '2-digit', month: '2-digit', timeZone: 'UTC' }).format(new Date(f + 'T12:00:00Z'));
+function rTrade(t) {
+  const d = t.detalle || {}, r = t.rr !== undefined && t.rr !== '' ? num(t.rr) : (d['% P&L Sistema'] !== undefined && d['% P&L Sistema'] !== '' ? num(d['% P&L Sistema']) : null);
+  if (r !== null) return r;
+  return num(t.riesgo) > 0 ? num(t.usd) / num(t.riesgo) : (t.salida === 'SL' ? -1 : t.salida === 'TP' ? 1 : 0);
+}
+function resets() {
+  const dias = {};
+  TRADES.forEach(t => { if (!t.fecha || t.fuente === 'Bot') return; (dias[t.fecha] = dias[t.fecha] || { r: 0, err: false }); dias[t.fecha].r += rTrade(t); if ((t.plan || (t.detalle || {})['¿Siguió el Plan?']) === 'No') dias[t.fecha].err = true; });
+  const out = []; let racha = [], hasta = '';
+  Object.keys(dias).sort().forEach(f => {
+    if (hasta && f < hasta) return;
+    if (dias[f].r < RESET_PERD) racha.push(f); else racha = [];
+    if (racha.length >= RESET_DIAS) {
+      const prev = out[out.length - 1], err = racha.some(x => dias[x].err), seguido = !!prev && f <= sumDias(prev.vuelta, 14);
+      const dur = seguido && err ? RESET_SEMANA : RESET_DIAS, ov = RESET_OV[f];
+      const r = { disparo: f, dias: racha.slice(), semana: dur === RESET_SEMANA, desde: (ov && ov.desde) || sumDias(f, 1), vuelta: (ov && ov.vuelta) || sumDias(f, 1 + dur) };
+      out.push(r); hasta = r.vuelta; racha = [];
+    }
+  });
+  return out;
+}
+function resetEn(fecha) { return resets().find(r => fecha >= r.desde && fecha < r.vuelta) || null; }
+function resetHtml() {
+  const hoy = hoyES(), r = resetEn(hoy);
+  if (r) return '<div class="warn bad" id="rsBox"><b style="font-size:15px">⏸ Estamos en reset, se vuelve a operar el ' + fmtDia(r.vuelta) + '</b>'
+    + '<div style="margin-top:4px">Motivo: ' + RESET_DIAS + ' días perdedores seguidos (' + r.dias.map(fmtF).join(', ') + ')' + (r.semana ? ' · 2.º reset seguido con errores de ejecución → 1 semana' : '') + ' · Pausa: ' + fmtF(r.desde) + ' – ' + fmtF(sumDias(r.vuelta, -1)) + '</div>'
+    + '<div style="margin-top:6px">1 Parar, sin gráficos · 2 Recuperar perspectiva · 3 Repasar plan y reglas</div>'
+    + '<details style="margin-top:6px"><summary style="cursor:pointer">Ver protocolo</summary><div style="margin-top:4px">1 <b>Parar</b>: no abrir gráficos, no analizar, no buscar setups. 2 <b>Recuperar perspectiva</b>: deporte, pasear, leer, descansar. 3 <b>Revisar la identidad como trader</b>: repasar plan, gestión de riesgo y reglas, sin cambiar la estrategia. 4 <b>Volver poco a poco</b>: menos trades, más paciencia, foco en ejecutar. El reset no mejora la estrategia: recupera la claridad para no romper el sistema.</div></details>'
+    + '<div class="row" style="margin-top:8px;gap:6px;flex-wrap:wrap"><input type="date" id="rsVuelta" value="' + r.vuelta + '"><button type="button" id="rsGuardar" data-disparo="' + r.disparo + '">Cambiar fecha de vuelta</button></div></div>';
+  if (resets().some(x => x.vuelta === hoy)) return '<div class="warn">🚶 Volviste del reset · paso 4: volver poco a poco. Menos trades, más paciencia, foco en ejecutar. El objetivo es recuperar disciplina, no dinero.</div>';
+  return '';
+}
+function avisoReset(fecha, seguir) {
+  const r = resetEn(fecha); if (!r) return seguir(false);
+  let o = $('trOv'); if (!o) { o = document.createElement('div'); o.id = 'trOv'; document.body.appendChild(o); }
+  o.innerHTML = '<div class="bx" style="max-width:440px"><b>⚠ Estás en reset hasta el ' + fmtF(sumDias(r.vuelta, -1)) + '</b><div class="mut" style="font-size:13px;margin:8px 0 12px">Este trade va contra el protocolo. Si lo registrás, queda marcado como incumplimiento (P5 · filtro de NO OPERAR).</div>'
+    + '<div class="row" style="justify-content:flex-end;gap:8px"><button type="button" id="rsNo">Cancelar</button><button type="button" class="pri" id="rsSi">Registrar igual</button></div></div>';
+  $('rsNo').onclick = () => o.remove();
+  $('rsSi').onclick = () => { o.remove(); seguir(true); };
+}
+const NOTA_RESET = 'Reset (operó durante la pausa, falla P5). ';
 const PREG_TXT = { P0: '¿Sesión preparada? (checklist)', P1: '¿Setup válido de la estrategia?', P2: '¿Entrada, SL y TP según la estrategia?', P3: '¿Riesgo correcto según escalera?', P4: '¿Operación sin tocar?', P5: '¿Sin filtros de NO OPERAR? (horario, noticias, 3 SL)', P6: '¿Registrada con capturas y comentario?' };
 const VENTANA_NY = ['09:30', '12:00'];
-let F = null, F_EDIT = null, F_MSG = '', CHKS = {};
+let F = null, F_EDIT = null, F_MSG = '', CHKS = {}, RESET_OV = {};
 const P0_DESDE = '2026-10-26';
 function autoP0() {
   if (!F || F.p0Manual) return;
@@ -610,12 +659,14 @@ function validarTrade(f) {
   Object.keys(o.detalle).forEach(k => { if (o.detalle[k] === '' || o.detalle[k] === 'undefined') delete o.detalle[k]; });
   return { o, c };
 }
-async function guardarTrade() {
+async function guardarTrade(enReset) {
   const v = validarTrade(F);
   if (v.err) { F_MSG = v.err; $('frmMsg').textContent = v.err; $('frmMsg').className = 'msg err'; return; }
+  if (enReset === undefined && !F_EDIT) return avisoReset(F.fecha, x => guardarTrade(x));
   $('frmSave').disabled = true;
   try {
     const o = v.o, prev = F_EDIT ? TRADES.find(x => x._id === F_EDIT) : null, b = writeBatch(db);
+    if (enReset) { o.plan = 'No'; o.preguntas = Array.from(new Set((o.preguntas || []).concat(['P5']))); o.cuentaStats = 'No'; o.enReset = true; o.nota = NOTA_RESET + (o.nota || ''); if (o.detalle) { o.detalle['¿Siguió el Plan?'] = 'No'; o.detalle['Preguntas Fallidas'] = o.preguntas.join(', '); o.detalle['Cuenta para Estadística'] = 'No'; o.detalle['Reflexión'] = o.nota; } }
     let rot = '';
     if (prev) { o.num = prev.num; o.registrado = prev.registrado; if (prev.rapido) o.rapido = true; if (prev.migrado) o.migrado = true; o.editado = Date.now(); b.set(uref('trades', prev._id), o); }
     else {
@@ -890,6 +941,7 @@ document.addEventListener('click', async ev => {
     if (k === 'salida') { const u = parseFloat(String(F.usd).replace(',', '.')); if (!isNaN(u)) F.usd = String(v === 'SL' ? -Math.abs(u) : v === 'TP' ? Math.abs(u) : u); if (v === 'SL') F.rr = '-1'; else if (v === 'BE') F.rr = '0'; else if (v === 'TP' && parseFloat(F.rr) < 0) F.rr = ''; }
     renderForm(); return; }
   if (el.id === 'frmSave') return guardarTrade();
+  if (el.id === 'rsGuardar') { const v = $('rsVuelta').value; if (!/^\d{4}-\d{2}-\d{2}$/.test(v) || v <= el.dataset.disparo) return; RESET_OV[el.dataset.disparo] = Object.assign({}, RESET_OV[el.dataset.disparo], { vuelta: v }); await setDoc(uref('meta', 'reset'), RESET_OV); return renderHoy(); }
   if (el.id === 'frmCancel') { F_EDIT = null; nuevoForm(); document.querySelector('[data-tab=trades]').click(); return; }
   if (el.id === 'btnNuevoTr') return abrirForm(null);
   if (el.dataset.ver) return verTrade(el.dataset.ver);
