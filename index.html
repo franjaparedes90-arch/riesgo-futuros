@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Riesgo Futuros</title>
-<!-- Riesgo Futuros · app multiusuario (Firebase) · v6 (24/10/2026) · v6: formulario completo de trade (Nasdaq) igual al de la app vieja, editar/completar trades y journal en Trades (sin R plan) · v5 (24/10/2026) · v5: tabla de cuentas: quemadas/pasadas/reserva sin "Poner en turno" · v4 (24/10/2026) · v4: riesgo en rojo si supera el margen; checklist con bots VPS solo para el admin · v3 (23/10/2026) · v3: Cuentas y contabilidad (equity, retiros, compras, resets, reserva, inactividad, caducidad) · v2: consistencia por cuenta
+<!-- Riesgo Futuros · app multiusuario (Firebase) · v7 (24/10/2026) · v7: P0 "¿Sesión preparada?" automática desde la checklist del día (vigente desde 26/10/2026), checklist guardada por fecha, KPI Sesión preparada · v6 (24/10/2026) · v6: formulario completo de trade (Nasdaq) igual al de la app vieja, editar/completar trades y journal en Trades (sin R plan) · v5 (24/10/2026) · v5: tabla de cuentas: quemadas/pasadas/reserva sin "Poner en turno" · v4 (24/10/2026) · v4: riesgo en rojo si supera el margen; checklist con bots VPS solo para el admin · v3 (23/10/2026) · v3: Cuentas y contabilidad (equity, retiros, compras, resets, reserva, inactividad, caducidad) · v2: consistencia por cuenta
      Misma lógica que la app de Apps Script (Real_Codigo.gs): Tabla maestra para Funded, regla v7 para challenges,
      rotación (SL → siguiente cuenta), plan B y registro rápido. Cada usuario ve solo sus cuentas y trades.
      La Tabla maestra es compartida (config/tablaMaestra) y solo la edita el admin. -->
@@ -310,6 +310,8 @@ async function cargar() {
   TRADES = ts.docs.map(d => Object.assign({ _id: d.id }, d.data()));
   const ms = await getDocs(ucol('movimientos'));
   MOVS = ms.docs.map(d => Object.assign({ _id: d.id }, d.data()));
+  const cks = await getDocs(ucol('checklists'));
+  CHKS = {}; cks.docs.forEach(d => { CHKS[d.id] = d.data(); });
   const ck = await getDoc(uref('meta', 'checklist'));
   if (IS_ADMIN && CHK_ITEMS.length === 4) CHK_ITEMS = CHK_BOTS.concat(CHK_ITEMS);
   CHK = (ck.exists() && ck.data().fecha === hoyES() && Array.isArray(ck.data().m) && ck.data().m.length === CHK_ITEMS.length) ? ck.data().m : CHK_ITEMS.map(() => false);
@@ -411,12 +413,23 @@ const CAT = {
   sensaciones: ['Seguro - Confiado', 'Convencido - Calma', 'Dudoso - Inseguro', 'Fomo - Acelerado', 'Venganza - Rabia', 'Miedo - Parálisis', 'Sin registrar'],
   poi: ['ORB', 'IRL', 'PDH/PDL', 'PWH/PWL', 'PMH/PML', 'BSL/SSL', 'Asia', 'Londres', 'FVG HTF', 'Otro'],
   quePaso: ['No llegó', 'Lo atravesó', 'Lo frenó'], bePoi: ['Me sacó en BE', 'Siguió'],
-  preguntas: ['P1', 'P2', 'P3', 'P4', 'P5', 'P6'], fvgTf: ['H4', 'H1', 'M15'],
+  preguntas: ['P0', 'P1', 'P2', 'P3', 'P4', 'P5', 'P6'], fvgTf: ['H4', 'H1', 'M15'],
   fvgUb: ['Dentro', 'Saliendo (reacción)', 'En el camino'], fvgDir: ['A favor', 'En contra'], fvgRe: ['Sí', 'No', 'No llegó']
 };
-const PREG_TXT = { P1: '¿Setup válido de la estrategia?', P2: '¿Entrada, SL y TP según la estrategia?', P3: '¿Riesgo correcto según escalera?', P4: '¿Operación sin tocar?', P5: '¿Sin filtros de NO OPERAR? (horario, noticias, 3 SL)', P6: '¿Registrada con capturas y comentario?' };
+const PREG_TXT = { P0: '¿Sesión preparada? (checklist)', P1: '¿Setup válido de la estrategia?', P2: '¿Entrada, SL y TP según la estrategia?', P3: '¿Riesgo correcto según escalera?', P4: '¿Operación sin tocar?', P5: '¿Sin filtros de NO OPERAR? (horario, noticias, 3 SL)', P6: '¿Registrada con capturas y comentario?' };
 const VENTANA_NY = ['09:30', '12:00'];
-let F = null, F_EDIT = null, F_MSG = '';
+let F = null, F_EDIT = null, F_MSG = '', CHKS = {};
+const P0_DESDE = '2026-10-26';
+function autoP0() {
+  if (!F || F.p0Manual) return;
+  if (!F.fecha || F.fecha < P0_DESDE) { F.p0 = ''; F.p0Falta = []; F.preguntas = F.preguntas.filter(x => x !== 'P0'); return; }
+  const ck = CHKS[F.fecha] || (F.fecha === hoyES() ? { m: CHK, items: CHK_ITEMS } : null), items = ck && ck.items ? ck.items : CHK_ITEMS, m = ck ? ck.m || [] : [];
+  F.p0Falta = items.filter((t, i) => !m[i]); F.p0 = F.p0Falta.length ? 'No' : 'Sí'; aplicarP0();
+}
+function aplicarP0() {
+  if (F.p0 === 'No') { F.plan = 'No'; if (!F.preguntas.includes('P0')) F.preguntas = ['P0'].concat(F.preguntas); }
+  else F.preguntas = F.preguntas.filter(x => x !== 'P0');
+}
 const minHHMM = h => { const p = String(h).split(':'); return +p[0] * 60 + +p[1]; };
 function horaNYde(fecha, hora) {
   const [y, m, d] = fecha.split('-').map(Number), [hh, mi] = hora.split(':').map(Number);
@@ -429,6 +442,7 @@ function nuevoForm(base) {
   F = Object.assign({ estrategia: 'Nasdaq', cuenta: turno ? turno.c.id : '', estado: turno ? turno.estado : '', salida: '', usd: '', rr: '', riesgoManual: '', plan: '', preguntas: [], sensacion: '',
     fecha: hoyES(), horaAp: horaTz(now, 'Europe/Madrid'), horaCi: horaTz(now, 'Europe/Madrid'), setup: '', modelo: '', zona: '', tipos: [], mfe: '', volvioBE: '', mfeAntesBE: '', abierto: false, rCierre: '',
     poi: 'Ninguno', distPoi: '', quePaso: '', bePoi: '', puntoLiq: '', distLiq: '', fvg: '', fvgTf: [], fvgUb: '', fvgDir: '', fvgRe: '', fvgDist: '', linkHtf: '', linkLtf: '', reflexion: '' }, base || {});
+  F.p0Manual = !!(base && base.p0); if (!F.p0Manual) autoP0();
 }
 function formDeTrade(t) {
   const d = t.detalle || {}, g = (k, alt) => t[k] !== undefined && t[k] !== '' ? t[k] : (d[alt] !== undefined ? d[alt] : '');
@@ -443,6 +457,7 @@ function formDeTrade(t) {
     poi: g('poi', 'POI en el Camino') || 'Ninguno', distPoi: n(g('distPoi', 'Distancia POI (R)')), quePaso: g('quePaso', 'Qué Pasó en el POI'), bePoi: g('bePoi', 'BE en el POI'),
     puntoLiq: g('puntoLiq', 'Punto de Liquidez'), distLiq: n(g('distLiq', 'Distancia Liquidez (R)')),
     fvg: g('fvg', 'FVG HTF Presente'), fvgTf: lista('fvgTf', 'FVG HTF Temporalidad', '|'), fvgUb: g('fvgUb', 'FVG HTF Ubicación'), fvgDir: g('fvgDir', 'FVG HTF Dirección'), fvgRe: g('fvgRe', 'FVG HTF Reacciona'), fvgDist: n(g('fvgDist', 'FVG HTF Distancia (R)')),
+    p0: t.p0 || '', p0Falta: t.p0Falta || [],
     linkHtf: g('linkHtf', 'Link HTF'), linkLtf: g('linkLtf', 'Link LTF'), reflexion: t.completo || t.migrado ? (t.nota || '') : String(t.nota || '').replace(/^Registro rápido: /, '') };
 }
 function abrirForm(id) {
@@ -473,7 +488,8 @@ function renderForm() {
     + campo('Resultado ($) *', inp('usd', 'number', '−79,50'))
     + campo('% P&amp;L sistema (R) * · 2 = TP, −1 = SL', inp('rr', 'number', '−1'))
     + (rr === 0 ? campo('Riesgo usado ($) · opcional en BE', inp('riesgoManual', 'number')) : campo('Riesgo real · P&amp;L real', '<div class="ro">' + (isNaN(riesgo) || !c ? '—' : money2(riesgo) + ' · ' + (riesgo / c.tam * 100).toFixed(2).replace('.', ',') + ' % · P&amp;L ' + (isNaN(usd) ? '—' : (usd / c.tam * 100).toFixed(2).replace('.', ',') + ' %')) + '</div>'))
-    + campo('¿Seguiste el plan? *', chips('plan', ['Sí', 'No']))
+    + (F.fecha >= P0_DESDE ? campo('P0 · ¿Sesión preparada? * (de la checklist de Hoy)', chips('p0', ['Sí', 'No']) + (F.p0 === 'No' && F.p0Falta && F.p0Falta.length ? '<div class="warn bad" style="margin:4px 0 0;padding:5px 8px;font-size:12px">Faltó: ' + esc(F.p0Falta.join(' · ')) + '</div>' : '')) : '')
+    + campo('¿Seguiste el plan? *' + (F.p0 === 'No' ? ' <span class="mut">· No automático por P0</span>' : ''), chips('plan', ['Sí', 'No']))
     + (F.plan === 'No' ? campo('¿Qué pregunta falló? * (va al comienzo de la reflexión)', chips('preguntas', CAT.preguntas, true, PREG_TXT), 'w2') : '')
     + campo('Sensación al ejecutar *', sel('sensacion', CAT.sensaciones)) + '</div></div>';
   h += '<div class="card fsec"><div class="ft">2 · Setup</div><div class="fg">'
@@ -509,9 +525,11 @@ function validarTrade(f) {
   let riesgo;
   if (rr === 0) { riesgo = n(f.riesgoManual); if (isNaN(riesgo) || riesgo <= 0) riesgo = ''; }
   else { if ((usd > 0) !== (rr > 0) && usd !== 0) return err('Resultado ($) y % P&L sistema tienen que tener el mismo signo'); riesgo = Math.round(Math.abs(usd / rr) * 100) / 100; }
+  if (f.fecha >= P0_DESDE && f.p0 !== 'Sí' && f.p0 !== 'No') return err('P0 · ¿Sesión preparada?: obligatorio');
+  if (f.p0 === 'No' && f.plan !== 'No') return err('Con P0 fallida, ¿Seguiste el plan? es No');
   if (f.plan !== 'Sí' && f.plan !== 'No') return err('¿Seguiste el plan?: obligatorio');
   const fallidas = f.plan === 'No' ? CAT.preguntas.filter(p => f.preguntas.includes(p)) : [];
-  if (f.plan === 'No' && !fallidas.length) return err('¿Qué pregunta falló?: marcá al menos una (P1–P6)');
+  if (f.plan === 'No' && !fallidas.length) return err('¿Qué pregunta falló?: marcá al menos una (P0–P6)');
   if (!en(CAT.sensaciones, f.sensacion)) return err('Sensación al ejecutar: obligatoria');
   if (!/^\d{4}-\d{2}-\d{2}$/.test(f.fecha)) return err('Fecha: obligatoria');
   if (!/^\d{1,2}:\d{2}$/.test(f.horaAp) || !/^\d{1,2}:\d{2}$/.test(f.horaCi)) return err('Hora de apertura y de cierre: obligatorias');
@@ -573,18 +591,18 @@ function validarTrade(f) {
   const be1 = T => mfe < 1 ? noAlc : (volvio === 'Sí' ? (mfeAntes >= T ? T : 0) : (mfe >= T ? T : 0));
   const gest = { g1: fijo(1), g15: fijo(1.5), g2: fijo(2), be15: be1(1.5), be2: be1(2), poi: hayPoi ? (bePoi === 'Me sacó en BE' ? 0 : fijo(2)) : '', liq: hayLiq ? (mfe >= distLiq ? distLiq : 0) : '' };
   let reflexion = String(f.reflexion || '').trim();
-  if (f.plan === 'No' && !fallidas.every(x => reflexion.includes(x))) reflexion = fallidas.join(', ') + (reflexion ? ' · ' + reflexion : '');
+  if (f.plan === 'No' && !fallidas.every(x => reflexion.includes(x))) reflexion = fallidas.map(x => x === 'P0' && f.p0Falta && f.p0Falta.length ? 'P0 (faltó: ' + f.p0Falta.join(', ') + ')' : x).join(', ') + (reflexion ? ' · ' + reflexion : '');
   const p6 = (!reflexion || !f.linkHtf || !f.linkLtf) ? 'Sí' : 'No';
   const cuentaStats = (f.plan === 'No' && fallidas.some(p => p !== 'P6')) ? 'No' : 'Sí';
   const riesgoPct = riesgo === '' ? '' : Math.round(riesgo / c.tam * 100 * 1000) / 1000, pnlPct = Math.round(usd / c.tam * 100 * 1000) / 1000;
   const E = TM ? estadoCuentas().find(e => e.c.id === c.id) : null;
   const target = f.estado === 'Challenge' ? (E && E.target || '1,5R fijo') : (TM && TM[f.estado] ? TM[f.estado].target : '');
-  const o = { estrategia: 'Nasdaq', cuenta: c.id, estado: f.estado, salida: f.salida, usd, rr, riesgo: riesgo === '' ? 0 : riesgo, riesgoPct, pnlPct, plan: f.plan, preguntas: fallidas, sensacion: f.sensacion,
+  const o = { estrategia: 'Nasdaq', cuenta: c.id, estado: f.estado, salida: f.salida, usd, rr, riesgo: riesgo === '' ? 0 : riesgo, riesgoPct, pnlPct, plan: f.plan, preguntas: fallidas, p0: f.fecha >= P0_DESDE ? f.p0 : '', p0Falta: f.p0 === 'No' ? (f.p0Falta || []) : [], sensacion: f.sensacion,
     fecha: f.fecha, hora: f.horaAp, horaCi: f.horaCi, setup: f.setup, modelo: f.modelo, zona: f.zona, tipos, mfe, volvioBE: volvio, mfeAntesBE: mfeAntes, abierto, rCierre,
     poi: hayPoi ? f.poi : 'Ninguno', distPoi, fueraPlan: fuera, quePaso, bePoi, puntoLiq, distLiq, llegoLiq, fvg: f.fvg, fvgTf, fvgUb, fvgDir, fvgRe, fvgDist,
     linkHtf: f.linkHtf || '', linkLtf: f.linkLtf || '', nota: reflexion, p6, cuentaStats, gestiones: gest, target, completo: true };
   o.detalle = { 'Fecha': fmtF(o.fecha), 'Hora Apertura': o.hora, 'Hora Cierre': o.horaCi, 'Cuenta': o.cuenta, 'Estado al Entrar': o.estado, 'Cómo Salió': o.salida, 'Resultado ($)': String(usd), '% P&L Sistema': String(rr), 'Riesgo Usado ($)': String(riesgo), 'Riesgo Real (%)': String(riesgoPct), 'P&L Real (%)': String(pnlPct),
-    '¿Siguió el Plan?': o.plan, 'Preguntas Fallidas': fallidas.join(', '), 'Sensación': o.sensacion, 'Setup': o.setup, 'Modelo': o.modelo, 'Zona': o.zona, 'Tipo de Entrada': tipos.join(' | '), 'MFE (R)': String(mfe),
+    '¿Siguió el Plan?': o.plan, 'Sesión Preparada (P0)': o.p0, 'Preguntas Fallidas': fallidas.join(', '), 'Sensación': o.sensacion, 'Setup': o.setup, 'Modelo': o.modelo, 'Zona': o.zona, 'Tipo de Entrada': tipos.join(' | '), 'MFE (R)': String(mfe),
     'Volvió a BE tras 1R': volvio, 'MFE antes de BE (R)': String(mfeAntes), 'Seguía Abierto 19:00': abierto ? 'Sí' : 'No', 'R al Cierre': String(rCierre), 'POI en el Camino': o.poi, 'Distancia POI (R)': String(distPoi), 'Fuera de Plan': fuera, 'Qué Pasó en el POI': quePaso, 'BE en el POI': bePoi,
     'Punto de Liquidez': puntoLiq, 'Distancia Liquidez (R)': String(distLiq), 'Llegó a Liquidez': llegoLiq, 'R 1R fijo': String(gest.g1), 'R 1,5R fijo': String(gest.g15), 'R 2R fijo': String(gest.g2), 'R 1,5R + BE 1R': String(gest.be15), 'R 2R + BE 1R': String(gest.be2), 'R 2R + BE POI': String(gest.poi), 'R Liquidez + BE 2R': String(gest.liq),
     'Gestión Plan (Tabla maestra)': target, 'Link HTF': o.linkHtf, 'Link LTF': o.linkLtf, 'Reflexión': reflexion, 'P6 Pendiente': p6, 'Cuenta para Estadística': cuentaStats,
@@ -619,7 +637,7 @@ function renderTrades() {
   const conPlan = T.map(t => t.plan || (t.detalle || {})['¿Siguió el Plan?']).filter(Boolean), si = conPlan.filter(x => x === 'Sí').length;
   const pend = T.filter(t => t.rapido && !t.completo).length;
   $('trKpis').innerHTML = [['Trades', T.length, tp + ' TP · ' + sl + ' SL · ' + be + ' BE'], ['Winrate', tp + sl ? Math.round(tp / (tp + sl) * 100) + ' %' : '—', 'TP ÷ (TP + SL)'], ['Profit factor', p ? (g / p).toFixed(2).replace('.', ',') : '—', '$ ganado ÷ $ perdido'],
-    ['P&amp;L', '<span class="' + (g - p < 0 ? 'neg' : 'pos') + '">' + money(g - p) + '</span>', 'suma de resultados'], ['Siguió el plan', conPlan.length ? Math.round(si / conPlan.length * 100) + ' %' : '—', si + ' de ' + conPlan.length], ['Detalles pendientes', pend, 'registros rápidos sin completar']]
+    ['P&amp;L', '<span class="' + (g - p < 0 ? 'neg' : 'pos') + '">' + money(g - p) + '</span>', 'suma de resultados'], ['Sesión preparada', (() => { const L = T.filter(t => t.p0 === 'Sí' || t.p0 === 'No'); return L.length ? Math.round(L.filter(t => t.p0 === 'Sí').length / L.length * 100) + ' %' : '—'; })(), 'P0 · desde el 26/10'], ['Siguió el plan', conPlan.length ? Math.round(si / conPlan.length * 100) + ' %' : '—', si + ' de ' + conPlan.length], ['Detalles pendientes', pend, 'registros rápidos sin completar']]
     .map(k => '<div class="kpi"><div class="l">' + k[0] + '</div><div class="v">' + k[1] + '</div><div class="d">' + k[2] + '</div></div>').join('');
   $('trTabla').innerHTML = T.length ? '<table><thead><tr><th>Nº</th><th>Fecha</th><th>Cuenta</th><th>Modelo</th><th>Setup</th><th>Salida</th><th class="num">Resultado</th><th class="num">R</th><th>Plan</th><th></th></tr></thead><tbody>'
     + T.map(t => { const c = CUENTAS.find(x => x.id === t.cuenta), d = t.detalle || {}, s = String(t.salida).toLowerCase(), r = t.rr !== undefined ? t.rr : (d['% P&L Sistema'] !== undefined ? num(d['% P&L Sistema']) : (t.riesgo > 0 ? t.usd / t.riesgo : null)), pl = t.plan || d['¿Siguió el Plan?'] || '', pen = t.rapido && !t.completo;
@@ -866,6 +884,9 @@ document.addEventListener('click', async ev => {
   if (el.dataset.delmov) { if (!confirm('¿Borrar este movimiento?')) return; await deleteDoc(uref('movimientos', el.dataset.delmov)); return cargar(); }
   if (el.id === 'btnMov') return guardarMov();
   if (el.dataset.fk) { const k = el.dataset.fk, v = el.dataset.fv; if (el.dataset.multi) F[k] = F[k].includes(v) ? F[k].filter(x => x !== v) : F[k].concat([v]); else F[k] = F[k] === v ? '' : v;
+    if (k === 'p0') { F.p0Manual = true; aplicarP0(); }
+    if (k === 'plan' && F.p0 === 'No') F.plan = 'No';
+    if (k === 'preguntas' && v === 'P0') { F.p0Manual = true; F.p0 = F.preguntas.includes('P0') ? 'No' : (F.fecha >= P0_DESDE ? 'Sí' : ''); if (F.p0 === 'No') F.plan = 'No'; }
     if (k === 'salida') { const u = parseFloat(String(F.usd).replace(',', '.')); if (!isNaN(u)) F.usd = String(v === 'SL' ? -Math.abs(u) : v === 'TP' ? Math.abs(u) : u); if (v === 'SL') F.rr = '-1'; else if (v === 'BE') F.rr = '0'; else if (v === 'TP' && parseFloat(F.rr) < 0) F.rr = ''; }
     renderForm(); return; }
   if (el.id === 'frmSave') return guardarTrade();
@@ -905,13 +926,16 @@ document.addEventListener('change', ev => {
   if (fk && F) {
     F[fk] = ev.target.type === 'checkbox' ? ev.target.checked : ev.target.value;
     if (fk === 'usd' && (F.salida === 'SL' || F.salida === 'TP')) { const u = parseFloat(String(F.usd).replace(',', '.')); if (!isNaN(u)) F.usd = String(F.salida === 'SL' ? -Math.abs(u) : Math.abs(u)); }
+    if (fk === 'fecha') autoP0();
     if (fk === 'cuenta' && TM) { const e = estadoCuentas().find(x => x.c.id === F.cuenta); if (e) F.estado = e.estado; }
-    if (['cuenta', 'usd', 'rr', 'mfe', 'poi', 'abierto', 'fvgUb'].includes(fk)) setTimeout(() => { const a = document.activeElement && document.activeElement.dataset ? document.activeElement.dataset.fin : null; renderForm(); if (a) { const e = document.querySelector('[data-fin="' + a + '"]'); if (e) e.focus(); } }, 0);
+    if (['cuenta', 'usd', 'rr', 'mfe', 'poi', 'abierto', 'fvgUb', 'fecha'].includes(fk)) setTimeout(() => { const a = document.activeElement && document.activeElement.dataset ? document.activeElement.dataset.fin : null; renderForm(); if (a) { const e = document.querySelector('[data-fin="' + a + '"]'); if (e) e.focus(); } }, 0);
     return;
   }
   const k = ev.target.dataset && ev.target.dataset.chk; if (k == null) return;
   CHK[+k] = ev.target.checked; renderChk();
   setDoc(uref('meta', 'checklist'), { fecha: hoyES(), m: CHK }).catch(() => {});
+  CHKS[hoyES()] = { m: CHK.slice(), items: CHK_ITEMS.slice() };
+  setDoc(uref('checklists', hoyES()), CHKS[hoyES()]).catch(() => {});
 });
 $('btnLogin').onclick = () => signInWithPopup(auth, new GoogleAuthProvider()).catch(e => { $('loginMsg').textContent = e.message; });
 $('btnSalir').onclick = () => signOut(auth);
