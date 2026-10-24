@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Riesgo Futuros</title>
-<!-- Riesgo Futuros · app multiusuario (Firebase) · v4 (24/10/2026) · v4: riesgo en rojo si supera el margen; checklist con bots VPS solo para el admin · v3 (23/10/2026) · v3: Cuentas y contabilidad (equity, retiros, compras, resets, reserva, inactividad, caducidad) · v2: consistencia por cuenta
+<!-- Riesgo Futuros · app multiusuario (Firebase) · v5 (24/10/2026) · v5: tabla de cuentas: quemadas/pasadas/reserva sin "Poner en turno" · v4 (24/10/2026) · v4: riesgo en rojo si supera el margen; checklist con bots VPS solo para el admin · v3 (23/10/2026) · v3: Cuentas y contabilidad (equity, retiros, compras, resets, reserva, inactividad, caducidad) · v2: consistencia por cuenta
      Misma lógica que la app de Apps Script (Real_Codigo.gs): Tabla maestra para Funded, regla v7 para challenges,
      rotación (SL → siguiente cuenta), plan B y registro rápido. Cada usuario ve solo sus cuentas y trades.
      La Tabla maestra es compartida (config/tablaMaestra) y solo la edita el admin. -->
@@ -384,9 +384,9 @@ function renderChk() {
     + (CHK_OPEN ? CHK_ITEMS.map((t, k) => (IS_ADMIN && k === 0 ? '<div class="g">BOTS NASDAQ (VPS)</div>' : '') + (IS_ADMIN && k === 2 ? '<div class="g">ANTES DE LA SESIÓN</div>' : '') + '<label><input type="checkbox" data-chk="' + k + '"' + (CHK[k] ? ' checked' : '') + '>' + esc(t) + '</label>').join('') : '') + '</div>';
 }
 function renderCuentas() {
-  $('ctaTabla').innerHTML = CUENTAS.length ? '<table><thead><tr><th>Orden</th><th>Cuenta</th><th>Fase</th><th class="num">Tamaño</th><th class="num">Balance firma</th><th class="num">Mínimo firma</th><th>Sincronizada</th><th>Turno</th><th>Activa</th><th></th></tr></thead><tbody>'
+  $('ctaTabla').innerHTML = CUENTAS.length ? '<table><thead><tr><th>Orden</th><th>Cuenta</th><th>Fase</th><th class="num">Tamaño</th><th class="num">Balance firma</th><th class="num">Mínimo firma</th><th>Sincronizada</th><th>Turno</th><th>Rotación</th><th></th></tr></thead><tbody>'
     + CUENTAS.map(c => '<tr><td>' + c.orden + '</td><td><b>' + esc(c.nombre) + '</b><div class="mut" style="font:11px var(--mono)">' + esc(c.id) + '</div></td><td>' + esc(c.fase) + '</td><td class="num">' + money(c.tam) + '</td><td class="num">' + money(c.balance) + '</td><td class="num">' + money(c.minimo) + '</td><td class="mut">' + (c.syncAt ? new Date(c.syncAt).toLocaleString('es-ES', { timeZone: 'Europe/Madrid', dateStyle: 'short', timeStyle: 'short' }) : '—') + '</td>'
-      + '<td>' + (c.enTurno ? '<b style="color:var(--real)">● En turno</b>' : '<button class="link" type="button" data-turno="' + esc(c.id) + '">Poner en turno</button>') + '</td><td>' + (c.activa ? 'Sí' : 'No') + '</td><td><button class="link" type="button" data-edit="' + esc(c.id) + '">✎ Editar / sincronizar</button></td></tr>').join('') + '</tbody></table>'
+      + '<td>' + (c.enTurno ? '<b style="color:var(--real)">● En turno</b>' : (c.activa && c.estado === 'Activa') ? '<button class="link" type="button" data-turno="' + esc(c.id) + '">Poner en turno</button>' : '<span class="mut">—</span>') + '</td><td>' + (c.estado !== 'Activa' ? '<span class="tag ' + (c.estado === 'Quemada' ? 'q' : 'p') + '">' + esc(c.estado) + '</span>' : c.activa ? 'En rotación' : '<span class="tag r">Reserva</span>') + '</td><td><button class="link" type="button" data-edit="' + esc(c.id) + '">✎ Editar / sincronizar</button></td></tr>').join('') + '</tbody></table>'
     : '<div class="empty">Sin cuentas todavía.</div>';
 }
 function renderTrades() {
