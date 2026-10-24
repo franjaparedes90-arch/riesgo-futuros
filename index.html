@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Riesgo Futuros</title>
-<!-- Riesgo Futuros · app multiusuario (Firebase) · v5 (24/10/2026) · v5: tabla de cuentas: quemadas/pasadas/reserva sin "Poner en turno" · v4 (24/10/2026) · v4: riesgo en rojo si supera el margen; checklist con bots VPS solo para el admin · v3 (23/10/2026) · v3: Cuentas y contabilidad (equity, retiros, compras, resets, reserva, inactividad, caducidad) · v2: consistencia por cuenta
+<!-- Riesgo Futuros · app multiusuario (Firebase) · v6 (24/10/2026) · v6: formulario completo de trade (Nasdaq) igual al de la app vieja, editar/completar trades y journal en Trades (sin R plan) · v5 (24/10/2026) · v5: tabla de cuentas: quemadas/pasadas/reserva sin "Poner en turno" · v4 (24/10/2026) · v4: riesgo en rojo si supera el margen; checklist con bots VPS solo para el admin · v3 (23/10/2026) · v3: Cuentas y contabilidad (equity, retiros, compras, resets, reserva, inactividad, caducidad) · v2: consistencia por cuenta
      Misma lógica que la app de Apps Script (Real_Codigo.gs): Tabla maestra para Funded, regla v7 para challenges,
      rotación (SL → siguiente cuenta), plan B y registro rápido. Cada usuario ve solo sus cuentas y trades.
      La Tabla maestra es compartida (config/tablaMaestra) y solo la edita el admin. -->
@@ -75,6 +75,15 @@ td.num,th.num{text-align:right}
 .inl{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;align-items:end;margin-top:8px}
 .inl label{display:flex;flex-direction:column;gap:3px;font:10px var(--mono);text-transform:uppercase;color:var(--muted)}
 .ck .g{font:11px var(--mono);color:var(--muted);margin:8px 0 4px;letter-spacing:.06em}
+.fsec{margin-bottom:10px}.ft{font:600 11px var(--mono);letter-spacing:.08em;color:var(--text-2);text-transform:uppercase;margin-bottom:8px}
+.fg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px 12px}.fc{display:flex;flex-direction:column;gap:4px;min-width:0}.fc>span{font:10px var(--mono);text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.fc.w2{grid-column:span 2}.fc.w3{grid-column:1/-1}.fc input,.fc select,.fc textarea{width:100%}.fc textarea{font:14px Inter,sans-serif;border:1px solid var(--line-2);border-radius:7px;padding:7px 9px}
+.ro{font:13px var(--mono);padding:7px 0;color:var(--text-2)}.chips{display:flex;flex-wrap:wrap;gap:5px}.chip{padding:5px 10px;font-size:13px;border-radius:99px}.chip.on{background:var(--sel);color:#fff;border-color:var(--sel)}.chip.on .mut{color:#dbe9fc}.chip:disabled{opacity:.45}
+.chk{display:flex;gap:6px;align-items:center;font-size:14px;padding:6px 0}.fc .chk input{width:auto}
+#trOv{position:fixed;inset:0;background:rgba(18,34,59,.45);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px}
+#trOv .bx{background:#fff;border-radius:12px;max-width:720px;width:100%;max-height:88vh;overflow:auto;padding:16px 18px}
+.kv2{display:grid;grid-template-columns:minmax(120px,200px) 1fr;gap:5px 12px;font-size:13px}.kv2 span{font:11px var(--mono);color:var(--muted)}.kv2 div{word-break:break-word}
+@media(max-width:700px){.fg{grid-template-columns:1fr 1fr}.fc.w2,.fc.w3{grid-column:1/-1}}
 .warn.bad{background:#fde6e6;border-color:#eba3a3;color:#9b2222}
 @media(max-width:560px){.kv{grid-template-columns:repeat(2,1fr)}.acc .hero b{font-size:19px}}
 </style></head><body>
@@ -92,6 +101,7 @@ td.num,th.num{text-align:right}
         <button class="tab on" data-tab="hoy" type="button">Hoy</button>
         <button class="tab" data-tab="cuentas" type="button">Cuentas</button>
         <button class="tab" data-tab="conta" type="button">Contabilidad</button>
+        <button class="tab" data-tab="nuevo" type="button">+ Nuevo trade</button>
         <button class="tab" data-tab="trades" type="button">Trades</button>
         <button class="tab" data-tab="admin" type="button" id="tabAdmin" hidden>Admin</button>
         <button type="button" id="btnSalir">Salir</button>
@@ -160,8 +170,11 @@ td.num,th.num{text-align:right}
         <div class="msg" id="movMsg"></div>
       </div>
     </section>
+    <section id="v-nuevo" hidden><div id="frmBox"></div></section>
     <section id="v-trades" hidden>
-      <div class="sec"><h2>Trades</h2><span class="hint">Registrados desde el registro rápido. Los más recientes arriba.</span></div>
+      <div class="kpis" id="trKpis"></div>
+      <div class="sec"><h2>Trades</h2><span class="hint">Los más recientes arriba · 👁 ver detalle · ✎ editar o completar un registro rápido</span><button type="button" class="pri" id="btnNuevoTr">+ Nuevo trade</button></div>
+      <div class="msg ok" id="trMsg"></div>
       <div class="card tbl" id="trTabla"></div>
     </section>
     <section id="v-admin" hidden>
@@ -389,14 +402,245 @@ function renderCuentas() {
       + '<td>' + (c.enTurno ? '<b style="color:var(--real)">● En turno</b>' : (c.activa && c.estado === 'Activa') ? '<button class="link" type="button" data-turno="' + esc(c.id) + '">Poner en turno</button>' : '<span class="mut">—</span>') + '</td><td>' + (c.estado !== 'Activa' ? '<span class="tag ' + (c.estado === 'Quemada' ? 'q' : 'p') + '">' + esc(c.estado) + '</span>' : c.activa ? 'En rotación' : '<span class="tag r">Reserva</span>') + '</td><td><button class="link" type="button" data-edit="' + esc(c.id) + '">✎ Editar / sincronizar</button></td></tr>').join('') + '</tbody></table>'
     : '<div class="empty">Sin cuentas todavía.</div>';
 }
+// ---------- formulario completo de trade (v6) · estrategia Nasdaq · misma lógica que Real_Codigo.gs (rjArmarFila) ----------
+const CAT = {
+  salida: ['TP', 'SL', 'BE', 'Manual'], setup: ['LONG', 'SHORT'],
+  modelos: ['1 · ORB', '2 · AMD + IFVG', '3 · Liquidez externa', '4 · Continuación'],
+  zonas: ['ORB', 'ASIA', 'LONDON', 'BSL/SSL', 'PDH/PDL', 'PWH/PWL', 'IRL', 'FVG M15', 'FVG HTF', 'CONT'],
+  tipos: ['IFVG', 'ENVOL', 'FVG', 'BPR', 'BAG'],
+  sensaciones: ['Seguro - Confiado', 'Convencido - Calma', 'Dudoso - Inseguro', 'Fomo - Acelerado', 'Venganza - Rabia', 'Miedo - Parálisis', 'Sin registrar'],
+  poi: ['ORB', 'IRL', 'PDH/PDL', 'PWH/PWL', 'PMH/PML', 'BSL/SSL', 'Asia', 'Londres', 'FVG HTF', 'Otro'],
+  quePaso: ['No llegó', 'Lo atravesó', 'Lo frenó'], bePoi: ['Me sacó en BE', 'Siguió'],
+  preguntas: ['P1', 'P2', 'P3', 'P4', 'P5', 'P6'], fvgTf: ['H4', 'H1', 'M15'],
+  fvgUb: ['Dentro', 'Saliendo (reacción)', 'En el camino'], fvgDir: ['A favor', 'En contra'], fvgRe: ['Sí', 'No', 'No llegó']
+};
+const PREG_TXT = { P1: '¿Setup válido de la estrategia?', P2: '¿Entrada, SL y TP según la estrategia?', P3: '¿Riesgo correcto según escalera?', P4: '¿Operación sin tocar?', P5: '¿Sin filtros de NO OPERAR? (horario, noticias, 3 SL)', P6: '¿Registrada con capturas y comentario?' };
+const VENTANA_NY = ['09:30', '12:00'];
+let F = null, F_EDIT = null, F_MSG = '';
+const minHHMM = h => { const p = String(h).split(':'); return +p[0] * 60 + +p[1]; };
+function horaNYde(fecha, hora) {
+  const [y, m, d] = fecha.split('-').map(Number), [hh, mi] = hora.split(':').map(Number);
+  let t = Date.UTC(y, m - 1, d, hh, mi);
+  for (let i = 0; i < 2; i++) { const l = fmtTz(new Date(t), 'Europe/Madrid', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).replace(', ', 'T'); t += Date.UTC(y, m - 1, d, hh, mi) - Date.parse(l + ':00Z'); }
+  return horaTz(new Date(t), 'America/New_York');
+}
+function nuevoForm(base) {
+  const E = TM ? estadoCuentas() : [], turno = E.find(e => e.c.enTurno), now = new Date();
+  F = Object.assign({ estrategia: 'Nasdaq', cuenta: turno ? turno.c.id : '', estado: turno ? turno.estado : '', salida: '', usd: '', rr: '', riesgoManual: '', plan: '', preguntas: [], sensacion: '',
+    fecha: hoyES(), horaAp: horaTz(now, 'Europe/Madrid'), horaCi: horaTz(now, 'Europe/Madrid'), setup: '', modelo: '', zona: '', tipos: [], mfe: '', volvioBE: '', mfeAntesBE: '', abierto: false, rCierre: '',
+    poi: 'Ninguno', distPoi: '', quePaso: '', bePoi: '', puntoLiq: '', distLiq: '', fvg: '', fvgTf: [], fvgUb: '', fvgDir: '', fvgRe: '', fvgDist: '', linkHtf: '', linkLtf: '', reflexion: '' }, base || {});
+}
+function formDeTrade(t) {
+  const d = t.detalle || {}, g = (k, alt) => t[k] !== undefined && t[k] !== '' ? t[k] : (d[alt] !== undefined ? d[alt] : '');
+  const lista = (k, alt, sep) => Array.isArray(t[k]) ? t[k] : (d[alt] ? String(d[alt]).split(sep).map(s => s.trim()).filter(Boolean) : []);
+  const n = v => v === '' || v == null ? '' : String(v).replace(',', '.');
+  const rr = t.rr !== undefined ? t.rr : (d['% P&L Sistema'] !== undefined ? n(d['% P&L Sistema']) : (t.riesgo > 0 ? Math.round(t.usd / t.riesgo * 100) / 100 : ''));
+  return { estrategia: t.estrategia || 'Nasdaq', cuenta: t.cuenta, estado: t.estado || '', salida: t.salida || '', usd: t.usd, rr, riesgoManual: Number(rr) === 0 ? (t.riesgo || '') : '',
+    plan: g('plan', '¿Siguió el Plan?'), preguntas: lista('preguntas', 'Preguntas Fallidas', ','), sensacion: g('sensacion', 'Sensación'),
+    fecha: t.fecha, horaAp: t.hora || g('horaAp', 'Hora Apertura'), horaCi: g('horaCi', 'Hora Cierre') || t.hora,
+    setup: g('setup', 'Setup'), modelo: g('modelo', 'Modelo'), zona: g('zona', 'Zona'), tipos: lista('tipos', 'Tipo de Entrada', '|'),
+    mfe: n(g('mfe', 'MFE (R)')), volvioBE: g('volvioBE', 'Volvió a BE tras 1R'), mfeAntesBE: n(g('mfeAntesBE', 'MFE antes de BE (R)')), abierto: t.abierto === true || d['Seguía Abierto 19:00'] === 'Sí', rCierre: n(g('rCierre', 'R al Cierre')),
+    poi: g('poi', 'POI en el Camino') || 'Ninguno', distPoi: n(g('distPoi', 'Distancia POI (R)')), quePaso: g('quePaso', 'Qué Pasó en el POI'), bePoi: g('bePoi', 'BE en el POI'),
+    puntoLiq: g('puntoLiq', 'Punto de Liquidez'), distLiq: n(g('distLiq', 'Distancia Liquidez (R)')),
+    fvg: g('fvg', 'FVG HTF Presente'), fvgTf: lista('fvgTf', 'FVG HTF Temporalidad', '|'), fvgUb: g('fvgUb', 'FVG HTF Ubicación'), fvgDir: g('fvgDir', 'FVG HTF Dirección'), fvgRe: g('fvgRe', 'FVG HTF Reacciona'), fvgDist: n(g('fvgDist', 'FVG HTF Distancia (R)')),
+    linkHtf: g('linkHtf', 'Link HTF'), linkLtf: g('linkLtf', 'Link LTF'), reflexion: t.completo || t.migrado ? (t.nota || '') : String(t.nota || '').replace(/^Registro rápido: /, '') };
+}
+function abrirForm(id) {
+  const t = id ? TRADES.find(x => x._id === id) : null;
+  F_EDIT = t ? t._id : null; F_MSG = '';
+  if (t) { nuevoForm(formDeTrade(t)); } else nuevoForm();
+  document.querySelector('[data-tab=nuevo]').click();
+}
+function chips(k, list, multi, lab) {
+  const v = F[k];
+  return '<div class="chips">' + list.map(o => '<button type="button" class="chip' + ((multi ? v.includes(o) : v === o) ? ' on' : '') + '" data-fk="' + k + '" data-fv="' + esc(o) + '"' + (multi ? ' data-multi="1"' : '') + '>' + esc(o) + (lab && lab[o] ? ' <span class="mut">' + esc(lab[o]) + '</span>' : '') + '</button>').join('') + '</div>';
+}
+const inp = (k, type, ph) => '<input data-fin="' + k + '" type="' + (type || 'text') + '"' + (type === 'number' ? ' step="any"' : '') + ' value="' + esc(F[k]) + '" placeholder="' + esc(ph || '') + '">';
+const sel = (k, list, ph) => '<select data-fin="' + k + '"><option value="">' + esc(ph || 'Elegí…') + '</option>' + list.map(o => '<option' + (F[k] === o ? ' selected' : '') + '>' + esc(o) + '</option>').join('') + '</select>';
+const campo = (l, h, cls) => '<label class="fc' + (cls ? ' ' + cls : '') + '"><span>' + l + '</span>' + h + '</label>';
+function renderForm() {
+  if (!$('frmBox')) return;
+  if (!F) nuevoForm();
+  const ctas = F_EDIT ? CUENTAS : CUENTAS.filter(c => c.estado === 'Activa'), num = v => parseFloat(String(v).replace(',', '.')), mfe = num(F.mfe), rr = num(F.rr), hayPoi = F.poi && F.poi !== 'Ninguno';
+  const c = CUENTAS.find(x => x.id === F.cuenta), usd = num(F.usd);
+  const riesgo = rr === 0 ? num(F.riesgoManual) : (isNaN(usd) || isNaN(rr) || !rr ? NaN : Math.abs(usd / rr));
+  const t = F_EDIT ? TRADES.find(x => x._id === F_EDIT) : null;
+  let h = '<div class="sec"><h2>' + (t ? (t.rapido && !t.completo ? 'Completar registro rápido #' : 'Editar trade #') + esc(t.num) : 'Nuevo trade real') + '</h2><span class="hint">Estrategia</span>' + '<div class="chips"><button type="button" class="chip on">Nasdaq</button><button type="button" class="chip" disabled>Zonas · pronto</button><button type="button" class="chip" disabled>Liquidez · pronto</button></div></div>';
+  h += '<div class="card fsec"><div class="ft">1 · Cuenta y resultado</div><div class="fg">'
+    + campo('Cuenta *', '<select data-fin="cuenta"><option value="">Elegí…</option>' + ctas.map(x => '<option value="' + esc(x.id) + '"' + (F.cuenta === x.id ? ' selected' : '') + '>' + esc(x.nombre) + (x.enTurno ? ' · en turno' : '') + '</option>').join('') + '</select>')
+    + campo('Estado de la cuenta al entrar *', sel('estado', ESTADOS.concat(['Challenge'])))
+    + campo('Cómo saliste *', chips('salida', CAT.salida))
+    + campo('Resultado ($) *', inp('usd', 'number', '−79,50'))
+    + campo('% P&amp;L sistema (R) * · 2 = TP, −1 = SL', inp('rr', 'number', '−1'))
+    + (rr === 0 ? campo('Riesgo usado ($) · opcional en BE', inp('riesgoManual', 'number')) : campo('Riesgo real · P&amp;L real', '<div class="ro">' + (isNaN(riesgo) || !c ? '—' : money2(riesgo) + ' · ' + (riesgo / c.tam * 100).toFixed(2).replace('.', ',') + ' % · P&amp;L ' + (isNaN(usd) ? '—' : (usd / c.tam * 100).toFixed(2).replace('.', ',') + ' %')) + '</div>'))
+    + campo('¿Seguiste el plan? *', chips('plan', ['Sí', 'No']))
+    + (F.plan === 'No' ? campo('¿Qué pregunta falló? * (va al comienzo de la reflexión)', chips('preguntas', CAT.preguntas, true, PREG_TXT), 'w2') : '')
+    + campo('Sensación al ejecutar *', sel('sensacion', CAT.sensaciones)) + '</div></div>';
+  h += '<div class="card fsec"><div class="ft">2 · Setup</div><div class="fg">'
+    + campo('Fecha *', inp('fecha', 'date')) + campo('Hora apertura * (Madrid)', inp('horaAp', 'time')) + campo('Hora cierre *', inp('horaCi', 'time'))
+    + campo('Setup *', chips('setup', CAT.setup)) + campo('Modelo de entrada *', sel('modelo', CAT.modelos)) + campo('Zona *', sel('zona', CAT.zonas))
+    + campo('Tipo de entrada * (una o más; BAG solo con ORB)', chips('tipos', CAT.tipos, true), 'w2') + '</div></div>';
+  h += '<div class="card fsec"><div class="ft">3 · Recorrido</div><div class="fg">' + campo('MFE · R máximo a favor *', inp('mfe', 'number', '0 si no fue nada a favor'));
+  if (mfe >= 1) h += campo('Después de pasar 1R, ¿volvió a BE? *', chips('volvioBE', ['Sí', 'No']));
+  if (mfe >= 1 && F.volvioBE === 'Sí') h += campo('MFE antes de volver a BE *', inp('mfeAntesBE', 'number'));
+  if (F.volvioBE !== 'No') h += campo('¿Seguía abierto a las 19:00? (caso raro)', '<label class="chk"><input type="checkbox" data-fin="abierto"' + (F.abierto ? ' checked' : '') + '> Sí</label>');
+  if (F.volvioBE !== 'No' && F.abierto) h += campo('R al cierre de las 19:00 *', inp('rCierre', 'number'));
+  h += '</div></div><div class="card fsec"><div class="ft">4 · POI y liquidez</div><div class="fg">' + campo('POI en el camino (entrada → 2R) *', sel('poi', ['Ninguno'].concat(CAT.poi), 'Ninguno'));
+  if (hayPoi) h += campo('¿A cuántos R está? *', inp('distPoi', 'number')) + campo('¿Qué pasó en el POI? *', chips('quePaso', CAT.quePaso)) + (F.quePaso === 'Lo atravesó' ? campo('BE en el POI *', chips('bePoi', CAT.bePoi)) : '');
+  if (!hayPoi && mfe >= 2) h += campo('Punto de liquidez objetivo *', sel('puntoLiq', CAT.poi)) + campo('¿A cuántos R está? (≥ 2) *', inp('distLiq', 'number'));
+  if (!hayPoi && !(mfe >= 2)) h += '<div class="mut" style="font-size:12px;align-self:center">Punto de liquidez: solo si no hay POI y llegó a 2R.</div>';
+  h += '</div></div><div class="card fsec"><div class="ft">5 · FVG HTF</div><div class="fg">' + campo('¿FVG HTF (H4/H1/M15) en la entrada o en el camino? *', chips('fvg', ['Sí', 'No']));
+  if (F.fvg === 'Sí') h += campo('Temporalidad * (una o más)', chips('fvgTf', CAT.fvgTf, true)) + campo('¿Dónde está? *', chips('fvgUb', CAT.fvgUb)) + (F.fvgUb === 'En el camino' ? campo('¿A cuántos R de la entrada? *', inp('fvgDist', 'number')) : '') + campo('¿A favor o en contra? *', chips('fvgDir', CAT.fvgDir)) + campo('¿Reacciona? * (sea TP o SL)', chips('fvgRe', CAT.fvgRe));
+  h += '</div></div><div class="card fsec"><div class="ft">6 · Links y reflexión · P6</div><div class="fg">' + campo('Link HTF (M15)', inp('linkHtf', 'url', 'https://www.tradingview.com/x/…')) + campo('Link LTF (M1)', inp('linkLtf', 'url', 'https://www.tradingview.com/x/…'))
+    + campo('Reflexión', '<textarea data-fin="reflexion" rows="3">' + esc(F.reflexion) + '</textarea>', 'w3') + '</div>'
+    + '<div class="row" style="margin-top:12px;justify-content:space-between"><span class="mut" style="font-size:12px">' + (t ? 'Editar no cambia el turno.' : 'Si es SL, el turno pasa a la siguiente cuenta en rotación.') + '</span><span class="row"><button type="button" id="frmCancel">Cancelar</button><button type="button" class="pri" id="frmSave">' + (t ? 'Guardar cambios' : 'Guardar trade') + '</button></span></div>'
+    + '<div class="msg' + (F_MSG.startsWith('✓') ? ' ok' : ' err') + '" id="frmMsg">' + esc(F_MSG) + '</div></div>';
+  $('frmBox').innerHTML = h;
+}
+function validarTrade(f) {
+  const n = v => parseFloat(String(v).replace(',', '.')), en = (l, v) => l.includes(v), err = m => ({ err: m });
+  const c = CUENTAS.find(x => x.id === f.cuenta);
+  if (!c) return err('Cuenta: elegí una cuenta');
+  if (!f.estado) return err('Estado de la cuenta al entrar: obligatorio');
+  if (!en(CAT.salida, f.salida)) return err('Cómo saliste: obligatorio');
+  const usd = n(f.usd), rr = n(f.rr);
+  if (isNaN(usd)) return err('Resultado ($): obligatorio');
+  if (isNaN(rr)) return err('% P&L sistema (R obtenido): obligatorio');
+  let riesgo;
+  if (rr === 0) { riesgo = n(f.riesgoManual); if (isNaN(riesgo) || riesgo <= 0) riesgo = ''; }
+  else { if ((usd > 0) !== (rr > 0) && usd !== 0) return err('Resultado ($) y % P&L sistema tienen que tener el mismo signo'); riesgo = Math.round(Math.abs(usd / rr) * 100) / 100; }
+  if (f.plan !== 'Sí' && f.plan !== 'No') return err('¿Seguiste el plan?: obligatorio');
+  const fallidas = f.plan === 'No' ? CAT.preguntas.filter(p => f.preguntas.includes(p)) : [];
+  if (f.plan === 'No' && !fallidas.length) return err('¿Qué pregunta falló?: marcá al menos una (P1–P6)');
+  if (!en(CAT.sensaciones, f.sensacion)) return err('Sensación al ejecutar: obligatoria');
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(f.fecha)) return err('Fecha: obligatoria');
+  if (!/^\d{1,2}:\d{2}$/.test(f.horaAp) || !/^\d{1,2}:\d{2}$/.test(f.horaCi)) return err('Hora de apertura y de cierre: obligatorias');
+  if (minHHMM(f.horaCi) < minHHMM(f.horaAp)) return err('Hora de cierre: no puede ser anterior a la apertura (igual sí: misma vela)');
+  const ny = horaNYde(f.fecha, f.horaAp);
+  if (minHHMM(ny) < minHHMM(VENTANA_NY[0]) || minHHMM(ny) > minHHMM(VENTANA_NY[1])) return err('Hora de apertura fuera de la ventana de Nasdaq (09:30–12:00 Nueva York). Tu entrada es a las ' + ny + ' de NY.');
+  if (!en(CAT.setup, f.setup)) return err('Setup: LONG o SHORT');
+  if (!en(CAT.modelos, f.modelo)) return err('Modelo de entrada: obligatorio');
+  if (!en(CAT.zonas, f.zona)) return err('Zona: obligatoria');
+  const tipos = CAT.tipos.filter(x => f.tipos.includes(x));
+  if (!tipos.length) return err('Tipo de entrada: marcá al menos uno');
+  if (tipos.includes('BAG') && f.modelo !== '1 · ORB') return err('Tipo de entrada: BAG solo con ORB');
+  const mfe = n(f.mfe);
+  if (isNaN(mfe) || mfe < 0) return err('MFE: obligatorio (0 si no fue nada a favor)');
+  let volvio = '', mfeAntes = '';
+  if (mfe >= 1) {
+    if (f.volvioBE !== 'Sí' && f.volvioBE !== 'No') return err('Después de pasar 1R, ¿volvió a BE?: Sí o No');
+    volvio = f.volvioBE;
+    if (volvio === 'Sí') { mfeAntes = n(f.mfeAntesBE); if (isNaN(mfeAntes) || mfeAntes < 1 || mfeAntes > mfe) return err('MFE antes de volver a BE: entre 1 y el MFE (' + mfe + ')'); }
+  }
+  let abierto = false, rCierre = '';
+  if (volvio !== 'No' && f.abierto) { abierto = true; rCierre = n(f.rCierre); if (isNaN(rCierre) || rCierre <= -1 || rCierre > mfe) return err('R al cierre de las 19:00: por encima de −1 y sin superar el MFE (' + mfe + ')'); }
+  const hayPoi = f.poi && f.poi !== 'Ninguno';
+  let distPoi = '', fuera = '', quePaso = '', bePoi = '';
+  if (hayPoi) {
+    if (!en(CAT.poi, f.poi)) return err('POI en el camino: elegí uno del catálogo o "Ninguno"');
+    distPoi = n(f.distPoi); if (isNaN(distPoi) || distPoi <= 0 || distPoi > 2) return err('Distancia del POI: entre 0 y 2R');
+    fuera = distPoi < 1 ? 'Sí' : 'No';
+    if (!en(CAT.quePaso, f.quePaso)) return err('¿Qué pasó en el POI?: obligatorio');
+    quePaso = f.quePaso;
+    if (mfe >= 2 && quePaso !== 'Lo atravesó') return err('¿Qué pasó en el POI?: si llegó al 2R, lo atravesó');
+    if (quePaso === 'Lo atravesó') { if (!en(CAT.bePoi, f.bePoi)) return err('BE en el POI: Me sacó en BE o Siguió'); bePoi = f.bePoi; }
+    else if (quePaso === 'Lo frenó') bePoi = 'Me sacó en BE';
+  }
+  const hayLiq = !hayPoi && mfe >= 2;
+  let puntoLiq = '', distLiq = '', llegoLiq = '';
+  if (hayLiq) {
+    if (!en(CAT.poi, f.puntoLiq)) return err('Punto de liquidez objetivo: obligatorio (sin POI y con 2R alcanzado)');
+    puntoLiq = f.puntoLiq; distLiq = n(f.distLiq);
+    if (isNaN(distLiq) || distLiq < 2) return err('Distancia al punto de liquidez: 2R o más');
+    llegoLiq = mfe >= distLiq ? 'Sí' : 'No';
+  }
+  if (f.fvg !== 'Sí' && f.fvg !== 'No') return err('¿FVG HTF en la entrada o en el camino?: Sí o No');
+  let fvgTf = [], fvgUb = '', fvgDir = '', fvgRe = '', fvgDist = '';
+  if (f.fvg === 'Sí') {
+    fvgTf = CAT.fvgTf.filter(x => f.fvgTf.includes(x));
+    if (!fvgTf.length) return err('FVG HTF: elegí al menos una temporalidad (H4, H1 o M15)');
+    if (!en(CAT.fvgUb, f.fvgUb)) return err('FVG HTF: ¿dónde está? (Dentro, Saliendo o En el camino)');
+    if (!en(CAT.fvgDir, f.fvgDir)) return err('FVG HTF: ¿a favor o en contra?');
+    if (!en(CAT.fvgRe, f.fvgRe)) return err('FVG HTF: ¿reacciona? Sí, No o No llegó');
+    fvgUb = f.fvgUb; fvgDir = f.fvgDir; fvgRe = f.fvgRe;
+    if (fvgUb === 'En el camino') { fvgDist = n(f.fvgDist); if (isNaN(fvgDist) || fvgDist <= 0) return err('FVG HTF en el camino: ¿a cuántos R de la entrada está? (mayor a 0)'); }
+  }
+  const url = u => /^https?:\/\/\S+$/i.test(String(u).trim());
+  if (f.linkHtf && !url(f.linkHtf)) return err('Link HTF: la URL no tiene un formato válido');
+  if (f.linkLtf && !url(f.linkLtf)) return err('Link LTF: la URL no tiene un formato válido');
+  // gestiones (igual que el BT v9)
+  const noAlc = volvio === 'No' ? 0 : (abierto ? rCierre : -1), fijo = T => mfe >= T ? T : noAlc;
+  const be1 = T => mfe < 1 ? noAlc : (volvio === 'Sí' ? (mfeAntes >= T ? T : 0) : (mfe >= T ? T : 0));
+  const gest = { g1: fijo(1), g15: fijo(1.5), g2: fijo(2), be15: be1(1.5), be2: be1(2), poi: hayPoi ? (bePoi === 'Me sacó en BE' ? 0 : fijo(2)) : '', liq: hayLiq ? (mfe >= distLiq ? distLiq : 0) : '' };
+  let reflexion = String(f.reflexion || '').trim();
+  if (f.plan === 'No' && !fallidas.every(x => reflexion.includes(x))) reflexion = fallidas.join(', ') + (reflexion ? ' · ' + reflexion : '');
+  const p6 = (!reflexion || !f.linkHtf || !f.linkLtf) ? 'Sí' : 'No';
+  const cuentaStats = (f.plan === 'No' && fallidas.some(p => p !== 'P6')) ? 'No' : 'Sí';
+  const riesgoPct = riesgo === '' ? '' : Math.round(riesgo / c.tam * 100 * 1000) / 1000, pnlPct = Math.round(usd / c.tam * 100 * 1000) / 1000;
+  const E = TM ? estadoCuentas().find(e => e.c.id === c.id) : null;
+  const target = f.estado === 'Challenge' ? (E && E.target || '1,5R fijo') : (TM && TM[f.estado] ? TM[f.estado].target : '');
+  const o = { estrategia: 'Nasdaq', cuenta: c.id, estado: f.estado, salida: f.salida, usd, rr, riesgo: riesgo === '' ? 0 : riesgo, riesgoPct, pnlPct, plan: f.plan, preguntas: fallidas, sensacion: f.sensacion,
+    fecha: f.fecha, hora: f.horaAp, horaCi: f.horaCi, setup: f.setup, modelo: f.modelo, zona: f.zona, tipos, mfe, volvioBE: volvio, mfeAntesBE: mfeAntes, abierto, rCierre,
+    poi: hayPoi ? f.poi : 'Ninguno', distPoi, fueraPlan: fuera, quePaso, bePoi, puntoLiq, distLiq, llegoLiq, fvg: f.fvg, fvgTf, fvgUb, fvgDir, fvgRe, fvgDist,
+    linkHtf: f.linkHtf || '', linkLtf: f.linkLtf || '', nota: reflexion, p6, cuentaStats, gestiones: gest, target, completo: true };
+  o.detalle = { 'Fecha': fmtF(o.fecha), 'Hora Apertura': o.hora, 'Hora Cierre': o.horaCi, 'Cuenta': o.cuenta, 'Estado al Entrar': o.estado, 'Cómo Salió': o.salida, 'Resultado ($)': String(usd), '% P&L Sistema': String(rr), 'Riesgo Usado ($)': String(riesgo), 'Riesgo Real (%)': String(riesgoPct), 'P&L Real (%)': String(pnlPct),
+    '¿Siguió el Plan?': o.plan, 'Preguntas Fallidas': fallidas.join(', '), 'Sensación': o.sensacion, 'Setup': o.setup, 'Modelo': o.modelo, 'Zona': o.zona, 'Tipo de Entrada': tipos.join(' | '), 'MFE (R)': String(mfe),
+    'Volvió a BE tras 1R': volvio, 'MFE antes de BE (R)': String(mfeAntes), 'Seguía Abierto 19:00': abierto ? 'Sí' : 'No', 'R al Cierre': String(rCierre), 'POI en el Camino': o.poi, 'Distancia POI (R)': String(distPoi), 'Fuera de Plan': fuera, 'Qué Pasó en el POI': quePaso, 'BE en el POI': bePoi,
+    'Punto de Liquidez': puntoLiq, 'Distancia Liquidez (R)': String(distLiq), 'Llegó a Liquidez': llegoLiq, 'R 1R fijo': String(gest.g1), 'R 1,5R fijo': String(gest.g15), 'R 2R fijo': String(gest.g2), 'R 1,5R + BE 1R': String(gest.be15), 'R 2R + BE 1R': String(gest.be2), 'R 2R + BE POI': String(gest.poi), 'R Liquidez + BE 2R': String(gest.liq),
+    'Gestión Plan (Tabla maestra)': target, 'Link HTF': o.linkHtf, 'Link LTF': o.linkLtf, 'Reflexión': reflexion, 'P6 Pendiente': p6, 'Cuenta para Estadística': cuentaStats,
+    'FVG HTF Presente': o.fvg, 'FVG HTF Temporalidad': fvgTf.join(' | '), 'FVG HTF Ubicación': fvgUb, 'FVG HTF Dirección': fvgDir, 'FVG HTF Reacciona': fvgRe, 'FVG HTF Distancia (R)': String(fvgDist) };
+  Object.keys(o.detalle).forEach(k => { if (o.detalle[k] === '' || o.detalle[k] === 'undefined') delete o.detalle[k]; });
+  return { o, c };
+}
+async function guardarTrade() {
+  const v = validarTrade(F);
+  if (v.err) { F_MSG = v.err; $('frmMsg').textContent = v.err; $('frmMsg').className = 'msg err'; return; }
+  $('frmSave').disabled = true;
+  try {
+    const o = v.o, prev = F_EDIT ? TRADES.find(x => x._id === F_EDIT) : null, b = writeBatch(db);
+    let rot = '';
+    if (prev) { o.num = prev.num; o.registrado = prev.registrado; if (prev.rapido) o.rapido = true; if (prev.migrado) o.migrado = true; o.editado = Date.now(); b.set(uref('trades', prev._id), o); }
+    else {
+      o.num = TRADES.reduce((m, t) => Math.max(m, num(t.num)), 0) + 1; o.registrado = Date.now(); b.set(doc(ucol('trades')), o);
+      if (o.salida === 'SL') {
+        const act = CUENTAS.filter(c => c.activa && c.estado === 'Activa'), i = act.findIndex(c => c.id === o.cuenta);
+        if (act.length > 1 && i > -1) { const sig = act[(i + 1) % act.length]; act.forEach(c => b.set(uref('cuentas', c.id), { enTurno: c.id === sig.id }, { merge: true })); rot = ' Turno: SL → pasa a ' + sig.nombre + '.'; }
+      }
+    }
+    await b.commit();
+    F_MSG = '✓ Guardado #' + o.num + ' · ' + v.c.nombre + ' · ' + o.salida + ' ' + o.usd + ' $.' + rot;
+    F_EDIT = null; nuevoForm(); await cargar();
+    document.querySelector('[data-tab=trades]').click(); $('trMsg').textContent = F_MSG; F_MSG = '';
+  } catch (e) { $('frmMsg').textContent = 'Error: ' + e.message; $('frmSave').disabled = false; }
+}
 function renderTrades() {
-  $('trTabla').innerHTML = TRADES.length ? '<table><thead><tr><th>Nº</th><th>Fecha</th><th>Hora</th><th>Cuenta</th><th>Estado</th><th>Salida</th><th class="num">Resultado</th><th class="num">Riesgo</th><th class="num">R</th><th>Nota</th><th></th></tr></thead><tbody>'
-    + TRADES.map(t => { const c = CUENTAS.find(x => x.id === t.cuenta), s = String(t.salida).toLowerCase(), r = t.riesgo > 0 ? t.usd / t.riesgo : null;
-      return '<tr><td>' + t.num + '</td><td>' + esc(t.fecha.split('-').reverse().join('/')) + '</td><td>' + esc(t.hora) + '</td><td>' + esc(c ? c.nombre : t.cuenta) + '</td><td>' + (ICON[t.estado] || '') + ' ' + esc(t.estado) + '</td><td><span class="pill ' + s + '">' + esc(t.salida) + '</span></td>'
-        + '<td class="num ' + (t.usd > 0 ? 'pos' : t.usd < 0 ? 'neg' : '') + '">' + money(t.usd) + '</td><td class="num">' + money(t.riesgo) + '</td><td class="num">' + (r == null ? '—' : (r > 0 ? '+' : '') + r.toFixed(2).replace('.', ',') + 'R') + '</td><td class="mut" style="white-space:normal;min-width:160px">' + esc(t.nota) + '</td>'
-        + '<td><button class="link" type="button" data-del="' + esc(t._id) + '" title="Borrar">🗑</button></td></tr>'; }).join('') + '</tbody></table>'
+  const T = TRADES, tp = T.filter(t => t.salida === 'TP').length, sl = T.filter(t => t.salida === 'SL').length, be = T.length - tp - sl;
+  const g = T.filter(t => t.usd > 0).reduce((a, t) => a + num(t.usd), 0), p = -T.filter(t => t.usd < 0).reduce((a, t) => a + num(t.usd), 0);
+  const conPlan = T.map(t => t.plan || (t.detalle || {})['¿Siguió el Plan?']).filter(Boolean), si = conPlan.filter(x => x === 'Sí').length;
+  const pend = T.filter(t => t.rapido && !t.completo).length;
+  $('trKpis').innerHTML = [['Trades', T.length, tp + ' TP · ' + sl + ' SL · ' + be + ' BE'], ['Winrate', tp + sl ? Math.round(tp / (tp + sl) * 100) + ' %' : '—', 'TP ÷ (TP + SL)'], ['Profit factor', p ? (g / p).toFixed(2).replace('.', ',') : '—', '$ ganado ÷ $ perdido'],
+    ['P&amp;L', '<span class="' + (g - p < 0 ? 'neg' : 'pos') + '">' + money(g - p) + '</span>', 'suma de resultados'], ['Siguió el plan', conPlan.length ? Math.round(si / conPlan.length * 100) + ' %' : '—', si + ' de ' + conPlan.length], ['Detalles pendientes', pend, 'registros rápidos sin completar']]
+    .map(k => '<div class="kpi"><div class="l">' + k[0] + '</div><div class="v">' + k[1] + '</div><div class="d">' + k[2] + '</div></div>').join('');
+  $('trTabla').innerHTML = T.length ? '<table><thead><tr><th>Nº</th><th>Fecha</th><th>Cuenta</th><th>Modelo</th><th>Setup</th><th>Salida</th><th class="num">Resultado</th><th class="num">R</th><th>Plan</th><th></th></tr></thead><tbody>'
+    + T.map(t => { const c = CUENTAS.find(x => x.id === t.cuenta), d = t.detalle || {}, s = String(t.salida).toLowerCase(), r = t.rr !== undefined ? t.rr : (d['% P&L Sistema'] !== undefined ? num(d['% P&L Sistema']) : (t.riesgo > 0 ? t.usd / t.riesgo : null)), pl = t.plan || d['¿Siguió el Plan?'] || '', pen = t.rapido && !t.completo;
+      return '<tr><td>' + esc(t.num) + '</td><td>' + fmtF(t.fecha) + ' ' + esc(t.hora || '') + '</td><td>' + esc(c ? c.nombre : t.cuenta) + '</td><td>' + esc(t.modelo || d['Modelo'] || '—') + '</td><td>' + esc(t.setup || d['Setup'] || '—') + '</td><td><span class="pill ' + s + '">' + esc(t.salida) + '</span></td>'
+        + '<td class="num ' + (t.usd > 0 ? 'pos' : t.usd < 0 ? 'neg' : '') + '">' + money2(num(t.usd)) + '</td><td class="num">' + (r == null || isNaN(r) ? '—' : (r > 0 ? '+' : '') + Number(r).toFixed(2).replace('.', ',') + 'R') + '</td><td>' + (pen ? '<span class="tag c">detalles pendientes</span>' : esc(pl)) + '</td>'
+        + '<td style="white-space:nowrap"><button class="link" type="button" data-ver="' + esc(t._id) + '" title="Ver">👁</button><button class="link" type="button" data-editr="' + esc(t._id) + '" title="' + (pen ? 'Completar' : 'Editar') + '">' + (pen ? '✎ completar' : '✎') + '</button></td></tr>'; }).join('') + '</tbody></table>'
     : '<div class="empty">Sin trades todavía.</div>';
 }
+function verTrade(id) {
+  const t = TRADES.find(x => x._id === id); if (!t) return;
+  const c = CUENTAS.find(x => x.id === t.cuenta), d = Object.assign({}, t.detalle || {});
+  ['R Plan', 'Ejecución (Real − Plan)', 'Registrado el', 'Cargado en Tradinverso'].forEach(k => delete d[k]);
+  if (!t.detalle) { d['Nota'] = t.nota; d['Riesgo Usado ($)'] = t.riesgo; }
+  const lk = v => /^https?:\/\//.test(String(v)) ? '<a href="' + esc(v) + '" target="_blank" rel="noopener">' + esc(v) + '</a>' : esc(v);
+  let o = $('trOv'); if (!o) { o = document.createElement('div'); o.id = 'trOv'; document.body.appendChild(o); o.addEventListener('click', e => { if (e.target === o) o.remove(); }); }
+  o.innerHTML = '<div class="bx"><div class="row" style="justify-content:space-between"><b>Trade #' + esc(t.num) + ' · ' + esc(c ? c.nombre : t.cuenta) + '</b><button type="button" id="trOvX">×</button></div>'
+    + '<div class="mut" style="font-size:12px;margin:4px 0 10px">' + fmtF(t.fecha) + ' ' + esc(t.hora || '') + ' · ' + esc(t.salida) + ' ' + money2(num(t.usd)) + (t.rapido && !t.completo ? ' · registro rápido, detalles pendientes' : '') + (t.fuente ? ' · origen ' + esc(t.fuente) : '') + '</div>'
+    + '<div class="kv2">' + Object.entries(d).filter(([k, v]) => v !== '' && v != null).map(([k, v]) => '<span>' + esc(k) + '</span><div>' + lk(v) + '</div>').join('') + '</div>'
+    + '<div class="row" style="justify-content:space-between;margin-top:12px"><button type="button" class="link" data-del="' + esc(t._id) + '">🗑 Borrar</button><span class="row"><button type="button" id="trOvC">Cerrar</button><button type="button" class="pri" data-editr="' + esc(t._id) + '">' + (t.rapido && !t.completo ? '✎ Completar' : '✎ Editar') + '</button></span></div></div>';
+}
+
 async function renderAdmin() {
   const al = await getDocs(collection(db, 'allow'));
   $('allowList').innerHTML = al.docs.map(d => '<div class="row" style="justify-content:space-between;border-bottom:1px solid var(--line);padding:6px 0"><span><b>' + esc(d.data().nombre || '') + '</b> · ' + esc(d.id) + '</span>' + (d.id === ADMIN ? '<span class="mut">admin</span>' : '<button class="link" type="button" data-unallow="' + esc(d.id) + '">Quitar</button>') + '</div>').join('') || '<div class="mut">Nadie autorizado.</div>';
@@ -610,7 +854,7 @@ async function guardarMov() {
 
 document.addEventListener('click', async ev => {
   const el = ev.target.closest('button,[data-chk],.ch'); if (!el) return;
-  if (el.dataset.tab) { document.querySelectorAll('.tab').forEach(b => b.classList.toggle('on', b === el)); ['hoy', 'cuentas', 'conta', 'trades', 'admin'].forEach(v => $('v-' + v).hidden = v !== el.dataset.tab); render(); return; }
+  if (el.dataset.tab) { document.querySelectorAll('.tab').forEach(b => b.classList.toggle('on', b === el)); ['hoy', 'cuentas', 'conta', 'nuevo', 'trades', 'admin'].forEach(v => $('v-' + v).hidden = v !== el.dataset.tab); render(); if (el.dataset.tab === 'nuevo') renderForm(); return; }
   if (el.dataset.qr) { QR_SAL = el.dataset.qr; pintarQr(); return; }
   if (el.id === 'qrGo') return qrGuardar();
   if (el.id === 'chkHead') { CHK_OPEN = !CHK_OPEN; renderChk(); return; }
@@ -621,7 +865,16 @@ document.addEventListener('click', async ev => {
   if (el.dataset.act) { ev.stopPropagation(); return accionCuenta(el.dataset.act, el.dataset.id); }
   if (el.dataset.delmov) { if (!confirm('¿Borrar este movimiento?')) return; await deleteDoc(uref('movimientos', el.dataset.delmov)); return cargar(); }
   if (el.id === 'btnMov') return guardarMov();
-  if (el.dataset.del) { if (!confirm('¿Borrar este trade? No se deshace el cambio de turno.')) return; await deleteDoc(uref('trades', el.dataset.del)); return cargar(); }
+  if (el.dataset.fk) { const k = el.dataset.fk, v = el.dataset.fv; if (el.dataset.multi) F[k] = F[k].includes(v) ? F[k].filter(x => x !== v) : F[k].concat([v]); else F[k] = F[k] === v ? '' : v;
+    if (k === 'salida') { const u = parseFloat(String(F.usd).replace(',', '.')); if (!isNaN(u)) F.usd = String(v === 'SL' ? -Math.abs(u) : v === 'TP' ? Math.abs(u) : u); if (v === 'SL') F.rr = '-1'; else if (v === 'BE') F.rr = '0'; else if (v === 'TP' && parseFloat(F.rr) < 0) F.rr = ''; }
+    renderForm(); return; }
+  if (el.id === 'frmSave') return guardarTrade();
+  if (el.id === 'frmCancel') { F_EDIT = null; nuevoForm(); document.querySelector('[data-tab=trades]').click(); return; }
+  if (el.id === 'btnNuevoTr') return abrirForm(null);
+  if (el.dataset.ver) return verTrade(el.dataset.ver);
+  if (el.dataset.editr) { const o = $('trOv'); if (o) o.remove(); return abrirForm(el.dataset.editr); }
+  if (el.id === 'trOvX' || el.id === 'trOvC') { $('trOv').remove(); return; }
+  if (el.dataset.del) { const ov = $('trOv'); if (ov) ov.remove(); if (!confirm('¿Borrar este trade? No se deshace el cambio de turno.')) return; await deleteDoc(uref('trades', el.dataset.del)); return cargar(); }
   if (el.id === 'btnAllow') {
     const e = $('aEmail').value.trim().toLowerCase(); if (!/^\S+@\S+\.\S+$/.test(e)) { $('allowMsg').textContent = 'Correo inválido.'; return; }
     await setDoc(doc(db, 'allow', e), { nombre: $('aNombre').value.trim(), agregado: Date.now() }); $('aEmail').value = ''; $('aNombre').value = ''; $('allowMsg').textContent = 'Autorizado: ' + e; return renderAdmin();
@@ -643,7 +896,19 @@ document.addEventListener('click', ev => {
   SEL_CTA = SEL_CTA === cc.dataset.cc ? null : cc.dataset.cc; renderCtaPage();
   if (SEL_CTA) $('ctaDet').scrollIntoView({ behavior: 'smooth', block: 'start' });
 });
+document.addEventListener('input', ev => {
+  const k = ev.target.dataset && ev.target.dataset.fin; if (!k || !F) return;
+  F[k] = ev.target.type === 'checkbox' ? ev.target.checked : ev.target.value;
+});
 document.addEventListener('change', ev => {
+  const fk = ev.target.dataset && ev.target.dataset.fin;
+  if (fk && F) {
+    F[fk] = ev.target.type === 'checkbox' ? ev.target.checked : ev.target.value;
+    if (fk === 'usd' && (F.salida === 'SL' || F.salida === 'TP')) { const u = parseFloat(String(F.usd).replace(',', '.')); if (!isNaN(u)) F.usd = String(F.salida === 'SL' ? -Math.abs(u) : Math.abs(u)); }
+    if (fk === 'cuenta' && TM) { const e = estadoCuentas().find(x => x.c.id === F.cuenta); if (e) F.estado = e.estado; }
+    if (['cuenta', 'usd', 'rr', 'mfe', 'poi', 'abierto', 'fvgUb'].includes(fk)) setTimeout(() => { const a = document.activeElement && document.activeElement.dataset ? document.activeElement.dataset.fin : null; renderForm(); if (a) { const e = document.querySelector('[data-fin="' + a + '"]'); if (e) e.focus(); } }, 0);
+    return;
+  }
   const k = ev.target.dataset && ev.target.dataset.chk; if (k == null) return;
   CHK[+k] = ev.target.checked; renderChk();
   setDoc(uref('meta', 'checklist'), { fecha: hoyES(), m: CHK }).catch(() => {});
