@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Riesgo Futuros</title>
-<!-- Riesgo Futuros · app multiusuario (Firebase) · v3 (23/10/2026) · v3: Cuentas y contabilidad (equity, retiros, compras, resets, reserva, inactividad, caducidad) · v2: consistencia por cuenta
+<!-- Riesgo Futuros · app multiusuario (Firebase) · v4 (24/10/2026) · v4: riesgo en rojo si supera el margen; checklist con bots VPS solo para el admin · v3 (23/10/2026) · v3: Cuentas y contabilidad (equity, retiros, compras, resets, reserva, inactividad, caducidad) · v2: consistencia por cuenta
      Misma lógica que la app de Apps Script (Real_Codigo.gs): Tabla maestra para Funded, regla v7 para challenges,
      rotación (SL → siguiente cuenta), plan B y registro rápido. Cada usuario ve solo sus cuentas y trades.
      La Tabla maestra es compartida (config/tablaMaestra) y solo la edita el admin. -->
@@ -74,6 +74,7 @@ td.num,th.num{text-align:right}
 .chartBox{position:relative;height:240px}
 .inl{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;align-items:end;margin-top:8px}
 .inl label{display:flex;flex-direction:column;gap:3px;font:10px var(--mono);text-transform:uppercase;color:var(--muted)}
+.ck .g{font:11px var(--mono);color:var(--muted);margin:8px 0 4px;letter-spacing:.06em}
 .warn.bad{background:#fde6e6;border-color:#eba3a3;color:#9b2222}
 @media(max-width:560px){.kv{grid-template-columns:repeat(2,1fr)}.acc .hero b{font-size:19px}}
 </style></head><body>
@@ -202,7 +203,8 @@ const SEED_TM = { filas: {
 }, fuente: 'BT 17/10/2026 · 107 trades' };
 const UMBRAL_NORMAL = 0.60, ACEL_DD_PEAK = 0.10, CIERRE_NY = 17;
 const CH_R_PCT = 0.01, CH_MIN_PCT = 0.004;
-const CHK_ITEMS = ['Noticias y festivos de EE. UU. revisados', 'Sentado como tarde a las 15:15', 'Riesgo listo y Tradesea abierto en la cuenta en turno', 'Niveles marcados antes de las 15:25'];
+const CHK_BOTS = ['MT5 del challenge abierto y bot ORB activo', 'MT5 de Pepperstone abierto y bot ORB activo'];
+let CHK_ITEMS = ['Noticias y festivos de EE. UU. revisados', 'Sentado como tarde a las 15:15', 'Riesgo listo y Tradesea abierto en la cuenta en turno', 'Niveles marcados antes de las 15:25'];
 
 let U = null, IS_ADMIN = false, TM = null, CUENTAS = [], TRADES = [], CHK = CHK_ITEMS.map(() => false), CHK_OPEN = true, QR_SAL = null, QR_MSG = '', EDIT_ID = null, MOVS = [], SEL_CTA = null, CHARTS = {};
 const $ = id => document.getElementById(id);
@@ -296,6 +298,7 @@ async function cargar() {
   const ms = await getDocs(ucol('movimientos'));
   MOVS = ms.docs.map(d => Object.assign({ _id: d.id }, d.data()));
   const ck = await getDoc(uref('meta', 'checklist'));
+  if (IS_ADMIN && CHK_ITEMS.length === 4) CHK_ITEMS = CHK_BOTS.concat(CHK_ITEMS);
   CHK = (ck.exists() && ck.data().fecha === hoyES() && Array.isArray(ck.data().m) && ck.data().m.length === CHK_ITEMS.length) ? ck.data().m : CHK_ITEMS.map(() => false);
   render();
 }
@@ -321,9 +324,10 @@ function renderHoy() {
   $('cards').innerHTML = E.slice().sort((a, b) => (b.c.enTurno ? 1 : 0) - (a.c.enTurno ? 1 : 0)).map(e => {
     const c = e.c, t = c.enTurno;
     return '<div class="acc' + (t ? ' turno' : '') + '"><div class="top"><span class="nm">' + esc(c.nombre) + '</span><span class="tg">' + (t ? 'EN TURNO · ' : '') + esc(c.fase) + (c.fase === 'Funded' ? ' · umbral Crítica ' + Math.round(e.umbral * 100) + ' %' : '') + '</span></div>'
-      + (t ? '<div class="hero"><span>OPERAR HOY</span><b>Riesgo ' + money(e.riesgo) + ' · ' + pct(e.riesgoPct) + '</b><b>' + esc(e.target) + '</b></div>' : '')
+      + (t ? '<div class="hero"><span>OPERAR HOY</span><b' + (e.riesgo > e.efectivo ? ' class="neg"' : '') + '>Riesgo ' + money(e.riesgo) + ' · ' + pct(e.riesgoPct) + '</b><b>' + esc(e.target) + '</b></div>'
+        + (e.riesgo > e.efectivo ? '<div class="warn bad">⚠ No se puede arriesgar ' + money(e.riesgo) + ': el margen efectivo es ' + money(e.efectivo) + '. Solo si el SL real entra con 1 MNQ dentro de ' + money(e.efectivo) + '; si no, plan B.</div>' : '') : '')
       + '<div class="kv"><div>Balance<b>' + money(e.balance) + '</b></div><div>Mínimo<b>' + (e.bloqueado ? '🔒 ' : '') + money(e.minimo) + '</b></div><div>Margen efectivo<b>' + money(e.efectivo) + ' · ' + Math.round(e.pct * 100) + ' %</b></div>'
-      + '<div>Estado<b>' + ICON[e.estado] + ' ' + e.estado + '</b></div><div>Riesgo<b>' + money(e.riesgo) + ' · ' + pct(e.riesgoPct) + '</b></div><div>Target<b>' + esc(e.target) + '</b></div><div>SLs que aguanta<b>' + e.aguanta + '</b></div>'
+      + '<div>Estado<b>' + ICON[e.estado] + ' ' + e.estado + '</b></div><div>Riesgo<b' + (e.riesgo > e.efectivo ? ' class="neg"' : '') + '>' + money(e.riesgo) + ' · ' + pct(e.riesgoPct) + '</b></div><div>Target<b>' + esc(e.target) + '</b></div><div>SLs que aguanta<b>' + e.aguanta + '</b></div>'
       + (e.objetivo ? '<div>TP máx. hoy<b>' + money(e.tpMaxHoy) + '</b></div><div>Faltan para pasar<b>' + money(e.faltan) + '</b></div>' : '')
       + (e.avisoCons ? '<div>Consistencia<b>' + esc(e.avisoCons) + '</b></div>' : '') + (e.resetRec ? '<div>Aviso<b>Reset recomendado</b></div>' : '') + '</div>'
       + (t ? planB(E, e) + qrHtml() : '') + '</div>';
@@ -377,7 +381,7 @@ async function qrGuardar() {
 function renderChk() {
   const n = CHK.filter(Boolean).length, ok = n === CHK.length;
   $('chkBox').innerHTML = '<div class="ck' + (ok ? ' ok' : '') + '"><div class="ch" id="chkHead"><span>' + (ok ? '✓ Sesión preparada' : '○ Checklist preoperativa pendiente') + '</span><span>' + n + '/' + CHK.length + ' ' + (CHK_OPEN ? '▾' : '▸') + '</span></div><div class="bar"><i style="width:' + Math.round(n / CHK.length * 100) + '%"></i></div>'
-    + (CHK_OPEN ? CHK_ITEMS.map((t, k) => '<label><input type="checkbox" data-chk="' + k + '"' + (CHK[k] ? ' checked' : '') + '>' + esc(t) + '</label>').join('') : '') + '</div>';
+    + (CHK_OPEN ? CHK_ITEMS.map((t, k) => (IS_ADMIN && k === 0 ? '<div class="g">BOTS NASDAQ (VPS)</div>' : '') + (IS_ADMIN && k === 2 ? '<div class="g">ANTES DE LA SESIÓN</div>' : '') + '<label><input type="checkbox" data-chk="' + k + '"' + (CHK[k] ? ' checked' : '') + '>' + esc(t) + '</label>').join('') : '') + '</div>';
 }
 function renderCuentas() {
   $('ctaTabla').innerHTML = CUENTAS.length ? '<table><thead><tr><th>Orden</th><th>Cuenta</th><th>Fase</th><th class="num">Tamaño</th><th class="num">Balance firma</th><th class="num">Mínimo firma</th><th>Sincronizada</th><th>Turno</th><th>Activa</th><th></th></tr></thead><tbody>'
