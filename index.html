@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Riesgo Futuros</title>
-<!-- Riesgo Futuros · app multiusuario (Firebase) · v8 (24/10/2026) · v8: alerta de reset del trader (3 días perdedores seguidos → pausa 3 días naturales; 2.º seguido con errores → 1 semana), aviso al registrar en reset (P5), ítem de checklist "No estoy en reset" · v7 (24/10/2026) · v7: P0 "¿Sesión preparada?" automática desde la checklist del día (vigente desde 26/10/2026), checklist guardada por fecha, KPI Sesión preparada · v6 (24/10/2026) · v6: formulario completo de trade (Nasdaq) igual al de la app vieja, editar/completar trades y journal en Trades (sin R plan) · v5 (24/10/2026) · v5: tabla de cuentas: quemadas/pasadas/reserva sin "Poner en turno" · v4 (24/10/2026) · v4: riesgo en rojo si supera el margen; checklist con bots VPS solo para el admin · v3 (23/10/2026) · v3: Cuentas y contabilidad (equity, retiros, compras, resets, reserva, inactividad, caducidad) · v2: consistencia por cuenta
+<!-- Riesgo Futuros · app multiusuario (Firebase) · v9 (26/10/2026) · v9: consistencia: target recortado a lo que queda del TP máx. (cortar en +$, ≈R), tarjeta amarilla, consistencia alcanzada → hoy se opera la siguiente y mañana vuelve la misma (SL del reemplazo → final de la cola), target con importe en $, fuera "No estoy en reset" de la checklist · v8 (24/10/2026) · v8: alerta de reset del trader (3 días perdedores seguidos → pausa 3 días naturales; 2.º seguido con errores → 1 semana), aviso al registrar en reset (P5), ítem de checklist "No estoy en reset" · v7 (24/10/2026) · v7: P0 "¿Sesión preparada?" automática desde la checklist del día (vigente desde 26/10/2026), checklist guardada por fecha, KPI Sesión preparada · v6 (24/10/2026) · v6: formulario completo de trade (Nasdaq) igual al de la app vieja, editar/completar trades y journal en Trades (sin R plan) · v5 (24/10/2026) · v5: tabla de cuentas: quemadas/pasadas/reserva sin "Poner en turno" · v4 (24/10/2026) · v4: riesgo en rojo si supera el margen; checklist con bots VPS solo para el admin · v3 (23/10/2026) · v3: Cuentas y contabilidad (equity, retiros, compras, resets, reserva, inactividad, caducidad) · v2: consistencia por cuenta
      Misma lógica que la app de Apps Script (Real_Codigo.gs): Tabla maestra para Funded, regla v7 para challenges,
      rotación (SL → siguiente cuenta), plan B y registro rápido. Cada usuario ve solo sus cuentas y trades.
      La Tabla maestra es compartida (config/tablaMaestra) y solo la edita el admin. -->
@@ -27,6 +27,7 @@ input,select{background:var(--card-2);color:var(--text);border:1px solid var(--l
 .acc{background:var(--card-2);border:1px solid var(--line-2);border-left:4px solid var(--pos);border-radius:10px;padding:10px 12px}
 .acc.turno{border:2px solid var(--real);border-left-width:6px;box-shadow:0 2px 10px rgba(0,0,0,.12)}
 .acc:not(.turno){opacity:.45}
+.acc.cons{border-color:#e0a800;background:#fff8e1}.acc.cons .hero{background:#fff1c2}.acc.cons .hero span{color:#7a5200}
 .acc .top{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:baseline}.acc .nm{font-weight:700}.acc .tg{font:11px var(--mono);color:var(--muted)}
 .acc .hero{display:flex;flex-wrap:wrap;gap:6px 18px;align-items:baseline;margin:8px 0 6px;padding:8px 10px;border-radius:8px;background:var(--card)}
 .acc .hero span{font:700 11px var(--mono);letter-spacing:.06em;color:var(--real)}.acc .hero b{font-size:22px}
@@ -217,7 +218,7 @@ const SEED_TM = { filas: {
 const UMBRAL_NORMAL = 0.60, ACEL_DD_PEAK = 0.10, CIERRE_NY = 17;
 const CH_R_PCT = 0.01, CH_MIN_PCT = 0.004;
 const CHK_BOTS = ['MT5 del challenge abierto y bot ORB activo', 'MT5 de Pepperstone abierto y bot ORB activo'];
-let CHK_ITEMS = ['No estoy en reset', 'Noticias y festivos de EE. UU. revisados', 'Sentado como tarde a las 15:15', 'Riesgo listo y Tradesea abierto en la cuenta en turno', 'Niveles marcados antes de las 15:25'];
+let CHK_ITEMS = ['Noticias y festivos de EE. UU. revisados', 'Sentado como tarde a las 15:15', 'Riesgo listo y Tradesea abierto en la cuenta en turno', 'Niveles marcados antes de las 15:25'];
 
 let U = null, IS_ADMIN = false, TM = null, CUENTAS = [], TRADES = [], CHK = CHK_ITEMS.map(() => false), CHK_OPEN = true, QR_SAL = null, QR_MSG = '', EDIT_ID = null, MOVS = [], SEL_CTA = null, CHARTS = {};
 const $ = id => document.getElementById(id);
@@ -277,10 +278,35 @@ function aplicarChallenge(e, c, pnl) {
   e.objetivo = obj;
   e.faltan = obj ? Math.max(0, obj - (e.balance - c.tam)) : null;
   e.tpMaxHoy = obj ? Math.max(0, obj * (c.consistencia > 0 ? c.consistencia / 100 : 0.5) - Math.max(0, pnl.hoy || 0)) : null;
-  if (obj) e.target = (1.5 * e.riesgo <= e.tpMaxHoy) ? '1,5R fijo' : '1R fijo';
+  e.consAjuste = false; e.consAlcanzada = false; e.tpUsd = null;
+  if (obj) {
+    if (e.tpMaxHoy <= 0) { e.consAlcanzada = true; e.target = '—'; e.tpUsd = 0; }
+    else if (1.5 * e.riesgo <= e.tpMaxHoy) { e.target = '1,5R fijo'; e.tpUsd = 1.5 * e.riesgo; }
+    else { e.consAjuste = true; e.tpUsd = Math.floor(e.tpMaxHoy); e.target = fmtR(e.riesgo > 0 ? Math.floor(e.tpMaxHoy / e.riesgo * 10) / 10 : 0) + ' fijo'; }
+  }
   else e.target = pnl.tpHoy > 0 ? '1R fijo' : '1,5R fijo';
-  e.avisoCons = (obj && e.riesgo > e.tpMaxHoy) ? 'TP máx. hoy ' + Math.round(e.tpMaxHoy) + ' $' : '';
+  e.avisoCons = '';
   e.aguanta = e.riesgo > 0 ? Math.floor(ef / e.riesgo) : 0;
+}
+const fmtR = x => String(Math.round(x * 10) / 10).replace('.', ',') + 'R';
+function decorarTarget(e) {
+  if (e.tpUsd == null) { const m = /^(\d+(?:[.,]\d+)?)R/.exec(e.target || ''); e.tpUsd = m ? parseFloat(m[1].replace(',', '.')) * e.riesgo : null; }
+  e.targetTxt = e.consAlcanzada ? 'No operar más hoy' : e.consAjuste ? 'Cortar en +' + money(e.tpUsd) + ' · ≈' + e.target.replace(' fijo', '') : e.target + (e.tpUsd != null ? ' · +' + money(e.tpUsd) : '');
+  return e;
+}
+// Cuenta a operar ahora: la en turno, salvo que haya llegado hoy a su consistencia → la siguiente de la rotación (solo por hoy).
+function cuentaOperar(E) {
+  const t = E.find(x => x.c.enTurno); if (!t) return null; if (!t.consAlcanzada) return t;
+  const i = E.indexOf(t);
+  for (let k = 1; k < E.length; k++) { const x = E[(i + k) % E.length]; if (!x.consAlcanzada) return x; }
+  return null;
+}
+// SL en la cuenta de reemplazo: pasa al final de la cola (justo antes de la cuenta en turno); el turno no se mueve.
+function colaFinal(b, id) {
+  const act = CUENTAS.filter(c => c.activa && c.estado === 'Activa'), ti = act.findIndex(c => c.enTurno), x = act.find(c => c.id === id);
+  if (ti < 0 || !x) return;
+  const seq = act.slice(ti).concat(act.slice(0, ti)).filter(c => c.id !== id).concat([x]), ords = act.map(c => c.orden).sort((p, q) => p - q);
+  seq.forEach((c, k) => b.set(uref('cuentas', c.id), { orden: ords[k] }, { merge: true }));
 }
 function estadoCuentas() {
   const ahora = new Date(), hoyNY = diaTz(ahora, 'America/New_York'), horaNY = parseInt(horaTz(ahora, 'America/New_York'), 10);
@@ -291,6 +317,7 @@ function estadoCuentas() {
     const m = (syncDia && c.tipoDD !== 'Estático') ? calcMinimo(c, pnl.dias, syncDia, cerrado) : { minimo: c.minimo, bloqueado: false };
     const e = calcEstado(Object.assign({}, c, { minimo: m.minimo }), pnl, TM);
     if (c.fase === 'Evaluación') aplicarChallenge(e, c, pnl);
+    decorarTarget(e);
     return Object.assign(e, { c, minimo: m.minimo, bloqueado: m.bloqueado, pnl, syncDias: c.syncAt ? Math.floor((ahora - c.syncAt) / 86400000) : 999 });
   });
 }
@@ -315,7 +342,7 @@ async function cargar() {
   const rs = await getDoc(uref('meta', 'reset'));
   RESET_OV = rs.exists() ? rs.data() : {};
   const ck = await getDoc(uref('meta', 'checklist'));
-  if (IS_ADMIN && CHK_ITEMS.length === 5) CHK_ITEMS = CHK_BOTS.concat(CHK_ITEMS);
+  if (IS_ADMIN && CHK_ITEMS.length === 4) CHK_ITEMS = CHK_BOTS.concat(CHK_ITEMS);
   CHK = (ck.exists() && ck.data().fecha === hoyES() && Array.isArray(ck.data().m) && ck.data().m.length === CHK_ITEMS.length) ? ck.data().m : CHK_ITEMS.map(() => false);
   render();
 }
@@ -334,17 +361,22 @@ function renderHoy() {
   if (!TM) { $('cards').innerHTML = '<div class="empty">Falta la Tabla maestra. Avisale a Javier.</div>'; return; }
   const E = estadoCuentas();
   const viejas = E.filter(e => e.syncDias > 7);
-  $('avisos').innerHTML = resetHtml() + (E.length && !E.some(e => e.c.enTurno) ? '<div class="warn">Ninguna cuenta está en turno: marcá una en Cuentas.</div>' : '')
+  const op = cuentaOperar(E), tu = E.find(x => x.c.enTurno);
+  const avCons = tu && tu.consAlcanzada ? '<div class="warn">✓ ' + esc(tu.c.nombre) + ' llegó hoy a su consistencia: ' + (op ? 'hoy se opera <b>' + esc(op.c.nombre) + '</b>' : '<b>no queda otra cuenta para operar hoy</b>') + '. Mañana vuelve ' + esc(tu.c.nombre) + ' como primera opción.</div>' : '';
+  $('avisos').innerHTML = resetHtml() + avCons + (E.length && !E.some(e => e.c.enTurno) ? '<div class="warn">Ninguna cuenta está en turno: marcá una en Cuentas.</div>' : '')
     + (viejas.length ? '<div class="warn">Hace más de 7 días que no sincronizás con la firma: ' + viejas.map(e => esc(e.c.nombre)).join(', ') + '. Actualizá balance y mínimo en Cuentas.</div>' : '')
     + avisosCuentas().map(a => '<div class="warn' + (a.bad ? ' bad' : '') + '">' + a.t + '</div>').join('');
   if (!E.length) { $('cards').innerHTML = '<div class="empty">Todavía no cargaste cuentas. Andá a <b>Cuentas</b> y agregá la primera.</div>'; return; }
-  $('cards').innerHTML = E.slice().sort((a, b) => (b.c.enTurno ? 1 : 0) - (a.c.enTurno ? 1 : 0)).map(e => {
-    const c = e.c, t = c.enTurno;
-    return '<div class="acc' + (t ? ' turno' : '') + '"><div class="top"><span class="nm">' + esc(c.nombre) + '</span><span class="tg">' + (t ? 'EN TURNO · ' : '') + esc(c.fase) + (c.fase === 'Funded' ? ' · umbral Crítica ' + Math.round(e.umbral * 100) + ' %' : '') + '</span></div>'
-      + (t ? '<div class="hero"><span>OPERAR HOY</span><b' + (e.riesgo > e.efectivo ? ' class="neg"' : '') + '>Riesgo ' + money(e.riesgo) + ' · ' + pct(e.riesgoPct) + '</b><b>' + esc(e.target) + '</b></div>'
+  const rk = e => e === op ? 2 : e.c.enTurno ? 1 : 0;
+  $('cards').innerHTML = E.slice().sort((a, b) => rk(b) - rk(a)).map(e => {
+    const c = e.c, t = e === op;
+    return '<div class="acc' + (t ? ' turno' : '') + (t && e.consAjuste ? ' cons' : '') + '"><div class="top"><span class="nm">' + esc(c.nombre) + '</span><span class="tg">' + (c.enTurno ? 'EN TURNO · ' : t ? 'OPERAR AHORA · REEMPLAZO DE HOY · ' : '') + (c.enTurno && e.consAlcanzada ? 'PAUSADA HASTA MAÑANA · ' : '') + esc(c.fase) + (c.fase === 'Funded' ? ' · umbral Crítica ' + Math.round(e.umbral * 100) + ' %' : '') + '</span></div>'
+      + (e.consAlcanzada ? '<div class="warn">✓ Consistencia del día alcanzada (TP máx. hoy 0 $). <b>No operar más hoy en esta cuenta.</b> Mañana vuelve a ser la primera opción.</div>' : '')
+      + (t ? '<div class="hero"><span>' + (e.consAjuste ? 'OPERAR HOY · AJUSTADO POR CONSISTENCIA' : c.enTurno ? 'OPERAR HOY' : 'OPERAR HOY (SOLO POR HOY)') + '</span><b' + (e.riesgo > e.efectivo ? ' class="neg"' : '') + '>Riesgo ' + money(e.riesgo) + ' · ' + pct(e.riesgoPct) + '</b><b>' + esc(e.targetTxt) + '</b></div>'
+        + (e.consAjuste ? '<div class="warn">⚠ Consistencia: quedan <b>' + money(e.tpMaxHoy) + '</b> de TP máx. hoy. Un TP a 1,5R (+' + money(1.5 * e.riesgo) + ') la rompería → <b>cortar en +' + money(e.tpUsd) + '</b> (≈' + esc(e.target.replace(' fijo', '')) + ' con el riesgo recomendado).</div>' : '')
         + (e.riesgo > e.efectivo ? '<div class="warn bad">⚠ No se puede arriesgar ' + money(e.riesgo) + ': el margen efectivo es ' + money(e.efectivo) + '. Solo si el SL real entra con 1 MNQ dentro de ' + money(e.efectivo) + '; si no, plan B.</div>' : '') : '')
       + '<div class="kv"><div>Balance<b>' + money(e.balance) + '</b></div><div>Mínimo<b>' + (e.bloqueado ? '🔒 ' : '') + money(e.minimo) + '</b></div><div>Margen efectivo<b>' + money(e.efectivo) + ' · ' + Math.round(e.pct * 100) + ' %</b></div>'
-      + '<div>Estado<b>' + ICON[e.estado] + ' ' + e.estado + '</b></div><div>Riesgo<b' + (e.riesgo > e.efectivo ? ' class="neg"' : '') + '>' + money(e.riesgo) + ' · ' + pct(e.riesgoPct) + '</b></div><div>Target<b>' + esc(e.target) + '</b></div><div>SLs que aguanta<b>' + e.aguanta + '</b></div>'
+      + '<div>Estado<b>' + ICON[e.estado] + ' ' + e.estado + '</b></div><div>Riesgo<b' + (e.riesgo > e.efectivo ? ' class="neg"' : '') + '>' + money(e.riesgo) + ' · ' + pct(e.riesgoPct) + '</b></div><div>Target<b>' + esc(e.targetTxt) + '</b></div><div>SLs que aguanta<b>' + e.aguanta + '</b></div>'
       + (e.objetivo ? '<div>TP máx. hoy<b>' + money(e.tpMaxHoy) + '</b></div><div>Faltan para pasar<b>' + money(e.faltan) + '</b></div>' : '')
       + (e.avisoCons ? '<div>Consistencia<b>' + esc(e.avisoCons) + '</b></div>' : '') + (e.resetRec ? '<div>Aviso<b>Reset recomendado</b></div>' : '') + '</div>'
       + (t ? planB(E, e) + qrHtml() : '') + '</div>';
@@ -352,8 +384,9 @@ function renderHoy() {
 }
 function planB(E, e) {
   const i = E.indexOf(e); if (E.length < 2 || i < 0) return '';
-  const b = E[(i + 1) % E.length];
-  return '<div class="pb"><div class="pbl">PLAN B · SI NO ENTRA EN ESTA CUENTA</div><b>' + esc(b.c.nombre) + '</b> · ' + esc(b.c.fase) + ' · riesgo ' + money(b.riesgo) + ' · ' + esc(b.target)
+  let b = null; for (let k = 1; k < E.length; k++) { const x = E[(i + k) % E.length]; if (!x.consAlcanzada) { b = x; break; } }
+  if (!b) return '';
+  return '<div class="pb"><div class="pbl">PLAN B · SI NO ENTRA EN ESTA CUENTA</div><b>' + esc(b.c.nombre) + '</b> · ' + esc(b.c.fase) + ' · riesgo ' + money(b.riesgo) + ' · ' + esc(b.targetTxt)
     + (b.objetivo ? ' · TP máx. hoy ' + money(b.tpMaxHoy) + ' · faltan ' + money(b.faltan) + ' para pasar' : '') + (b.resetRec ? ' · reset recomendado' : '') + '</div>';
 }
 function qrHtml() {
@@ -370,8 +403,8 @@ async function qrGuardar(enReset) {
   let usd = parseFloat($('qrAmt').value);
   if (isNaN(usd)) return msg('Poné el monto.');
   if (QR_SAL === 'SL') usd = -Math.abs(usd); else if (QR_SAL === 'TP') usd = Math.abs(usd);
-  const E = estadoCuentas(), e = E.find(x => x.c.enTurno);
-  if (!e) return msg('No hay cuenta en turno.');
+  const E = estadoCuentas(), e = cuentaOperar(E), tu = E.find(x => x.c.enTurno);
+  if (!e) return msg(tu ? 'No queda cuenta para operar hoy (consistencia alcanzada).' : 'No hay cuenta en turno.');
   if (enReset === undefined) return avisoReset(hoyES(), x => qrGuardar(x));
   $('qrGo').disabled = true;
   try {
@@ -383,7 +416,10 @@ async function qrGuardar(enReset) {
     const b = writeBatch(db);
     b.set(doc(ucol('trades')), t);
     let rot = 'Turno: sigue la misma cuenta.';
-    if (QR_SAL === 'SL') {
+    if (QR_SAL === 'SL' && tu && e !== tu) {
+      colaFinal(b, e.c.id);
+      rot = 'Turno: SL en el reemplazo → ' + e.c.nombre + ' pasa al final de la cola; mañana vuelve ' + tu.c.nombre + '.';
+    } else if (QR_SAL === 'SL') {
       const act = CUENTAS.filter(c => c.activa);
       if (act.length > 1) {
         const sig = act[(act.findIndex(c => c.id === e.c.id) + 1) % act.length];
@@ -487,7 +523,7 @@ function horaNYde(fecha, hora) {
   return horaTz(new Date(t), 'America/New_York');
 }
 function nuevoForm(base) {
-  const E = TM ? estadoCuentas() : [], turno = E.find(e => e.c.enTurno), now = new Date();
+  const E = TM ? estadoCuentas() : [], turno = cuentaOperar(E), now = new Date();
   F = Object.assign({ estrategia: 'Nasdaq', cuenta: turno ? turno.c.id : '', estado: turno ? turno.estado : '', salida: '', usd: '', rr: '', riesgoManual: '', plan: '', preguntas: [], sensacion: '',
     fecha: hoyES(), horaAp: horaTz(now, 'Europe/Madrid'), horaCi: horaTz(now, 'Europe/Madrid'), setup: '', modelo: '', zona: '', tipos: [], mfe: '', volvioBE: '', mfeAntesBE: '', abierto: false, rCierre: '',
     poi: 'Ninguno', distPoi: '', quePaso: '', bePoi: '', puntoLiq: '', distLiq: '', fvg: '', fvgTf: [], fvgUb: '', fvgDir: '', fvgRe: '', fvgDist: '', linkHtf: '', linkLtf: '', reflexion: '' }, base || {});
@@ -671,7 +707,10 @@ async function guardarTrade(enReset) {
     if (prev) { o.num = prev.num; o.registrado = prev.registrado; if (prev.rapido) o.rapido = true; if (prev.migrado) o.migrado = true; o.editado = Date.now(); b.set(uref('trades', prev._id), o); }
     else {
       o.num = TRADES.reduce((m, t) => Math.max(m, num(t.num)), 0) + 1; o.registrado = Date.now(); b.set(doc(ucol('trades')), o);
-      if (o.salida === 'SL') {
+      const Eh = TM ? estadoCuentas() : [], tuH = Eh.find(x => x.c.enTurno);
+      if (o.salida === 'SL' && tuH && tuH.consAlcanzada && o.cuenta !== tuH.c.id && o.fecha === hoyES()) {
+        colaFinal(b, o.cuenta); rot = ' Turno: SL en el reemplazo → pasa al final de la cola; mañana vuelve ' + tuH.c.nombre + '.';
+      } else if (o.salida === 'SL') {
         const act = CUENTAS.filter(c => c.activa && c.estado === 'Activa'), i = act.findIndex(c => c.id === o.cuenta);
         if (act.length > 1 && i > -1) { const sig = act[(i + 1) % act.length]; act.forEach(c => b.set(uref('cuentas', c.id), { enTurno: c.id === sig.id }, { merge: true })); rot = ' Turno: SL → pasa a ' + sig.nombre + '.'; }
       }
