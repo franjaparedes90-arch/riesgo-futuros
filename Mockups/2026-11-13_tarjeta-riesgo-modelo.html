@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mockup integrado · Journal riesgo</title>
+<style>
+:root{--bg:#dbe8f7;--side:#d3e2f4;--card:#fff;--soft:#e8f0fa;--line:#c9d8ea;--txt:#1d2733;--mut:#6b7a8c;--acc:#2563c9;--accs:#e1ecfb;--warn:#e9a23b;--new:#fff7e0;--newb:#e9b949}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--txt);font-size:13px}
+.mono{font-family:ui-monospace,Menlo,Consolas,monospace}
+.app{display:grid;grid-template-columns:172px 1fr;min-height:100vh}
+.side{background:var(--side);padding:14px 8px}
+.brand{display:flex;gap:8px;align-items:center;margin-bottom:18px}.logo{background:var(--acc);color:#fff;border-radius:6px;width:26px;height:26px;display:grid;place-items:center;font-weight:700;font-size:11px}
+.grp{font-size:9px;letter-spacing:.08em;color:var(--mut);margin:14px 6px 6px}
+.nav{padding:7px 10px;border-radius:7px;margin:2px 0}.nav.on{background:var(--acc);color:#fff}
+.nav.new{border:1.5px dashed var(--newb);background:var(--new)}
+main{padding:18px 22px}
+.legend{background:var(--new);border:1px dashed var(--newb);border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:12px}
+.chk{background:#fff;border:1px solid var(--warn);border-radius:8px;padding:10px 12px;margin-bottom:10px}
+.bar{height:4px;background:#c9d8ea;border-radius:2px;margin:6px 0 8px}.bar i{display:block;height:4px;width:33%;background:var(--warn);border-radius:2px}
+.k{font-size:9px;letter-spacing:.06em;color:var(--mut);text-transform:uppercase}
+.layout{display:grid;grid-template-columns:1fr 1fr 1fr 230px;gap:10px;align-items:start}
+.acc{background:var(--soft);border:1px solid var(--line);border-left:4px solid #8fc1c9;border-radius:8px;padding:10px 12px;opacity:.6}
+.acc.turn{opacity:1;background:#fff;border-left-color:var(--acc);border-color:var(--acc)}
+.hd{display:flex;justify-content:space-between;align-items:baseline}.hd b{font-size:13px}.hd span{font-size:10px;color:var(--mut)}
+.op{background:var(--accs);border-radius:8px;padding:8px 10px;margin:8px 0}
+.op .big{font-size:18px;font-weight:700}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:4px 8px;margin:6px 0}.g3 div{font-size:12px}
+.newbox{border:1.5px dashed var(--newb);background:var(--new);border-radius:8px;padding:8px;margin:8px 0}
+.chip{font-size:11px;padding:3px 8px;border-radius:6px;border:1px solid #b9c7d8;background:#fff;cursor:pointer;margin:2px 2px 0 0}
+.chip.on{background:var(--accs);color:#0c447c;border-color:#85b7eb}
+.src{font-size:11px;color:var(--mut);margin-top:6px}
+.planb{background:var(--soft);border-radius:6px;padding:7px 9px;font-size:11px;margin-top:8px}
+.btn{border:1px solid var(--line);background:#fff;border-radius:6px;padding:6px 10px;font-size:12px}
+.save{background:var(--acc);color:#fff;border:0;border-radius:6px;padding:8px 12px;float:right}
+.in{border:1px solid var(--line);border-radius:6px;padding:6px 8px;font-size:12px;color:var(--mut);background:#fff}
+.risk{background:#fff;border:1.5px dashed var(--newb);border-radius:8px;padding:10px 12px}
+.row{display:flex;justify-content:space-between;font-size:12px;padding:6px 0 2px;border-top:1px solid #eee}
+.pb{height:4px;background:#eee;border-radius:2px}.pb i{display:block;height:4px;background:var(--acc);border-radius:2px}
+.tag{font-size:10px;padding:1px 6px;border-radius:5px;background:#f1efe8;color:#555}
+@media(max-width:900px){.app{grid-template-columns:1fr}.side{display:none}.layout{grid-template-columns:1fr}}
+</style></head><body>
+<div class="app">
+<aside class="side">
+<div class="brand"><div class="logo">RF</div><div><b>Riesgo Futuros</b><div style="font-size:11px;color:var(--mut)">Nasdaq</div></div></div>
+<div class="grp">OPERATIVA</div><div class="nav on">🛡 Journal · riesgo</div><div class="nav">☰ Trades</div><div class="nav">📅 Calendario</div>
+<div class="grp">ANÁLISIS</div><div class="nav">📊 Dashboard</div><div class="nav">📰 Noticias</div>
+<div class="grp">GESTIÓN</div><div class="nav">🏦 Cuentas</div><div class="nav">💵 Contabilidad</div><div class="nav new">⚖ Risk engine</div>
+<div class="grp">&nbsp;</div><div class="nav">⚙ Ajustes · Admin</div>
+</aside>
+<main>
+<div class="legend">Mockup integrado. Todo es la pantalla actual; lo <b>nuevo</b> va con borde punteado amarillo: selector "¿Qué entrada buscas?" en la tarjeta en turno, panel "Risk" a la derecha y "Risk engine" en el menú. Nada de lo actual se reemplaza.</div>
+
+<div class="chk"><b>○ Checklist preoperativa pendiente</b><span style="float:right"><b>2/6</b> ▾</span>
+<div class="bar"><i></i></div>
+<div class="k">Bots Nasdaq (VPS)</div>
+<div>☑ MT5 del challenge abierto y bot ORB activo</div><div>☑ MT5 de Pepperstone abierto y bot ORB activo</div>
+<div class="k" style="margin-top:6px">Antes de la sesión</div>
+<div>☐ Noticias y festivos de EE. UU. revisados</div><div>☐ Sentado como tarde a las 15:15</div><div>☐ Riesgo listo y Tradesea abierto en la cuenta en turno</div><div>☐ Niveles marcados antes de las 15:25</div>
+</div>
+
+<div class="layout">
+<div class="acc turn">
+<div class="hd"><b>Lucid · Cuenta 002</b><span class="mono">EN TURNO · Evaluación</span></div>
+
+<div class="newbox">
+<div class="k">¿Qué entrada buscas?</div>
+<div id="chips"><button class="chip on" data-m="Todos">Todos</button><button class="chip" data-m="ORB">1 · ORB</button><button class="chip" data-m="Rev">2 · Reversión</button><button class="chip" data-m="Liq">3 · Liquidez ext.</button><button class="chip" data-m="Cont">4 · Continuación</button></div>
+</div>
+
+<div class="op"><span class="k" style="color:var(--acc)">Operar hoy</span> <span class="big">Riesgo 250 $ · 1,0 %</span><br><span class="big" id="tgt">1,5R fijo · +375 $</span>
+<div class="src" id="src">Fuente: Tabla maestra (BT) · trades reales 26/50</div></div>
+
+<div class="g3 mono">
+<div><div class="k">Balance</div>25.690 $</div><div><div class="k">Mínimo</div>24.690 $</div><div><div class="k">Margen efectivo</div>600 $ · 60 %</div>
+<div><div class="k">Estado</div>🎯 Challenge</div><div><div class="k">Riesgo</div>250 $ · 1,0 %</div><div><div class="k">Target</div><span id="tgt2">1,5R fijo · +375 $</span></div>
+<div><div class="k">SLs que aguanta</div>2</div><div><div class="k">TP máx. hoy</div>625 $</div><div><div class="k">Faltan para pasar</div>560 $</div>
+</div>
+<div class="planb"><span class="k">Plan B · si no entra en esta cuenta</span><br><b>Lucid · Cuenta 003</b> · Evaluación · riesgo 250 $ · 1,5R fijo · +375 $ · TP máx. hoy 500 $ · faltan 1178 $ para pasar</div>
+<div class="k" style="margin-top:10px;border-top:1px solid var(--line);padding-top:8px">Registrar operación</div>
+<div style="display:flex;gap:6px;margin:6px 0"><span class="btn">TP</span><span class="btn">SL</span><span class="btn">BE</span><span class="in" style="flex:1">Monto $</span></div>
+<div class="in">Nota rápida (opcional)</div>
+<div style="overflow:hidden;margin-top:8px"><button class="save">Guardar</button></div>
+</div>
+
+<div class="acc">
+<div class="hd"><b>Lucid · Cuenta 003</b><span class="mono">Evaluación</span></div>
+<div class="g3 mono" style="margin-top:8px">
+<div><div class="k">Balance</div>25.072 $</div><div><div class="k">Mínimo</div>24.274 $</div><div><div class="k">Margen efectivo</div>600 $ · 60 %</div>
+<div><div class="k">Estado</div>🎯 Challenge</div><div><div class="k">Riesgo</div>250 $ · 1,0 %</div><div><div class="k">Target</div>1,5R fijo · +375 $</div>
+<div><div class="k">SLs que aguanta</div>2</div><div><div class="k">TP máx. hoy</div>625 $</div><div><div class="k">Faltan para pasar</div>1178 $</div></div>
+</div>
+
+<div class="acc">
+<div class="hd"><b>LucidFlex 25K · PRO001</b><span class="mono">Funded · umbral Crítica 35 %</span></div>
+<div class="g3 mono" style="margin-top:8px">
+<div><div class="k">Balance</div>24.606 $</div><div><div class="k">Mínimo</div>24.172 $</div><div><div class="k">Margen efectivo</div>434 $ · 43 %</div>
+<div><div class="k">Estado</div>🟡 Defensa</div><div><div class="k">Riesgo</div>150 $ · 0,6 %</div><div><div class="k">Target</div>1,5R + BE en 1R · +225 $</div>
+<div><div class="k">SLs que aguanta</div>2</div></div>
+</div>
+
+<div class="risk">
+<b>Risk</b><div style="font-size:11px;color:var(--mut)">Gestión vigente por modelo</div>
+<div class="row"><span>General</span><span class="tag">Tabla maestra</span></div><div class="pb"><i style="width:52%"></i></div><div class="src" style="margin:2px 0 4px">26/50 reales</div>
+<div class="row"><span>1 · ORB</span><span class="tag">General</span></div><div class="pb"><i style="width:22%"></i></div><div class="src" style="margin:2px 0 4px">11/50</div>
+<div class="row"><span>2 · Reversión</span><span class="tag">General</span></div><div class="pb"><i style="width:0%"></i></div><div class="src" style="margin:2px 0 4px">0/50</div>
+<div class="row"><span>3 · Liquidez ext.</span><span class="tag">General</span></div><div class="pb"><i style="width:8%"></i></div><div class="src" style="margin:2px 0 4px">4/50</div>
+<div class="row"><span>4 · Continuación</span><span class="tag">General</span></div><div class="pb"><i style="width:22%"></i></div><div class="src" style="margin:2px 0 4px">11/50</div>
+<div class="row"><span>Ver detalle</span><span style="color:var(--acc)">→ Risk engine</span></div>
+</div>
+</div>
+<p class="src" style="margin-top:12px">Datos de ejemplo (conteos por modelo aproximados). Mientras no haya 50 trades reales, todos los modelos muestran el target de la Tabla maestra; al elegir el modelo solo cambia la línea de fuente. Cuando un modelo llegue a 50, su chip mostrará su propio target y BE.</p>
+</main></div>
+<script>
+const D={Todos:'Fuente: Tabla maestra (BT) · trades reales 26/50',ORB:'Fuente: Tabla maestra (ORB 11/50 · general 26/50)',Rev:'Fuente: Tabla maestra (sin trades reales)',Liq:'Fuente: Tabla maestra (Liquidez 4/50)',Cont:'Fuente: Tabla maestra (Continuación 11/50)'};
+document.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{document.querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));c.classList.add('on');document.getElementById('src').textContent=D[c.dataset.m]});
+</script>
+</body></html>
