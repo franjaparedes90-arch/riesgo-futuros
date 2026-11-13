@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Riesgo Futuros</title>
-<!-- Riesgo Futuros · app multiusuario (Firebase) · v12 (08/11/2026) · v12: editar un trade conserva cargadoTradinverso y cargadoEl (antes se borraban y el cierre de día lo volvía a dar como pendiente) · v11 (28/10/2026) · v11: FVG HTF como el POI: en el camino (entrada → 2R), distancia entre 0 y 2R · v10 (28/10/2026) · v10: bloqueo por consistencia si el TP máx. de hoy < 0,4 % de la cuenta (mínimo de riesgo): la cuenta se bloquea hoy, se opera la siguiente de la cola y mañana vuelve; con ≥ 0,4 % sigue igual (cortar en el TP máx.) · v9 (26/10/2026) · v9: consistencia: target recortado a lo que queda del TP máx. (cortar en +$, ≈R), tarjeta amarilla, consistencia alcanzada → hoy se opera la siguiente y mañana vuelve la misma (SL del reemplazo → final de la cola), target con importe en $, fuera "No estoy en reset" de la checklist · v8 (24/10/2026) · v8: alerta de reset del trader (3 días perdedores seguidos → pausa 3 días naturales; 2.º seguido con errores → 1 semana), aviso al registrar en reset (P5), ítem de checklist "No estoy en reset" · v7 (24/10/2026) · v7: P0 "¿Sesión preparada?" automática desde la checklist del día (vigente desde 26/10/2026), checklist guardada por fecha, KPI Sesión preparada · v6 (24/10/2026) · v6: formulario completo de trade (Nasdaq) igual al de la app vieja, editar/completar trades y journal en Trades (sin R plan) · v5 (24/10/2026) · v5: tabla de cuentas: quemadas/pasadas/reserva sin "Poner en turno" · v4 (24/10/2026) · v4: riesgo en rojo si supera el margen; checklist con bots VPS solo para el admin · v3 (23/10/2026) · v3: Cuentas y contabilidad (equity, retiros, compras, resets, reserva, inactividad, caducidad) · v2: consistencia por cuenta
+<!-- Riesgo Futuros · app multiusuario (Firebase) · v13 (13/11/2026) · v13 · RF-27: curvas de equity (cartera y cuenta) ancladas al balance real de la última sincronización + ventana «Sincronizar cuentas» (balance y min balance por cuenta, Dif. con umbral 0,2 %) · v12 (08/11/2026) ·v12: editar un trade conserva cargadoTradinverso y cargadoEl (antes se borraban y el cierre de día lo volvía a dar como pendiente) · v11 (28/10/2026) · v11: FVG HTF como el POI: en el camino (entrada → 2R), distancia entre 0 y 2R · v10 (28/10/2026) · v10: bloqueo por consistencia si el TP máx. de hoy < 0,4 % de la cuenta (mínimo de riesgo): la cuenta se bloquea hoy, se opera la siguiente de la cola y mañana vuelve; con ≥ 0,4 % sigue igual (cortar en el TP máx.) · v9 (26/10/2026) · v9: consistencia: target recortado a lo que queda del TP máx. (cortar en +$, ≈R), tarjeta amarilla, consistencia alcanzada → hoy se opera la siguiente y mañana vuelve la misma (SL del reemplazo → final de la cola), target con importe en $, fuera "No estoy en reset" de la checklist · v8 (24/10/2026) · v8: alerta de reset del trader (3 días perdedores seguidos → pausa 3 días naturales; 2.º seguido con errores → 1 semana), aviso al registrar en reset (P5), ítem de checklist "No estoy en reset" · v7 (24/10/2026) · v7: P0 "¿Sesión preparada?" automática desde la checklist del día (vigente desde 26/10/2026), checklist guardada por fecha, KPI Sesión preparada · v6 (24/10/2026) · v6: formulario completo de trade (Nasdaq) igual al de la app vieja, editar/completar trades y journal en Trades (sin R plan) · v5 (24/10/2026) · v5: tabla de cuentas: quemadas/pasadas/reserva sin "Poner en turno" · v4 (24/10/2026) · v4: riesgo en rojo si supera el margen; checklist con bots VPS solo para el admin · v3 (23/10/2026) · v3: Cuentas y contabilidad (equity, retiros, compras, resets, reserva, inactividad, caducidad) · v2: consistencia por cuenta
      Misma lógica que la app de Apps Script (Real_Codigo.gs): Tabla maestra para Funded, regla v7 para challenges,
      rotación (SL → siguiente cuenta), plan B y registro rápido. Cada usuario ve solo sus cuentas y trades.
      La Tabla maestra es compartida (config/tablaMaestra) y solo la edita el admin. -->
@@ -89,6 +89,15 @@ td.num,th.num{text-align:right}
 .kv2{display:grid;grid-template-columns:minmax(120px,200px) 1fr;gap:5px 12px;font-size:13px}.kv2 span{font:11px var(--mono);color:var(--muted)}.kv2 div{word-break:break-word}
 @media(max-width:700px){.fg{grid-template-columns:1fr 1fr}.fc.w2,.fc.w3{grid-column:1/-1}}
 .warn.bad{background:#fde6e6;border-color:#eba3a3;color:#9b2222}
+.pie{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px;font-size:13px}.pie button{margin-left:auto}
+.chipA,.chipW{padding:4px 10px;border-radius:8px}.chipA{background:#E6F1FB;color:#185FA5}.chipW{background:var(--warn-bg);color:var(--warn)}
+.syi{font-size:15px;margin-left:4px}
+#syOv{position:fixed;inset:0;background:rgba(18,34,59,.45);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px}
+#syOv .bx{background:#fff;border-radius:12px;max-width:680px;width:100%;max-height:88vh;overflow:auto;padding:16px 18px}
+.syg{display:grid;grid-template-columns:1.2fr 1fr 1fr 120px;gap:8px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line)}.syg input{width:100%}
+.syh{font:11px var(--mono);color:var(--muted);padding:0 0 6px;border-bottom:1px solid var(--line-2)}
+.syd{text-align:right;font-size:13px}.syok{color:var(--pos)}.sywa{color:var(--warn);font-weight:600}
+@media(max-width:560px){.syg{grid-template-columns:1fr 1fr}.syg>div:first-child,.syh span:first-child{grid-column:1/-1}.syd{grid-column:1/-1}.syh span:last-child{display:none}}
 @media(max-width:560px){.op2{grid-template-columns:1fr}.kv{grid-template-columns:repeat(2,1fr)}.acc .hero b{font-size:19px}}
 </style></head><body>
 <div class="wrap">
@@ -118,8 +127,8 @@ td.num,th.num{text-align:right}
     </section>
     <section id="v-cuentas" hidden>
       <div class="kpis" id="ctaKpis"></div>
-      <div class="sec"><h2>Evolución del equity</h2><span class="hint">Suma de cuentas fondeadas activas · cada trade mueve la curva, los retiros son caídas</span></div>
-      <div class="card"><div class="chartBox"><canvas id="chCartera"></canvas></div></div>
+      <div class="sec"><h2>Equity curve · Cartera</h2><span class="hint">Suma de cuentas fondeadas activas · anclada al balance real de la última sincronización · cada trade mueve la curva, los retiros son caídas</span></div>
+      <div class="card"><div class="kpis" id="eqKpis" style="margin-bottom:10px"></div><div class="chartBox"><canvas id="chCartera"></canvas></div><div id="eqPie"></div></div>
       <div id="ctaGrupos"></div>
       <div id="ctaDet"></div>
       <div class="sec"><h2>Tabla de cuentas</h2><span class="hint">Orden = rotación. Balance y mínimo se copian de la firma (Lucid) al sincronizar.</span></div>
@@ -863,16 +872,86 @@ function avisosCuentas() {
   });
   return out;
 }
+// RF-27 · curva anclada al balance real (mockup RF-27_curva_anclada, Javier 13/11/2026):
+// último punto = balance de la última sincronización + trades registrados después; hacia atrás, punto anterior = siguiente − resultado.
+// Antes de un reset no hay ancla: ese tramo sigue partiendo del tamaño de la cuenta.
+const balApp = c => r2(c.balance + pnlCuenta(c.id, c.syncAt).postSync);
 function serieCuenta(c) {
   const ev = TRADES.filter(t => t.cuenta === c.id).map(t => ({ f: t.fecha + ' ' + (t.hora || ''), v: num(t.usd) }))
     .concat(MOVS.filter(m => m.cuenta === c.id && m.tipo === 'Retiro').map(m => ({ f: m.fecha + ' 23:59', v: -num(m.importe), r: true })))
     .concat(MOVS.filter(m => m.cuenta === c.id && m.tipo === 'Reset').map(m => ({ f: m.fecha + ' 00:00', reset: true })))
     .sort((a, b) => a.f.localeCompare(b.f));
-  let bal = c.tam; const pts = [{ x: c.alta || (ev[0] ? ev[0].f.slice(0, 10) : hoyES()), y: bal }];
-  ev.forEach(e => { if (e.reset) bal = c.tam; else bal += e.v; pts.push({ x: e.f.slice(0, 10), y: Math.round(bal * 100) / 100, r: e.r }); });
-  const actual = c.estado === 'Activa' ? (estadoCuentas().find(x => x.c.id === c.id)?.balance ?? c.balance) : bal;
-  if (c.estado === 'Activa' && Math.abs(actual - bal) > 0.5) pts.push({ x: hoyES(), y: actual, ajuste: Math.round((actual - bal) * 100) / 100 });
+  let iR = -1; ev.forEach((e, i) => { if (e.reset) iR = i; });
+  const pre = ev.slice(0, Math.max(iR, 0)), tail = ev.slice(iR + 1), x0 = c.alta || (ev[0] ? ev[0].f.slice(0, 10) : hoyES()), pts = [];
+  let bal = c.tam;
+  if (iR >= 0) { pts.push({ x: x0, y: bal }); pre.forEach(e => { bal += e.v; pts.push({ x: e.f.slice(0, 10), y: r2(bal), r: e.r }); }); }
+  bal = balApp(c) - tail.reduce((a, e) => a + e.v, 0);
+  pts.push({ x: iR >= 0 ? ev[iR].f.slice(0, 10) : x0, y: r2(bal), inicio: true });
+  tail.forEach(e => { bal += e.v; pts.push({ x: e.f.slice(0, 10), y: r2(bal), r: e.r }); });
   return pts;
+}
+// Pie del gráfico: chip de ancla + aviso de +7 días + botón para sincronizar (cs = cuentas que entran en la curva).
+function pieCurva(cs, syncId) {
+  if (!cs.length) return '';
+  const ss = cs.map(c => c.syncAt || 0), viejo = Math.min(...ss), ahora = Date.now();
+  const f = viejo ? new Date(viejo).toLocaleDateString('es-ES', { timeZone: 'Europe/Madrid', day: '2-digit', month: '2-digit' }) : '—';
+  return '<div class="pie"><span class="chipA">⚓ Anclada al balance real del ' + f + (ss.some(s => s !== viejo) ? ' (la más antigua)' : '') + '</span>'
+    + (ss.some(s => !s || (ahora - s) / 86400000 > 7) ? '<span class="chipW">⚠ +7 días sin sincronizar</span>' : '')
+    + '<button type="button" data-sync="' + esc(syncId || '') + '">⟳ Sincronizar balance</button></div>';
+}
+
+// RF-27 · ventana «Sincronizar cuentas» (mockup RF-27_sincronizar, Javier 13/11/2026). Placeholder = valor actual de la app.
+const SYNC_UMBRAL = 0.002; // 0,2 % del tamaño de la cuenta
+let SYNC_L = [];
+function valoresApp(c) {
+  const e = TM ? estadoCuentas().find(x => x.c.id === c.id) : null;
+  return { balance: e ? r2(e.balance) : balApp(c), minimo: e ? e.minimo : c.minimo };
+}
+// Sin id (botón bajo la curva): cuentas en rotación (la en turno primero) + cualquier cuenta activa que figure en los últimos 10 trades
+// registrados, aunque esté en reserva (se opera por inactividad). Con id (icono ⟳ de la tarjeta): solo esa. Regla de Javier, 13/11/2026.
+const SYNC_ULT_TRADES = 10;
+function abrirSync(id) {
+  const ult = new Set(TRADES.slice().sort((a, b) => num(b.registrado) - num(a.registrado)).slice(0, SYNC_ULT_TRADES).map(t => t.cuenta));
+  SYNC_L = CUENTAS.filter(c => c.estado === 'Activa' && (id ? c.id === id : (c.activa || ult.has(c.id))))
+    .sort((a, b) => (b.enTurno - a.enTurno) || (b.activa - a.activa) || (a.orden - b.orden)).map(c => Object.assign({ c }, valoresApp(c)));
+  if (!SYNC_L.length) return;
+  const o = $('syOv'); if (o) o.remove();
+  const n2 = x => x == null ? '' : Number(x).toLocaleString('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 2 });
+  const fs = s => s ? new Date(s).toLocaleDateString('es-ES', { timeZone: 'Europe/Madrid', day: '2-digit', month: '2-digit' }) : '—';
+  document.body.insertAdjacentHTML('beforeend', '<div id="syOv"><div class="bx"><div class="row" style="justify-content:space-between"><b>Sincronizar cuentas</b><button class="link" type="button" id="syX">✕</button></div>'
+    + '<div class="mut" style="font-size:13px;margin:4px 0 12px">Copiá los dos datos de la web de la firma. Lo que no toques no se guarda.</div>'
+    + '<div class="syg syh"><span>Cuenta</span><span>Balance</span><span>Min balance (DD)</span><span style="text-align:right">Dif.</span></div>'
+    + SYNC_L.map((s, i) => '<div class="syg"><div><div>' + esc(s.c.nombre) + (s.c.enTurno ? ' <span class="tag f">en turno</span>' : '') + '</div><div class="mut" style="font-size:12px">Últ. sync ' + fs(s.c.syncAt) + '</div></div>'
+      + '<input type="number" step="0.01" data-syb="' + i + '" placeholder="' + n2(s.balance) + '"><input type="number" step="0.01" data-sym="' + i + '" placeholder="' + n2(s.minimo) + '"><span class="syd mut" id="syd' + i + '">—</span></div>').join('')
+    + '<div class="row" style="justify-content:space-between;margin-top:12px"><span class="mut" id="sySum" style="font-size:13px">Ningún cambio todavía</span><div class="row"><button type="button" id="syC">Cancelar</button><button class="pri" type="button" id="syG">Guardar</button></div></div>'
+    + '<div class="msg" id="syMsg"></div></div></div>');
+}
+const syVal = (k, i) => { const el = document.querySelector('[data-sy' + k + '="' + i + '"]'); const v = el ? String(el.value).trim() : ''; return v === '' ? null : num(v); };
+function syncDif() {
+  let n = 0;
+  SYNC_L.forEach((s, i) => {
+    const b = syVal('b', i), m = syVal('m', i), el = $('syd' + i); if (!el) return;
+    if (b != null || m != null) n++;
+    if (b == null) { el.textContent = '—'; el.className = 'syd mut'; return; }
+    const df = b - s.balance, p = Math.abs(df) / s.c.tam;
+    el.textContent = (df > 0 ? '+' : df < 0 ? '−' : '') + Math.abs(Math.round(df)).toLocaleString('es-ES') + ' $ · ' + (p * 100).toFixed(2).replace('.', ',') + ' %';
+    el.className = 'syd ' + (p <= SYNC_UMBRAL + 1e-9 ? 'syok' : 'sywa');
+  });
+  $('sySum').textContent = n ? n + ' cuenta' + (n === 1 ? '' : 's') + ' se actualizará' + (n === 1 ? '' : 'n') + ' · la curva se recalcula al guardar' : 'Ningún cambio todavía';
+}
+async function guardarSync() {
+  const ahora = Date.now(), b = writeBatch(db); let n = 0, err = '';
+  SYNC_L.forEach((s, i) => {
+    const bal = syVal('b', i), min = syVal('m', i);
+    if (bal == null && min == null) return;
+    if ((bal != null && !(bal > 0)) || (min != null && !(min > 0))) { err = 'Revisá ' + s.c.nombre + ': los importes tienen que ser mayores que 0.'; return; }
+    // La fecha de sync se mueve: el dato no tocado se fija en el valor que ya mostraba la app (no cambia nada a la vista).
+    b.set(uref('cuentas', s.c.id), { balance: bal != null ? bal : s.balance, minimo: min != null ? min : s.minimo, syncAt: ahora }, { merge: true }); n++;
+  });
+  const m = $('syMsg');
+  if (err) { m.textContent = err; m.className = 'msg err'; return; }
+  if (!n) { m.textContent = 'No cambiaste nada.'; m.className = 'msg err'; return; }
+  try { await b.commit(); $('syOv').remove(); await cargar(); } catch (e) { m.textContent = 'Error: ' + e.message; m.className = 'msg err'; }
 }
 function spark(pts, color) {
   if (pts.length < 2) return '<svg class="mini" viewBox="0 0 200 34"><line x1="0" y1="17" x2="200" y2="17" stroke="#9cbbe8" stroke-dasharray="3 3"/></svg>';
@@ -899,6 +978,10 @@ function renderCtaPage() {
   const serF = fund.map(serieCuenta), fechas = [...new Set(serF.flat().map(p => p.x))].sort();
   const tot = fechas.map(f => serF.reduce((a, s) => { const q = s.filter(p => p.x <= f).pop(); return a + (q ? q.y : s[0].y); }, 0));
   dibujar('chCartera', fechas.map(fmtF), [{ data: tot, borderColor: '#2f6fd1', backgroundColor: 'rgba(47,111,209,.12)', fill: true, tension: .25, pointRadius: 0 }]);
+  const sv = fund.map(c => c.syncAt || 0), fa = sv.length && Math.min(...sv) ? new Date(Math.min(...sv)).toLocaleDateString('es-ES', { timeZone: 'Europe/Madrid', day: '2-digit', month: '2-digit' }) : '—';
+  $('eqKpis').innerHTML = fund.length ? [['Balance', money2(tot[tot.length - 1])], ['Anchor · sync ' + fa, money2(fund.reduce((a, c) => a + c.balance, 0))], ['Start balance (calculado)', money2(tot[0])]]
+    .map(k => '<div class="kpi"><div class="l">' + k[0] + '</div><div class="v" style="font-size:18px">' + k[1] + '</div></div>').join('') : '';
+  $('eqPie').innerHTML = pieCurva(fund, '');
   // grupos
   const orden = ['Fondeadas', 'Challenges', 'Reserva', 'Pasadas', 'Quemadas'];
   $('ctaGrupos').innerHTML = orden.map(g => {
@@ -912,7 +995,7 @@ function renderCtaPage() {
   const mes = {}; T.forEach(t => { const k = t.fecha.slice(0, 7); mes[k] = (mes[k] || 0) + num(t.usd); });
   $('ctaDet').innerHTML = '<div class="sec"><h2>' + esc(c.nombre) + '</h2><span class="hint">' + esc(c.id) + ' · ' + esc(c.firma) + ' · alta ' + fmtF(c.alta) + (c.caducidad ? ' · caduca ' + fmtF(c.caducidad) : '') + '</span><button class="link" type="button" data-edit="' + esc(c.id) + '">✎ Editar / sincronizar</button></div>'
     + '<div class="kpis">' + [['Equity', money(eq)], ['Profit', '<span class="' + (eq - c.tam < 0 ? 'neg' : 'pos') + '">' + money(eq - c.tam + st.bruto) + '</span>'], ['Trades', st.n + ' · ' + st.tp + ' TP · ' + st.sl + ' SL · ' + st.be + ' BE'], ['Winrate', st.wr == null ? '—' : Math.round(st.wr * 100) + ' %'], ['Profit factor', st.pf == null ? '—' : st.pf.toFixed(2).replace('.', ',')], ['Retirado (neto)', money(st.neto) + ' · ' + st.nRet + ' retiro' + (st.nRet === 1 ? '' : 's')], ['Invertido', money2(st.inv)]].map(k => '<div class="kpi"><div class="l">' + k[0] + '</div><div class="v" style="font-size:17px">' + k[1] + '</div></div>').join('') + '</div>'
-    + '<div class="card" style="margin-top:10px"><div class="chartBox"><canvas id="chCta"></canvas></div>' + (pts[pts.length - 1].ajuste ? '<div class="note mut" style="font-size:12px;margin-top:6px">Último punto = balance de la firma; diferencia con los trades cargados: ' + money(pts[pts.length - 1].ajuste) + ' (comisiones o trades sin cargar).</div>' : '') + '</div>'
+    + '<div class="card" style="margin-top:10px"><div class="chartBox"><canvas id="chCta"></canvas></div>' + (c.estado === 'Activa' ? pieCurva([c], c.id) : '') + '</div>'
     + '<div class="card" style="margin-top:10px"><div class="chartBox" style="height:180px"><canvas id="chCtaMes"></canvas></div></div>'
     + '<div class="card tbl" style="margin-top:10px"><b>Retiros</b> ' + (R.length ? '<table><thead><tr><th>Fecha</th><th class="num">Bruto</th><th class="num">Split</th><th class="num">Neto</th><th>Nota</th></tr></thead><tbody>' + R.map(m => '<tr><td>' + fmtF(m.fecha) + '</td><td class="num">' + money(m.importe) + '</td><td class="num">' + (m.split || 100) + ' %</td><td class="num pos">' + money(netoMov(m)) + '</td><td class="mut">' + esc(m.nota) + '</td></tr>').join('') + '</tbody></table>' : '<span class="mut">sin retiros todavía · se cargan en Contabilidad → Movimientos</span>') + '</div>'
     + '<div class="card tbl" style="margin-top:10px"><b>Trades de la cuenta (' + T.length + ')</b><table><thead><tr><th>Nº</th><th>Fecha</th><th>Salida</th><th class="num">Resultado</th><th>Nota</th></tr></thead><tbody>' + T.map(t => '<tr><td>' + esc(t.num) + '</td><td>' + fmtF(t.fecha) + ' ' + esc(t.hora || '') + '</td><td><span class="pill ' + String(t.salida).toLowerCase() + '">' + esc(t.salida) + '</span></td><td class="num ' + (t.usd > 0 ? 'pos' : t.usd < 0 ? 'neg' : '') + '">' + money(t.usd) + '</td><td class="mut" style="white-space:normal;min-width:180px">' + esc(String(t.nota || '').slice(0, 140)) + '</td></tr>').join('') + '</tbody></table></div>';
@@ -930,7 +1013,7 @@ function tarjeta(c, e) {
   const acc = c.estado !== 'Activa' ? '' : '<div class="acts">' + (c.fase === 'Evaluación' ? '<button type="button" data-act="fondear" data-id="' + esc(c.id) + '">★ Pasar a funded</button>' : '<button type="button" data-act="retiro" data-id="' + esc(c.id) + '">💵 Retiro</button>')
     + '<button type="button" data-act="' + (c.activa ? 'reserva' : 'activar') + '" data-id="' + esc(c.id) + '">' + (c.activa ? 'A reserva' : '▶ Activar en rotación') + '</button>'
     + '<button type="button" data-act="reset" data-id="' + esc(c.id) + '">↺ Reset</button><button type="button" data-act="quemada" data-id="' + esc(c.id) + '">✗ Quemada</button></div>';
-  return '<div class="cc' + (c.enTurno ? ' turno' : '') + (!c.activa && c.estado === 'Activa' ? ' res' : '') + (SEL_CTA === c.id ? ' sel' : '') + '" data-cc="' + esc(c.id) + '"><div class="top"><b>' + esc(c.nombre) + '</b>' + tg + '</div>'
+  return '<div class="cc' + (c.enTurno ? ' turno' : '') + (!c.activa && c.estado === 'Activa' ? ' res' : '') + (SEL_CTA === c.id ? ' sel' : '') + '" data-cc="' + esc(c.id) + '"><div class="top"><b>' + esc(c.nombre) + '</b><span>' + tg + (c.estado === 'Activa' ? '<button class="link syi" type="button" data-sync="' + esc(c.id) + '" title="Sincronizar balance">⟳</button>' : '') + '</span></div>'
     + '<div class="top" style="margin-top:4px"><span class="eq">' + money(eq) + '</span><span class="' + (pc < 0 ? 'neg' : pc > 0 ? 'pos' : 'mut') + '">' + (pc > 0 ? '+' : '') + pc.toFixed(2).replace('.', ',') + ' %</span></div>'
     + spark(pts, pc < 0 ? '#c23b3b' : '#0e8a5c') + barra
     + '<div class="mut" style="font-size:12px;margin-top:6px">' + st.n + ' trades' + (st.wr == null ? '' : ' · ' + Math.round(st.wr * 100) + ' % WR') + ' · coste ' + money2(st.inv) + (st.neto ? ' · retirado ' + money(st.neto) : '') + (sin != null && c.estado === 'Activa' ? ' · ' + sin + ' días sin operar' : '') + '</div>' + acc + '</div>';
@@ -1018,6 +1101,9 @@ document.addEventListener('click', async ev => {
   if (el.dataset.act) { ev.stopPropagation(); return accionCuenta(el.dataset.act, el.dataset.id); }
   if (el.dataset.delmov) { if (!confirm('¿Borrar este movimiento?')) return; await deleteDoc(uref('movimientos', el.dataset.delmov)); return cargar(); }
   if (el.id === 'btnMov') return guardarMov();
+  if (el.dataset.sync != null) { ev.stopPropagation(); return abrirSync(el.dataset.sync); }
+  if (el.id === 'syX' || el.id === 'syC') { $('syOv').remove(); return; }
+  if (el.id === 'syG') return guardarSync();
   if (el.dataset.fk) { const k = el.dataset.fk, v = el.dataset.fv; if (el.dataset.multi) F[k] = F[k].includes(v) ? F[k].filter(x => x !== v) : F[k].concat([v]); else F[k] = F[k] === v ? '' : v;
     if (k === 'p0') { F.p0Manual = true; aplicarP0(); }
     if (k === 'plan' && F.p0 === 'No') F.plan = 'No';
@@ -1054,6 +1140,7 @@ document.addEventListener('click', ev => {
   if (SEL_CTA) $('ctaDet').scrollIntoView({ behavior: 'smooth', block: 'start' });
 });
 document.addEventListener('input', ev => {
+  if (ev.target.closest && ev.target.closest('#syOv')) return syncDif();
   const k = ev.target.dataset && ev.target.dataset.fin; if (!k || !F) return;
   F[k] = ev.target.type === 'checkbox' ? ev.target.checked : ev.target.value;
 });
