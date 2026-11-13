@@ -1,0 +1,18 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><title>RF-27 Sincronizar cuentas</title><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"><style>:root{--surface-1:#f7f7f5;--surface-2:#fff;--border:rgba(0,0,0,.12);--text-secondary:#666;--text-muted:#999;--text-success:#3B6D11;--text-warning:#854F0B;--bg-accent:#E6F1FB;--text-accent:#185FA5;--bg-warning:#FAEEDA;--fill-accent:#378ADD;--on-accent:#fff;--radius:8px}body{font-family:system-ui,sans-serif;max-width:680px;margin:2rem auto;color:#1a1a1a}button{border:.5px solid rgba(0,0,0,.25);background:transparent;border-radius:8px;padding:6px 12px;cursor:pointer}input{height:32px;border:.5px solid rgba(0,0,0,.25);border-radius:8px;padding:0 8px;box-sizing:border-box}</style></head><body>
+<div style="background:rgba(0,0,0,.35);border-radius:12px;padding:1.5rem">
+<div style="background:var(--surface-2);border-radius:12px;padding:1rem 1.25rem">
+<div style="display:flex;justify-content:space-between"><b style="font-weight:500">Sincronizar cuentas</b><i class="ti ti-x"></i></div>
+<div style="font-size:13px;color:var(--text-secondary);margin:4px 0 14px">Copia los dos datos de la web de la firma. Lo que no toques no se guarda.</div>
+<div style="display:grid;grid-template-columns:1.2fr 1fr 1fr 110px;gap:8px;font-size:12px;color:var(--text-muted);padding-bottom:6px;border-bottom:.5px solid var(--border)"><span>Cuenta</span><span>Balance</span><span>Min balance (DD)</span><span style="text-align:right">Dif.</span></div>
+<div id="rows"></div>
+<div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px"><span id="sum" style="font-size:13px;color:var(--text-secondary)">Ningún cambio todavía</span><div style="display:flex;gap:8px"><button>Cancelar</button><button style="background:var(--fill-accent);color:var(--on-accent);border:none">Guardar</button></div></div>
+</div></div>
+<script>
+const acc=[{n:'PRO001',t:'en turno',s:'23/10',size:25000,b:24561.5,m:23500},{n:'TEST002',s:'23/10',size:25000,b:25120,m:24000},{n:'TEST003',s:'23/10',size:25000,b:24890,m:23800}];
+const f=v=>v.toLocaleString('es-ES',{minimumFractionDigits:1,maximumFractionDigits:1}),R=document.getElementById('rows'),UMBRAL=0.2;
+acc.forEach((a,i)=>{const d=document.createElement('div');d.style.cssText='display:grid;grid-template-columns:1.2fr 1fr 1fr 110px;gap:8px;align-items:center;padding:10px 0;border-bottom:.5px solid var(--border)';
+d.innerHTML='<div><div style="font-size:14px">'+a.n+(a.t?' <span style="font-size:11px;background:var(--bg-accent);color:var(--text-accent);padding:2px 6px;border-radius:8px">'+a.t+'</span>':'')+'</div><div style="font-size:12px;color:var(--text-muted)">Últ. sync '+a.s+'</div></div><input type="number" step="0.5" id="b'+i+'" placeholder="'+f(a.b)+'"><input type="number" step="0.5" id="m'+i+'" placeholder="'+f(a.m)+'"><span id="d'+i+'" style="text-align:right;font-size:13px;color:var(--text-muted)">—</span>';R.appendChild(d);});
+R.oninput=()=>{let n=0;acc.forEach((a,i)=>{const v=parseFloat(document.getElementById('b'+i).value),m=document.getElementById('m'+i).value,el=document.getElementById('d'+i);
+if(!isNaN(v)){n++;const df=v-a.b,p=Math.abs(df)/a.size*100;el.textContent=(df>0?'+':'')+Math.round(df)+' $ · '+p.toFixed(2).replace('.',',')+' %';el.style.color=p<=UMBRAL?'var(--text-success)':'var(--text-warning)';}else{el.textContent='—';el.style.color='var(--text-muted)';if(m)n++;}});
+document.getElementById('sum').textContent=n?n+' cuenta(s) se actualizarán · la curva se recalcula al guardar':'Ningún cambio todavía';};
+</script></body></html>

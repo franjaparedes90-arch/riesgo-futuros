@@ -1,0 +1,19 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><title>RF-27 Curva anclada</title><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"><style>:root{--surface-1:#f7f7f5;--surface-2:#fff;--border:rgba(0,0,0,.12);--text-secondary:#666;--text-muted:#999;--text-success:#3B6D11;--text-warning:#854F0B;--bg-accent:#E6F1FB;--text-accent:#185FA5;--bg-warning:#FAEEDA;--fill-accent:#378ADD;--on-accent:#fff;--radius:8px}body{font-family:system-ui,sans-serif;max-width:680px;margin:2rem auto;color:#1a1a1a}button{border:.5px solid rgba(0,0,0,.25);background:transparent;border-radius:8px;padding:6px 12px;cursor:pointer}input{height:32px;border:.5px solid rgba(0,0,0,.25);border-radius:8px;padding:0 8px;box-sizing:border-box}</style></head><body>
+<div style="background:var(--surface-2);border:.5px solid var(--border);border-radius:12px;padding:1rem 1.25rem">
+<div style="display:flex;justify-content:space-between;align-items:center"><b style="font-weight:500">Equity curve · Cartera</b><button id="bNow">Ver fallo actual</button></div>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:1rem 0">
+<div style="background:var(--surface-1);border-radius:8px;padding:.75rem 1rem"><div style="font-size:13px;color:var(--text-secondary)">Balance</div><div style="font-size:22px">24.561,5 $</div></div>
+<div style="background:var(--surface-1);border-radius:8px;padding:.75rem 1rem"><div style="font-size:13px;color:var(--text-secondary)">Anchor · sync 23/10</div><div style="font-size:22px">24.206 $</div></div>
+<div style="background:var(--surface-1);border-radius:8px;padding:.75rem 1rem"><div style="font-size:13px;color:var(--text-secondary)">Start balance (calculado)</div><div style="font-size:22px">24.646,5 $</div></div></div>
+<div style="position:relative;height:260px"><canvas id="ch"></canvas></div>
+<div style="display:flex;gap:8px;align-items:center;margin-top:12px;font-size:13px">
+<span style="background:var(--bg-accent);color:var(--text-accent);padding:4px 10px;border-radius:8px"><i class="ti ti-anchor"></i> Anclada al balance real del 23/10</span>
+<span style="background:var(--bg-warning);color:var(--text-warning);padding:4px 10px;border-radius:8px"><i class="ti ti-alert-triangle"></i> +7 días sin sincronizar</span>
+<button style="margin-left:auto"><i class="ti ti-refresh"></i> Sincronizar balance</button></div>
+<p style="font-size:12px;color:var(--text-muted)">Puntos intermedios ilustrativos; valores de las tarjetas reales (RF-27). Misma lógica en la curva de cada cuenta.</p></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const L=['01/09','15/09','01/10','15/10','23/10','01/11','08/11','09/11'],prop=[24646.5,24510,24380,24290,24206,24420,24272,24561.5],now=prop.map((v,i)=>i===prop.length-1?v:v+353.5);
+const ch=new Chart(document.getElementById('ch'),{type:'line',data:{labels:L,datasets:[{label:'Propuesta (anclada)',data:prop,borderColor:'#378ADD',tension:.25},{label:'Hoy (fallo)',data:now,borderColor:'#E24B4A',borderDash:[5,4],tension:.25,hidden:true}]},options:{responsive:true,maintainAspectRatio:false}});
+const b=document.getElementById('bNow');b.onclick=()=>{const d=ch.data.datasets[1];d.hidden=!d.hidden;b.textContent=d.hidden?'Ver fallo actual':'Ocultar fallo actual';ch.update();};
+</script></body></html>
