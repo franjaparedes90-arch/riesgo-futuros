@@ -1,0 +1,66 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><title>Aviso sincronizar balances</title><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"><style>:root{--surface-1:#f7f7f5;--surface-2:#fff;--border:rgba(0,0,0,.12);--border-strong:rgba(0,0,0,.25);--text-primary:#1a1a1a;--text-secondary:#666;--text-muted:#999;--text-success:#3B6D11;--text-warning:#854F0B;--text-danger:#A32D2D;--text-accent:#185FA5;--bg-accent:#E6F1FB;--bg-warning:#FAEEDA;--bg-success:#EAF3DE;--bg-danger:#FCEBEB;--border-accent:#378ADD;--border-warning:#EF9F27;--border-success:#97C459;--border-danger:#F09595;--radius:8px}body{font-family:system-ui,sans-serif;max-width:720px;margin:2rem auto;color:var(--text-primary)}button{border:.5px solid var(--border-strong);background:transparent;border-radius:8px;padding:6px 12px;cursor:pointer}input,select{height:32px;border:.5px solid var(--border-strong);border-radius:8px;padding:0 8px;box-sizing:border-box}label{display:block}.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}h1{font-size:18px;font-weight:500}.note{font-size:13px;color:var(--text-secondary)}</style></head><body>
+<h1>Aviso de sincronizar balances — APROBADO 13/11/2026</h1>
+<p class="note">Amplía RF-27 (RF-27_sincronizar.html): añade el aviso en «Hoy», pide solo las cuentas operadas y guarda cuenta por cuenta. Datos de ejemplo.</p>
+<div style="background:var(--surface-1);border-radius:12px;padding:1.25rem;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;">
+<div>
+<p style="font-size:12px;color:var(--text-muted);margin:0 0 8px;">Pantalla «Hoy» · banner arriba</p>
+<div style="background:var(--bg-warning);border:0.5px solid var(--border-warning);border-radius:var(--radius);padding:10px 12px;display:flex;gap:10px;align-items:flex-start;">
+<i class="ti ti-refresh" style="font-size:18px;color:var(--text-warning);margin-top:2px"></i>
+<div style="flex:1">
+<p style="margin:0;font-size:14px;font-weight:500;color:var(--text-warning);">Toca sincronizar balances · faltan 2</p>
+<p style="margin:2px 0 8px;font-size:12px;color:var(--text-warning);">Vuelta completa · 7 trades desde el 09/11</p>
+<button style="font-size:13px;">Sincronizar ahora</button>
+</div>
+</div>
+<p style="font-size:12px;color:var(--text-muted);margin:10px 0 4px;">Motivo (lo que llegue primero):</p>
+<div style="display:flex;gap:6px;flex-wrap:wrap;font-size:12px;">
+<span style="background:var(--surface-2);border:0.5px solid var(--border);border-radius:var(--radius);padding:3px 8px;">Trades: 7 / 10</span>
+<span style="background:var(--bg-warning);color:var(--text-warning);border-radius:var(--radius);padding:3px 8px;">Vuelta: 4 / 4 cuentas</span>
+</div>
+<p style="font-size:12px;color:var(--text-muted);margin:8px 0 0;">Vuelta = todas las activas (sin reserva) tuvieron turno. El banner no se puede cerrar hasta guardar todas.</p>
+</div>
+<div style="background:var(--surface-2);border:0.5px solid var(--border);border-radius:12px;padding:1rem;">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+<p style="margin:0;font-size:15px;font-weight:500;">Sincronizar balances</p>
+<span style="font-size:12px;color:var(--text-secondary);">1 / 3 guardadas</span>
+</div>
+<p style="margin:0 0 12px;font-size:12px;color:var(--text-secondary);">Solo las cuentas operadas desde la última sincronización. Guarda cada cuenta al terminarla; puedes cerrar y seguir luego.</p>
+<div style="border-top:0.5px solid var(--border);padding:8px 0;display:flex;justify-content:space-between;align-items:center;">
+<div>
+<p style="margin:0;font-size:13px;font-weight:500;">PRO001</p>
+<p style="margin:0;font-size:12px;color:var(--text-secondary);">25.312 $ · min 23.812 $ · dif. +14 $</p>
+</div>
+<span style="font-size:12px;color:var(--text-success);"><i class="ti ti-check"></i> Guardada · editar</span>
+</div>
+<div style="border-top:0.5px solid var(--border);padding:8px 0;">
+<p style="margin:0 0 6px;font-size:13px;font-weight:500;">PRO002 <span style="font-weight:400;color:var(--text-secondary);font-size:12px;">· grupo A</span></p>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:12px;color:var(--text-secondary);">
+<label>Balance<input value="25.640" style="width:100%;font-size:13px"></label>
+<label>Min balance<input placeholder="24.140" style="width:100%;font-size:13px"></label>
+</div>
+<div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">
+<span style="font-size:11px;color:var(--text-success);">App: 25.628 $ · dif. +12 $ · 0,05 %</span>
+<button style="font-size:13px;">Guardar PRO002</button>
+</div>
+</div>
+<div style="border-top:0.5px solid var(--border);padding:8px 0;display:flex;justify-content:space-between;align-items:center;">
+<div>
+<p style="margin:0;font-size:13px;font-weight:500;">PRO003 <span style="font-weight:400;color:var(--text-secondary);font-size:12px;">· grupo A</span></p>
+<p style="margin:0;font-size:12px;color:var(--text-muted);">Pendiente</p>
+</div>
+<i class="ti ti-chevron-down" style="font-size:16px;color:var(--text-secondary)"></i>
+</div>
+<p style="border-top:0.5px solid var(--border);padding-top:8px;margin:0;font-size:11px;color:var(--text-muted);">PRO004 no se pide (sin trades desde la última sincronización).</p>
+</div>
+</div>
+<h1>Reglas</h1>
+<ul class="note">
+<li><b>Una vuelta</b> = todas las cuentas activas de la rotación (las de reserva no cuentan) han tenido al menos un turno desde la última sincronización.</li>
+<li><b>Cuándo salta</b>: lo que llegue primero, 10 trades o una vuelta. El banner muestra el motivo y el contador.</li>
+<li><b>Qué cuentas pide</b>: solo las operadas desde la última sincronización; en un grupo de copia, todas las del grupo.</li>
+<li><b>Guardado cuenta por cuenta</b>: cada cuenta tiene su botón «Guardar»; al guardar queda con tick (editable) y se abre la siguiente pendiente. Si se cierra a mitad, lo guardado se conserva y el banner marca «faltan N».</li>
+<li><b>Banner fijo</b>: no se puede cerrar hasta guardar todas.</li>
+<li><b>Dif. con la app</b>: igual que RF-27 (umbral 0,2 % del tamaño de la cuenta: ≤ verde, &gt; ámbar → revisar trades).</li>
+<li>Campos por cuenta: Balance y Min balance (como RF-27). Al guardar se re-anclan las curvas (RF-27).</li>
+</ul>
+</body></html>

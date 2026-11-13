@@ -1,0 +1,67 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><title>Gestión de copias drag and drop</title><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"><style>:root{--surface-1:#f7f7f5;--surface-2:#fff;--border:rgba(0,0,0,.12);--border-strong:rgba(0,0,0,.25);--text-primary:#1a1a1a;--text-secondary:#666;--text-muted:#999;--text-success:#3B6D11;--text-warning:#854F0B;--text-danger:#A32D2D;--text-accent:#185FA5;--bg-accent:#E6F1FB;--bg-warning:#FAEEDA;--bg-success:#EAF3DE;--bg-danger:#FCEBEB;--border-accent:#378ADD;--border-warning:#EF9F27;--border-success:#97C459;--border-danger:#F09595;--radius:8px}body{font-family:system-ui,sans-serif;max-width:720px;margin:2rem auto;color:var(--text-primary)}button{border:.5px solid var(--border-strong);background:transparent;border-radius:8px;padding:6px 12px;cursor:pointer}input,select{height:32px;border:.5px solid var(--border-strong);border-radius:8px;padding:0 8px;box-sizing:border-box}label{display:block}.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}h1{font-size:18px;font-weight:500}.note{font-size:13px;color:var(--text-secondary)}</style></head><body>
+<h1>Cuentas · Gestión de copias con arrastrar y soltar — APROBADO 13/11/2026</h1>
+<p class="note">Sustituye a los desplegables de «Gestión de copias» del mockup 2026-11-13_copia-cuentas. Interactivo: se pueden arrastrar las cuentas (o tocar cuenta y luego hueco).</p>
+<style>
+.acc{display:flex;align-items:center;gap:8px;padding:8px 10px;border:0.5px solid var(--border-strong);border-radius:var(--radius);background:var(--surface-2);font-size:13px;cursor:grab;user-select:none}
+.acc.sel{border:2px solid var(--border-accent)}
+.zone{min-height:46px;border:1px dashed var(--border-strong);border-radius:var(--radius);padding:6px;display:flex;flex-direction:column;gap:6px}
+.zone.over{background:var(--bg-accent);border-color:var(--border-accent)}
+.lbl{font-size:12px;color:var(--text-secondary);margin:0 0 4px}
+.tag{font-size:11px;padding:2px 8px;border-radius:var(--radius)}
+</style>
+<div style="background:var(--surface-1);border-radius:12px;padding:1rem">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+<p style="margin:0;font-weight:500;font-size:15px">Cuentas · Gestión de copias</p>
+<button id="newg"><i class="ti ti-plus" aria-hidden="true"></i> Nuevo grupo</button>
+</div>
+<div style="display:grid;grid-template-columns:minmax(0,200px) minmax(0,1fr);gap:16px">
+<div>
+<p class="lbl">Cuentas sin grupo</p>
+<div class="zone" data-z="free" style="min-height:200px">
+<div class="acc" draggable="true" id="a3"><i class="ti ti-grip-vertical" aria-hidden="true"></i>Cuenta 003<span class="tag" style="background:var(--bg-warning);color:var(--text-warning);margin-left:auto">Eval</span></div>
+<div class="acc" draggable="true" id="a4"><i class="ti ti-grip-vertical" aria-hidden="true"></i>Cuenta 004<span class="tag" style="background:var(--bg-warning);color:var(--text-warning);margin-left:auto">Eval</span></div>
+<div class="acc" draggable="true" id="a5"><i class="ti ti-grip-vertical" aria-hidden="true"></i>FUND002<span class="tag" style="background:var(--bg-success);color:var(--text-success);margin-left:auto">Funded</span></div>
+</div>
+<p style="font-size:12px;color:var(--text-muted);margin:8px 0 0">En el móvil: toca una cuenta y luego el hueco.</p>
+</div>
+<div id="groups">
+<div class="g" style="background:var(--surface-2);border:0.5px solid var(--border);border-radius:12px;padding:12px;margin-bottom:12px">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><p style="margin:0;font-weight:500;font-size:14px">Grupo 1</p><span style="font-size:12px;color:var(--text-secondary)">Consistency del grupo: 40 %</span></div>
+<div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px">
+<div><p class="lbl"><i class="ti ti-crown" aria-hidden="true"></i> Líder (1)</p><div class="zone" data-z="lead">
+<div class="acc" draggable="true" id="a1"><i class="ti ti-grip-vertical" aria-hidden="true"></i>FUND001<span class="tag" style="background:var(--bg-success);color:var(--text-success);margin-left:auto">Funded</span></div>
+</div></div>
+<div><p class="lbl"><i class="ti ti-copy" aria-hidden="true"></i> Seguidoras</p><div class="zone" data-z="fol">
+<div class="acc" draggable="true" id="a2"><i class="ti ti-grip-vertical" aria-hidden="true"></i>Cuenta 002<span class="tag" style="background:var(--bg-warning);color:var(--text-warning);margin-left:auto">Eval</span></div>
+</div></div>
+</div></div>
+</div>
+</div>
+<p id="msg" style="font-size:13px;color:var(--text-danger);margin:10px 0 0;min-height:18px"></p>
+</div>
+<h1>Reglas</h1>
+<ul class="note">
+<li>Cada grupo: hueco Líder (una sola cuenta; si se suelta una segunda, aviso y no la deja) y hueco Seguidoras (las que sean).</li>
+<li>La Consistency del grupo se calcula sola: el % más restrictivo de las fichas.</li>
+<li>Móvil: tocar la cuenta y luego el hueco (alternativa al arrastre).</li>
+<li>Sacar una cuenta de un grupo = devolverla a «Cuentas sin grupo».</li>
+</ul>
+<script>
+let drag=null,sel=null,n=1;
+const msg=document.getElementById('msg');
+function check(z,el){if(z.dataset.z==='lead'&&z.querySelectorAll('.acc').length>=1&&el.parentNode!==z){msg.textContent='Cada grupo tiene una sola líder. Saca la actual primero.';return false}msg.textContent='';return true}
+function bindZone(z){
+z.addEventListener('dragover',e=>{e.preventDefault();z.classList.add('over')});
+z.addEventListener('dragleave',()=>z.classList.remove('over'));
+z.addEventListener('drop',e=>{e.preventDefault();z.classList.remove('over');if(drag&&check(z,drag))z.appendChild(drag)});
+z.addEventListener('click',e=>{if(sel&&!e.target.closest('.acc')){if(check(z,sel))z.appendChild(sel);sel.classList.remove('sel');sel=null}});
+}
+function bindAcc(a){
+a.addEventListener('dragstart',()=>drag=a);
+a.addEventListener('click',e=>{e.stopPropagation();if(sel)sel.classList.remove('sel');sel=(sel===a)?null:a;if(sel)a.classList.add('sel')});
+}
+document.querySelectorAll('.zone').forEach(bindZone);
+document.querySelectorAll('.acc').forEach(bindAcc);
+document.getElementById('newg').onclick=()=>{n++;const g=document.querySelector('.g').cloneNode(true);g.querySelector('p').textContent='Grupo '+n;g.querySelector('span').textContent='Consistency del grupo: —';g.querySelectorAll('.acc').forEach(x=>x.remove());g.querySelectorAll('.zone').forEach(bindZone);document.getElementById('groups').appendChild(g)};
+</script>
+</body></html>
