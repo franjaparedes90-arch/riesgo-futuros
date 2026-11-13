@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Riesgo Futuros</title>
-<!-- Riesgo Futuros · app multiusuario (Firebase) · v19 (13/11/2026) · v19: Cuentas más limpia: Gestión de copias en desplegable cerrado con resumen de grupos; Agregar / Editar / sincronizar cuenta en panel lateral (✏️ o «＋ Agregar cuenta») · v18 (13/11/2026) · v18: cortar al pasar la challenge (target = menor de 1,5R, TP máx. y lo que falta + comisiones), objetivo alcanzado → no operar, fuera de la rotación y botón Pasar a Funded · v17 (13/11/2026) · v17: gestión de copias con arrastrar y soltar, pantalla Hoy minimalista con «Operaste con · hoy», aviso de sincronizar balances, normas de la firma al comprar · v16: copia de cuentas · v15: bloqueo al guardar trade, motor de gestión con trades reales, pantalla Risk engine, tarjeta con selector de modelo y panel Risk · v14: pantallas estilo Tradinverso (barra lateral plegable, filtros globales, Trades, Dashboard, Calendario, Cuentas, Contabilidad con pestañas), noticias (catálogo por usuario, cascada en la checklist, línea y color en la tarjeta, contexto «Operado en noticias» al guardar) y tema claro/oscuro · v13 (13/11/2026) ·v13 · RF-27: curvas de equity (cartera y cuenta) ancladas al balance real de la última sincronización + ventana «Sincronizar cuentas» (balance y min balance por cuenta, Dif. con umbral 0,2 %) · v12 (08/11/2026) ·v12: editar un trade conserva cargadoTradinverso y cargadoEl (antes se borraban y el cierre de día lo volvía a dar como pendiente) · v11 (28/10/2026) · v11: FVG HTF como el POI: en el camino (entrada → 2R), distancia entre 0 y 2R · v10 (28/10/2026) · v10: bloqueo por consistencia si el TP máx. de hoy < 0,4 % de la cuenta (mínimo de riesgo): la cuenta se bloquea hoy, se opera la siguiente de la cola y mañana vuelve; con ≥ 0,4 % sigue igual (cortar en el TP máx.) · v9 (26/10/2026) · v9: consistencia: target recortado a lo que queda del TP máx. (cortar en +$, ≈R), tarjeta amarilla, consistencia alcanzada → hoy se opera la siguiente y mañana vuelve la misma (SL del reemplazo → final de la cola), target con importe en $, fuera "No estoy en reset" de la checklist · v8 (24/10/2026) · v8: alerta de reset del trader (3 días perdedores seguidos → pausa 3 días naturales; 2.º seguido con errores → 1 semana), aviso al registrar en reset (P5), ítem de checklist "No estoy en reset" · v7 (24/10/2026) · v7: P0 "¿Sesión preparada?" automática desde la checklist del día (vigente desde 26/10/2026), checklist guardada por fecha, KPI Sesión preparada · v6 (24/10/2026) · v6: formulario completo de trade (Nasdaq) igual al de la app vieja, editar/completar trades y journal en Trades (sin R plan) · v5 (24/10/2026) · v5: tabla de cuentas: quemadas/pasadas/reserva sin "Poner en turno" · v4 (24/10/2026) · v4: riesgo en rojo si supera el margen; checklist con bots VPS solo para el admin · v3 (23/10/2026) · v3: Cuentas y contabilidad (equity, retiros, compras, resets, reserva, inactividad, caducidad) · v2: consistencia por cuenta
+<!-- Riesgo Futuros · app multiusuario (Firebase) · v20 (13/11/2026) · v20: equity con System y Real independientes (dos ejes) y sombreado del drawdown; Monthly P&L con valor por barra y media acumulada suavizada · v19 (13/11/2026) · v19: Cuentas más limpia: Gestión de copias en desplegable cerrado con resumen de grupos; Agregar / Editar / sincronizar cuenta en panel lateral (✏️ o «＋ Agregar cuenta») · v18 (13/11/2026) · v18: cortar al pasar la challenge (target = menor de 1,5R, TP máx. y lo que falta + comisiones), objetivo alcanzado → no operar, fuera de la rotación y botón Pasar a Funded · v17 (13/11/2026) · v17: gestión de copias con arrastrar y soltar, pantalla Hoy minimalista con «Operaste con · hoy», aviso de sincronizar balances, normas de la firma al comprar · v16: copia de cuentas · v15: bloqueo al guardar trade, motor de gestión con trades reales, pantalla Risk engine, tarjeta con selector de modelo y panel Risk · v14: pantallas estilo Tradinverso (barra lateral plegable, filtros globales, Trades, Dashboard, Calendario, Cuentas, Contabilidad con pestañas), noticias (catálogo por usuario, cascada en la checklist, línea y color en la tarjeta, contexto «Operado en noticias» al guardar) y tema claro/oscuro · v13 (13/11/2026) ·v13 · RF-27: curvas de equity (cartera y cuenta) ancladas al balance real de la última sincronización + ventana «Sincronizar cuentas» (balance y min balance por cuenta, Dif. con umbral 0,2 %) · v12 (08/11/2026) ·v12: editar un trade conserva cargadoTradinverso y cargadoEl (antes se borraban y el cierre de día lo volvía a dar como pendiente) · v11 (28/10/2026) · v11: FVG HTF como el POI: en el camino (entrada → 2R), distancia entre 0 y 2R · v10 (28/10/2026) · v10: bloqueo por consistencia si el TP máx. de hoy < 0,4 % de la cuenta (mínimo de riesgo): la cuenta se bloquea hoy, se opera la siguiente de la cola y mañana vuelve; con ≥ 0,4 % sigue igual (cortar en el TP máx.) · v9 (26/10/2026) · v9: consistencia: target recortado a lo que queda del TP máx. (cortar en +$, ≈R), tarjeta amarilla, consistencia alcanzada → hoy se opera la siguiente y mañana vuelve la misma (SL del reemplazo → final de la cola), target con importe en $, fuera "No estoy en reset" de la checklist · v8 (24/10/2026) · v8: alerta de reset del trader (3 días perdedores seguidos → pausa 3 días naturales; 2.º seguido con errores → 1 semana), aviso al registrar en reset (P5), ítem de checklist "No estoy en reset" · v7 (24/10/2026) · v7: P0 "¿Sesión preparada?" automática desde la checklist del día (vigente desde 26/10/2026), checklist guardada por fecha, KPI Sesión preparada · v6 (24/10/2026) · v6: formulario completo de trade (Nasdaq) igual al de la app vieja, editar/completar trades y journal en Trades (sin R plan) · v5 (24/10/2026) · v5: tabla de cuentas: quemadas/pasadas/reserva sin "Poner en turno" · v4 (24/10/2026) · v4: riesgo en rojo si supera el margen; checklist con bots VPS solo para el admin · v3 (23/10/2026) · v3: Cuentas y contabilidad (equity, retiros, compras, resets, reserva, inactividad, caducidad) · v2: consistencia por cuenta
      Misma lógica que la app de Apps Script (Real_Codigo.gs): Tabla maestra para Funded, regla v7 para challenges,
      rotación (SL → siguiente cuenta), plan B y registro rápido. Cada usuario ve solo sus cuentas y trades.
      La Tabla maestra es compartida (config/tablaMaestra) y solo la edita el admin. -->
@@ -390,7 +390,7 @@ const uref = (...p) => doc(db, 'users', U.uid, ...p);
 const ucol = (...p) => collection(db, 'users', U.uid, ...p);
 
 // ---------- v14 · pantallas estilo Tradinverso + noticias (mockup aprobado 13/11/2026) ----------
-let VIEW = 'hoy', NEWS = [], GF = {}, EQ_MODE = { tr: 'sys', dash: 'sys' }, CAL_MES = '', CTA_F = { fase: '', est: 'activas' }, CONTA_TAB = 'res', CONTA_SORT = 'net', NW_EDIT = null, NQ = { sel: '', hora: '', nuevo: false };
+let VIEW = 'hoy', NEWS = [], GF = {}, EQ_MODE = { tr: { sys: true, real: false }, dash: { sys: true, real: false } }, CAL_MES = '', CTA_F = { fase: '', est: 'activas' }, CONTA_TAB = 'res', CONTA_SORT = 'net', NW_EDIT = null, NQ = { sel: '', hora: '', nuevo: false };
 const MAX_TRADES_DIA = 3; // Overtrading = días con más de 3 trades (Javier, 13/11/2026)
 const VENT_MIN = 5;       // ventana de noticia: ±5 min
 const IMP = { alto: { ico: '🔴', txt: 'Alto' }, medio: { ico: '🟠', txt: 'Medio' }, festivo: { ico: '🏖', txt: 'Festivo' } };
@@ -491,19 +491,31 @@ function metricas(T) {
 }
 const kpiH = k => '<div class="kpi"><div class="l">' + k[0] + '</div><div class="v' + (k[3] ? ' ' + k[3] : '') + '">' + k[1] + '</div>' + (k[2] != null ? '<div class="d">' + k[2] + '</div>' : '') + '</div>';
 // curva de equity System (R acumulado) / Real ($, anclada al balance sincronizado · RF-27: el último punto = balance de la app de las cuentas que aparecen)
+// v20 (mockup 2026-11-13_equity, aprobado 13/11/2026): System y Real se encienden por separado (las dos a la vez = dos ejes: R izq., $ der.);
+// sombreado rojo suave del drawdown bajo el máximo (System si está encendida; si no, Real).
 function curvaEq(canvas, T, modo) {
-  const L = cronol(T);
-  if (modo === 'real') {
+  const L = cronol(T), labels = ['inicio'].concat(L.map(t => fmtF(t.fecha))), ds = [], dos = modo.sys && modo.real;
+  const pico = a => { let m = -Infinity; return a.map(v => (m = Math.max(m, v))); };
+  const ddSet = (pts, eje) => ({ label: '_dd', data: pico(pts), yAxisID: eje, borderWidth: 0, pointRadius: 0, tension: .2, fill: { target: '+1', above: 'rgba(224,82,82,.16)', below: 'rgba(0,0,0,0)' } });
+  if (modo.sys) {
+    let y = 0; const pts = [0].concat(L.map(t => (y += rTrade(t)))).map(v => Math.round(v * 100) / 100);
+    ds.push(ddSet(pts, 'yR'), { label: 'System (R)', data: pts, yAxisID: 'yR', borderColor: '#2f6fd1', tension: .2, pointRadius: 0, fill: false });
+  }
+  if (modo.real) {
     const ids = [...new Set(L.map(t => t.cuenta))], fin = ids.reduce((a, id) => { const c = CUENTAS.find(x => x.id === id); return a + (c ? balApp(c) : 0); }, 0);
     let y = fin - L.reduce((a, t) => a + num(t.usd), 0);
-    const pts = [y].concat(L.map(t => (y += num(t.usd))));
-    dibujar(canvas, ['inicio'].concat(L.map(t => fmtF(t.fecha))), [{ label: 'Real ($)', data: pts.map(r2), borderColor: '#0e8a5c', tension: .2, pointRadius: 0 }]);
-  } else {
-    let y = 0; const pts = [0].concat(L.map(t => (y += rTrade(t))));
-    dibujar(canvas, ['inicio'].concat(L.map(t => fmtF(t.fecha))), [{ label: 'System (R)', data: pts.map(v => Math.round(v * 100) / 100), borderColor: '#2f6fd1', tension: .2, pointRadius: 0 }]);
+    const pts = [y].concat(L.map(t => (y += num(t.usd)))).map(r2);
+    if (!modo.sys) ds.push(ddSet(pts, 'yU'));
+    ds.push({ label: 'Real ($)', data: pts, yAxisID: 'yU', borderColor: '#0e8a5c', tension: .2, pointRadius: 0, fill: false });
   }
+  const el = $(canvas); if (!el || typeof Chart === 'undefined') return;
+  if (CHARTS[canvas]) CHARTS[canvas].destroy();
+  const tk = { callback: v => v.toLocaleString('es-ES') };
+  CHARTS[canvas] = new Chart(el, { type: 'line', data: { labels, datasets: ds }, options: { maintainAspectRatio: false, animation: false,
+    plugins: { legend: { display: dos, labels: { filter: it => it.text !== '_dd' } }, tooltip: { filter: it => it.dataset.label !== '_dd' } },
+    scales: { x: { ticks: { maxTicksLimit: 8 } }, yR: { display: !!modo.sys, position: 'left', ticks: tk }, yU: { display: !!modo.real, position: dos ? 'right' : 'left', ticks: tk, grid: { drawOnChartArea: !dos } } } } });
 }
-const segEq = k => '<button type="button" data-eqm="' + k + '|sys" class="' + (EQ_MODE[k] === 'sys' ? 'on' : '') + '">System</button><button type="button" data-eqm="' + k + '|real" class="' + (EQ_MODE[k] === 'real' ? 'on' : '') + '">Real</button>';
+const segEq = k => '<button type="button" data-eqm="' + k + '|sys" class="' + (EQ_MODE[k].sys ? 'on' : '') + '">System</button><button type="button" data-eqm="' + k + '|real" class="' + (EQ_MODE[k].real ? 'on' : '') + '">Real</button>';
 function tablaGrupo(T, clave, orden, etiqueta, conPf) {
   const G = {}; T.forEach(t => { [].concat(clave(t)).forEach(k => { if (!k) return; (G[k] = G[k] || []).push(t); }); });
   const ks = (orden || Object.keys(G).sort()).filter(k => G[k]);
@@ -1570,7 +1582,7 @@ function renderTrades() {
     ['P&amp;L Real', money(m.usd), 'según riesgo real', cls(m.usd)], ['Profit Factor', pfTxt(m.pf), 'gross win / gross loss'], ['Max DD', fR(m.dd), 'Max SL streak ' + m.mS, m.dd < 0 ? 'neg' : '']].map(kpiH).join('');
   document.querySelector('[data-eqseg=tr]').innerHTML = segEq('tr');
   curvaEq('chTrEq', T, EQ_MODE.tr);
-  $('trEqNota').textContent = EQ_MODE.tr === 'real' ? 'Real: anclada al balance sincronizado (RF-27) de las cuentas de estos trades' : 'System: R acumulado (TP = R target, SL = −1, BE = 0)';
+  $('trEqNota').textContent = [EQ_MODE.tr.sys ? 'System: R acumulado (TP = R target, SL = −1, BE = 0)' : '', EQ_MODE.tr.real ? 'Real: anclada al balance sincronizado (RF-27) de las cuentas de estos trades' : ''].filter(Boolean).join(' · ') + ' · sombreado = drawdown';
   $('trHint').textContent = T.length + ' de ' + TRADES.length + ' · los más recientes arriba · 👁 abre el trade completo · ✎ editar o completar un registro rápido';
   const L = T.slice().sort((a, b) => claveT(b).localeCompare(claveT(a)));
   $('trTabla').innerHTML = L.length ? '<table><thead><tr><th></th><th>Fecha</th><th>Hora</th><th>Dir.</th><th>Modelo</th><th>Zona</th><th>Entrada</th><th>Contexto</th><th>Plan</th><th>Cuenta</th><th>Res.</th><th class="num">Dur.</th><th class="num">R system</th><th class="num">$ real</th></tr></thead><tbody>'
@@ -1592,7 +1604,20 @@ function renderDash() {
   curvaEq('chDashEq', T, EQ_MODE.dash);
   const mes = {}; T.forEach(t => { const k = String(t.fecha).slice(0, 7); mes[k] = (mes[k] || 0) + rTrade(t); });
   const ks = Object.keys(mes).sort();
-  dibujar('chDashMes', ks.map(mesCorto), [{ label: 'R', data: ks.map(k => Math.round(mes[k] * 100) / 100), backgroundColor: ks.map(k => mes[k] >= 0 ? '#0e8a5c' : '#c23b3b') }], 'bar');
+  // v20: valor encima/debajo de cada barra + línea suavizada de media acumulada por mes.
+  const vals = ks.map(k => Math.round(mes[k] * 100) / 100); let acc = 0; const med = vals.map((v, i) => Math.round((acc += v) / (i + 1) * 100) / 100);
+  const elM = $('chDashMes');
+  if (elM && typeof Chart !== 'undefined') {
+    if (CHARTS.chDashMes) CHARTS.chDashMes.destroy();
+    const fmtV = v => (v > 0 ? '+' : '') + String(v.toFixed(1)).replace('.', ',') + 'R';
+    const etq = { id: 'etqMes', afterDatasetsDraw(ch) { const m = ch.getDatasetMeta(0), c = ch.ctx; c.save(); c.font = '600 11px system-ui,sans-serif'; c.textAlign = 'center';
+      m.data.forEach((b, i) => { const v = vals[i]; c.fillStyle = v >= 0 ? '#0e8a5c' : '#c23b3b'; c.fillText(fmtV(v), b.x, v >= 0 ? b.y - 6 : b.y + 14); }); c.restore(); } };
+    CHARTS.chDashMes = new Chart(elM, { type: 'bar', data: { labels: ks.map(mesCorto), datasets: [
+      { label: 'R', data: vals, backgroundColor: vals.map(v => v >= 0 ? '#0e8a5c' : '#c23b3b'), order: 2 },
+      { type: 'line', label: 'Media acumulada', data: med, borderColor: '#f2b437', backgroundColor: '#f2b437', borderWidth: 2.5, tension: .35, pointRadius: 3, order: 1 }] },
+      options: { maintainAspectRatio: false, animation: false, layout: { padding: { top: 18 } }, plugins: { legend: { display: true, labels: { filter: it => it.text !== 'R' } } },
+        scales: { y: { grace: '10%', ticks: { callback: v => v.toLocaleString('es-ES') } } } }, plugins: [etq] });
+  }
   $('dModelo').innerHTML = tablaGrupo(T, t => campos(t).modelo, CAT.modelos);
   $('dCtx').innerHTML = tablaGrupo(T, ctxKey, ['normal', 'alto', 'medio', 'festivo'], ctxEtiq);
   $('dZona').innerHTML = tablaGrupo(T, t => campos(t).zona, CAT.zonas);
@@ -2146,7 +2171,7 @@ document.addEventListener('click', async ev => {
   // filtros globales
   if (el.dataset.gfx) { delete GF[el.dataset.gfx]; return render(); }
   if (el.id === 'gfClear') { GF = {}; return render(); }
-  if (el.dataset.eqm) { const [k, m] = el.dataset.eqm.split('|'); EQ_MODE[k] = m; return render(); }
+  if (el.dataset.eqm) { const [k, m] = el.dataset.eqm.split('|'), M = EQ_MODE[k], o = m === 'sys' ? 'real' : 'sys'; if (M[m] && !M[o]) return; M[m] = !M[m]; return render(); }
   if (el.id === 'calPrev' || el.id === 'calNext') { const [y, m] = CAL_MES.split('-').map(Number), d = new Date(Date.UTC(y, m - 1 + (el.id === 'calNext' ? 1 : -1), 1)); CAL_MES = d.toISOString().slice(0, 7); return renderCal(); }
   if (el.dataset.cotab) { CONTA_TAB = el.dataset.cotab; $('movMsg').textContent = ''; return renderConta(); }
   if (el.dataset.cosort) { CONTA_SORT = el.dataset.cosort; return renderConta(); }
