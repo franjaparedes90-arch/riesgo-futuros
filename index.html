@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Riesgo Futuros</title>
-<!-- Riesgo Futuros · app multiusuario (Firebase) · v18 (13/11/2026) · v18: cortar al pasar la challenge (target = menor de 1,5R, TP máx. y lo que falta + comisiones), objetivo alcanzado → no operar, fuera de la rotación y botón Pasar a Funded · v17 (13/11/2026) · v17: gestión de copias con arrastrar y soltar, pantalla Hoy minimalista con «Operaste con · hoy», aviso de sincronizar balances, normas de la firma al comprar · v16: copia de cuentas · v15: bloqueo al guardar trade, motor de gestión con trades reales, pantalla Risk engine, tarjeta con selector de modelo y panel Risk · v14: pantallas estilo Tradinverso (barra lateral plegable, filtros globales, Trades, Dashboard, Calendario, Cuentas, Contabilidad con pestañas), noticias (catálogo por usuario, cascada en la checklist, línea y color en la tarjeta, contexto «Operado en noticias» al guardar) y tema claro/oscuro · v13 (13/11/2026) ·v13 · RF-27: curvas de equity (cartera y cuenta) ancladas al balance real de la última sincronización + ventana «Sincronizar cuentas» (balance y min balance por cuenta, Dif. con umbral 0,2 %) · v12 (08/11/2026) ·v12: editar un trade conserva cargadoTradinverso y cargadoEl (antes se borraban y el cierre de día lo volvía a dar como pendiente) · v11 (28/10/2026) · v11: FVG HTF como el POI: en el camino (entrada → 2R), distancia entre 0 y 2R · v10 (28/10/2026) · v10: bloqueo por consistencia si el TP máx. de hoy < 0,4 % de la cuenta (mínimo de riesgo): la cuenta se bloquea hoy, se opera la siguiente de la cola y mañana vuelve; con ≥ 0,4 % sigue igual (cortar en el TP máx.) · v9 (26/10/2026) · v9: consistencia: target recortado a lo que queda del TP máx. (cortar en +$, ≈R), tarjeta amarilla, consistencia alcanzada → hoy se opera la siguiente y mañana vuelve la misma (SL del reemplazo → final de la cola), target con importe en $, fuera "No estoy en reset" de la checklist · v8 (24/10/2026) · v8: alerta de reset del trader (3 días perdedores seguidos → pausa 3 días naturales; 2.º seguido con errores → 1 semana), aviso al registrar en reset (P5), ítem de checklist "No estoy en reset" · v7 (24/10/2026) · v7: P0 "¿Sesión preparada?" automática desde la checklist del día (vigente desde 26/10/2026), checklist guardada por fecha, KPI Sesión preparada · v6 (24/10/2026) · v6: formulario completo de trade (Nasdaq) igual al de la app vieja, editar/completar trades y journal en Trades (sin R plan) · v5 (24/10/2026) · v5: tabla de cuentas: quemadas/pasadas/reserva sin "Poner en turno" · v4 (24/10/2026) · v4: riesgo en rojo si supera el margen; checklist con bots VPS solo para el admin · v3 (23/10/2026) · v3: Cuentas y contabilidad (equity, retiros, compras, resets, reserva, inactividad, caducidad) · v2: consistencia por cuenta
+<!-- Riesgo Futuros · app multiusuario (Firebase) · v19 (13/11/2026) · v19: Cuentas más limpia: Gestión de copias en desplegable cerrado con resumen de grupos; Agregar / Editar / sincronizar cuenta en panel lateral (✏️ o «＋ Agregar cuenta») · v18 (13/11/2026) · v18: cortar al pasar la challenge (target = menor de 1,5R, TP máx. y lo que falta + comisiones), objetivo alcanzado → no operar, fuera de la rotación y botón Pasar a Funded · v17 (13/11/2026) · v17: gestión de copias con arrastrar y soltar, pantalla Hoy minimalista con «Operaste con · hoy», aviso de sincronizar balances, normas de la firma al comprar · v16: copia de cuentas · v15: bloqueo al guardar trade, motor de gestión con trades reales, pantalla Risk engine, tarjeta con selector de modelo y panel Risk · v14: pantallas estilo Tradinverso (barra lateral plegable, filtros globales, Trades, Dashboard, Calendario, Cuentas, Contabilidad con pestañas), noticias (catálogo por usuario, cascada en la checklist, línea y color en la tarjeta, contexto «Operado en noticias» al guardar) y tema claro/oscuro · v13 (13/11/2026) ·v13 · RF-27: curvas de equity (cartera y cuenta) ancladas al balance real de la última sincronización + ventana «Sincronizar cuentas» (balance y min balance por cuenta, Dif. con umbral 0,2 %) · v12 (08/11/2026) ·v12: editar un trade conserva cargadoTradinverso y cargadoEl (antes se borraban y el cierre de día lo volvía a dar como pendiente) · v11 (28/10/2026) · v11: FVG HTF como el POI: en el camino (entrada → 2R), distancia entre 0 y 2R · v10 (28/10/2026) · v10: bloqueo por consistencia si el TP máx. de hoy < 0,4 % de la cuenta (mínimo de riesgo): la cuenta se bloquea hoy, se opera la siguiente de la cola y mañana vuelve; con ≥ 0,4 % sigue igual (cortar en el TP máx.) · v9 (26/10/2026) · v9: consistencia: target recortado a lo que queda del TP máx. (cortar en +$, ≈R), tarjeta amarilla, consistencia alcanzada → hoy se opera la siguiente y mañana vuelve la misma (SL del reemplazo → final de la cola), target con importe en $, fuera "No estoy en reset" de la checklist · v8 (24/10/2026) · v8: alerta de reset del trader (3 días perdedores seguidos → pausa 3 días naturales; 2.º seguido con errores → 1 semana), aviso al registrar en reset (P5), ítem de checklist "No estoy en reset" · v7 (24/10/2026) · v7: P0 "¿Sesión preparada?" automática desde la checklist del día (vigente desde 26/10/2026), checklist guardada por fecha, KPI Sesión preparada · v6 (24/10/2026) · v6: formulario completo de trade (Nasdaq) igual al de la app vieja, editar/completar trades y journal en Trades (sin R plan) · v5 (24/10/2026) · v5: tabla de cuentas: quemadas/pasadas/reserva sin "Poner en turno" · v4 (24/10/2026) · v4: riesgo en rojo si supera el margen; checklist con bots VPS solo para el admin · v3 (23/10/2026) · v3: Cuentas y contabilidad (equity, retiros, compras, resets, reserva, inactividad, caducidad) · v2: consistencia por cuenta
      Misma lógica que la app de Apps Script (Real_Codigo.gs): Tabla maestra para Funded, regla v7 para challenges,
      rotación (SL → siguiente cuenta), plan B y registro rápido. Cada usuario ve solo sus cuentas y trades.
      La Tabla maestra es compartida (config/tablaMaestra) y solo la edita el admin. -->
@@ -108,6 +108,8 @@ td.num,th.num{text-align:right}
 .empty{padding:30px 10px;text-align:center;color:var(--muted)}
 .msg{margin-top:8px;font-size:13px}.msg.err{color:var(--neg)}.msg.ok{color:var(--pos)}
 .okb{background:rgba(46,180,120,.12);border:1px solid rgba(46,180,120,.45);border-radius:10px;padding:8px 12px;font-size:13px;margin-bottom:10px}.okbtn{margin-left:6px;padding:4px 10px;border-radius:8px;border:0;background:#2eb478;color:#06140d;font-weight:700;cursor:pointer}
+#ctaPanOv{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:60}#ctaPanOv .ctaPan{position:absolute;top:0;right:0;bottom:0;width:min(560px,100%);background:var(--card);border-left:1px solid var(--line);padding:16px;overflow:auto;box-shadow:-8px 0 24px rgba(0,0,0,.35)}
+.cpDet{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin-top:16px}.cpDet>summary{cursor:pointer;list-style:none;display:flex;gap:10px;align-items:center}.cpDet>summary::-webkit-details-marker{display:none}.cpDet>summary::before{content:'▸';color:var(--muted)}.cpDet[open]>summary::before{content:'▾'}.cpDet[open]>summary{margin-bottom:10px}.cpDet #cpBox{border:0;padding:0}
 .warn{background:var(--warn-bg);border:1px solid var(--warn-line);color:var(--warn);border-radius:10px;padding:8px 12px;font-size:13px;margin-bottom:10px}
 #login{max-width:420px;margin:12vh auto;text-align:center}
 #login .card{padding:28px 22px}
@@ -259,12 +261,15 @@ td.num,th.num{text-align:right}
       <div class="gf" style="margin-top:14px"><select id="ctaFase"><option value="">Fase: todas</option><option>Evaluación</option><option>Funded</option><option>Capital propio</option></select><select id="ctaEst"><option value="activas">Estado: activas</option><option value="pausadas">Pausadas</option><option value="pasadas">Pasadas</option><option value="quemadas">Quemadas</option></select></div>
       <div id="ctaGrupos"></div>
       <div id="ctaDet"></div>
-      <div class="sec"><h2>Tabla de cuentas</h2><span class="hint">Orden = rotación. Balance y mínimo se copian de la firma (Lucid) al sincronizar.</span></div>
+      <div class="sec"><h2>Tabla de cuentas</h2><span class="hint">Orden = rotación. Balance y mínimo se copian de la firma (Lucid) al sincronizar.</span><button type="button" class="pri" id="ctaAdd" style="margin-left:auto">＋ Agregar cuenta</button></div>
       <div class="card tbl" id="ctaTabla"></div>
-      <div class="sec"><h2>Gestión de copias</h2><span class="hint">Copiador del broker: funded líder + challenge(s) copiada(s) = un grupo que funciona como una sola cuenta (una posición en la cola).</span><button type="button" class="pri" id="cpNuevo">＋ Nuevo grupo</button></div>
-      <div class="card" id="cpBox"></div>
-      <div class="sec"><h2 id="ctaFormTit">Agregar cuenta</h2></div>
-      <div class="card">
+      <details class="cpDet" id="cpDet"><summary><b>Gestión de copias</b><span class="pill" id="cpRes">—</span><button type="button" class="pri" id="cpNuevo" style="margin-left:auto">＋ Nuevo grupo</button></summary><div class="hint" style="margin:0 0 10px">Copiador del broker: funded líder + challenge(s) copiada(s) = un grupo que funciona como una sola cuenta (una posición en la cola).</div>
+      <div class="card" id="cpBox"></div></details>
+    </section>
+    <!-- v19 · formulario de cuenta como panel lateral (mockup 2026-11-13_cuentas-limpia, aprobado 13/11/2026) -->
+    <div id="ctaPanOv" hidden><div class="ctaPan">
+      <div class="sec" style="margin-top:0"><h2 id="ctaFormTit">Agregar cuenta</h2><button type="button" class="link" id="ctaPanX" style="margin-left:auto">✕</button></div>
+      <div>
         <div class="form">
           <label>Firma<input id="fFirma" value="Lucid"></label>
           <div class="flab">Monto<span class="seg" id="fTamSeg"></span><input id="fTam" type="number" value="25000" style="margin-top:4px"></div>
@@ -294,10 +299,10 @@ td.num,th.num{text-align:right}
           <label id="fEstadoL">Estado<select id="fEstado"><option>Activa</option><option>Pasada</option><option>Quemada</option></select></label>
           <label>Coste ($)<input id="fCoste" type="number" step="0.01"></label>
         </div>
-        <div class="row" style="margin-top:12px"><button class="pri" type="button" id="btnCta">Guardar cuenta</button><button type="button" id="btnCtaNueva" hidden>Cancelar edición</button></div>
+        <div class="row" style="margin-top:12px"><button class="pri" type="button" id="btnCta">Guardar cuenta</button><button type="button" id="btnCtaNueva">Cancelar</button></div>
         <div class="msg" id="ctaMsg"></div>
       </div>
-    </section>
+    </div></div>
     <section id="v-risk" hidden>
       <div class="sec"><h2>Risk engine</h2><span class="hint">Gestión con trades reales · cascada Tabla maestra → real general → real por modelo (50 trades)</span></div>
       <div id="reBox"></div>
@@ -1181,6 +1186,7 @@ function cpTarjeta(c) {
 }
 function renderCopias() {
   if (!$('cpBox')) return;
+  if ($('cpRes')) { const nm = id => (CUENTAS.find(c => c.id === id) || {}).nombre || id; $('cpRes').textContent = CPW.length ? CPW.map(g => g.nombre + ' · ' + [g.lider].concat(g.copias || []).filter(Boolean).map(nm).join(' + ')).join('  ·  ') : 'Sin grupos'; }
   const act = CUENTAS.filter(c => c.estado === 'Activa'), cta = id => CUENTAS.find(c => c.id === id);
   const enGrupo = id => CPW.some(g => g.lider === id || (g.copias || []).includes(id));
   const libres = act.filter(c => !enGrupo(c.id));
@@ -1716,10 +1722,12 @@ function aplicarNormas(forzar) {
   $('fVer').checked = false; $('btnCta').disabled = true;
   nfMarcar();
 }
+function abrirPanCta(c) { llenarForm(c); $('ctaMsg').textContent = ''; $('ctaPanOv').hidden = false; }
+function cerrarPanCta() { $('ctaPanOv').hidden = true; llenarForm(null); }
 function llenarForm(c) {
   EDIT_ID = c ? c.id : null;
   $('ctaFormTit').textContent = c ? 'Editar / sincronizar · ' + c.nombre : 'Agregar cuenta';
-  $('btnCtaNueva').hidden = !c; $('fId').disabled = !!c;
+  $('fId').disabled = !!c;
   const v = (id, x) => { $(id).value = x == null ? '' : x; };
   v('fNombre', c?.nombre ?? ''); v('fId', c?.id ?? ''); v('fFirma', c?.firma ?? 'Lucid'); v('fFase', c?.fase ?? 'Evaluación'); v('fTam', c?.tam ?? 25000); v('fDd', c?.dd ?? 1000);
   v('fDll', c && c.dll ? c.dll : ''); v('fBal', c?.balance ?? ''); v('fMin', c?.minimo ?? ''); v('fTipo', c?.tipoDD ?? 'Trailing EOD'); v('fLockMin', c ? (c.lockMin || '') : 25100); v('fLockCierre', c ? (c.lockCierre || '') : 26100);
@@ -1754,7 +1762,7 @@ async function guardarCuenta() {
   if (nueva) d.normas = { tipoDD: d.tipoDD, dd, minimo: min, sinCons: d.sinCons, consistencia: d.consistencia, objetivo: d.objetivo, maxContratos: d.maxContratos, plataforma: d.plataforma, inactividad: d.inactividad, caducidad: d.caducidad, fecha: d.alta, verificadas: Date.now() };
   if (!prev || prev.balance !== bal || prev.minimo !== min || !prev.syncAt) d.syncAt = Date.now(); else d.syncAt = prev.syncAt;
   if (prev && (prev.balance !== bal || prev.minimo !== min)) d.syncAt = Date.now();
-  try { await setDoc(uref('cuentas', id), d, { merge: true }); m('Cuenta guardada.', true); llenarForm(null); await cargar(); } catch (e) { m('Error: ' + e.message); }
+  try { await setDoc(uref('cuentas', id), d, { merge: true }); m('Cuenta guardada.', true); cerrarPanCta(); await cargar(); } catch (e) { m('Error: ' + e.message); }
 }
 async function ponerTurno(id) {
   const b = writeBatch(db); CUENTAS.forEach(c => b.set(uref('cuentas', c.id), { enTurno: c.id === id }, { merge: true })); await b.commit(); await cargar();
@@ -2063,7 +2071,7 @@ async function accionCuenta(a, id) {
   } else if (a === 'fondear') {
     if (!confirm('¿Pasar ' + c.nombre + ' a Funded? Después sincronizá balance y mínimo con la firma.')) return;
     await setDoc(ref, { fase: 'Funded', fechaFunded: hoy }, { merge: true });
-    await cargar(); llenarForm(CUENTAS.find(x => x.id === id)); $('ctaFormTit').scrollIntoView({ behavior: 'smooth' }); return;
+    await cargar(); abrirPanCta(CUENTAS.find(x => x.id === id)); return;
   } else if (a === 'retiro') {
     CONTA_TAB = 'ret'; ir('conta'); $('mTipo').value = 'Retiro'; $('mCta').value = id; $('mImp').focus(); return;
   }
@@ -2128,6 +2136,8 @@ async function guardarMov() {
   await cargar();
 }
 
+document.addEventListener('click', ev => { if (ev.target && ev.target.id === 'ctaPanOv') cerrarPanCta(); });
+document.addEventListener('keydown', ev => { if (ev.key === 'Escape' && $('ctaPanOv') && !$('ctaPanOv').hidden) cerrarPanCta(); });
 document.addEventListener('click', async ev => {
   const el = ev.target.closest('button,[data-chk],.ch,a[data-nav],[data-gfx],[data-cosort]'); if (!el) return;
   if (el.dataset.nav) { ev.preventDefault(); return ir(el.dataset.nav); }
@@ -2178,11 +2188,12 @@ document.addEventListener('click', async ev => {
   if (el.id === 'btnCta') return guardarCuenta();
   if (el.dataset.cons) { consSeg(el.dataset.cons === 'sin'); return nfMarcar(); }
   if (el.dataset.tamq) { $('fTam').value = el.dataset.tamq; return aplicarNormas(); }
-  if (el.id === 'cpNuevo') { const usadas = CPW.map(g => g.nombre); let i = 0; while (usadas.includes('Grupo ' + String.fromCharCode(65 + i))) i++; CPW.push({ id: 'g' + Date.now(), nombre: 'Grupo ' + String.fromCharCode(65 + i), lider: '', copias: [], tope: 600 }); CP_MSG = ''; return renderCopias(); }
+  if (el.id === 'cpNuevo') { ev.preventDefault(); $('cpDet').open = true; const usadas = CPW.map(g => g.nombre); let i = 0; while (usadas.includes('Grupo ' + String.fromCharCode(65 + i))) i++; CPW.push({ id: 'g' + Date.now(), nombre: 'Grupo ' + String.fromCharCode(65 + i), lider: '', copias: [], tope: 600 }); CP_MSG = ''; return renderCopias(); }
   if (el.dataset.cpg != null) return guardarCopias(+el.dataset.cpg);
   if (el.dataset.cpd != null) { const g = CPW[+el.dataset.cpd]; if (!confirm('¿Deshacer ' + g.nombre + '? Las cuentas vuelven a la rotación cada una por su lado.')) return; CPW.splice(+el.dataset.cpd, 1); return guardarCopias(null); }
-  if (el.id === 'btnCtaNueva') return llenarForm(null);
-  if (el.dataset.edit) { llenarForm(CUENTAS.find(c => c.id === el.dataset.edit)); $('ctaFormTit').scrollIntoView({ behavior: 'smooth' }); return; }
+  if (el.id === 'btnCtaNueva' || el.id === 'ctaPanX') return cerrarPanCta();
+  if (el.id === 'ctaAdd') return abrirPanCta(null);
+  if (el.dataset.edit) return abrirPanCta(CUENTAS.find(c => c.id === el.dataset.edit));
   if (el.dataset.turno) return ponerTurno(el.dataset.turno);
   if (el.dataset.act) { ev.stopPropagation(); return accionCuenta(el.dataset.act, el.dataset.id); }
   if (el.dataset.delmov) { if (!confirm('¿Borrar este movimiento?')) return; await deleteDoc(uref('movimientos', el.dataset.delmov)); return cargar(); }
