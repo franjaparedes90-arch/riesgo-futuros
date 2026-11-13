@@ -104,7 +104,7 @@ td.num,th.num{text-align:right}
 .pill{display:inline-block;font:11px var(--mono);padding:1px 7px;border-radius:99px;border:1px solid var(--line-2);color:var(--text-2);background:var(--card-2)}
 .pill.tp{color:var(--pos);border-color:var(--ok-line)}.pill.sl{color:var(--neg);border-color:var(--bad-line)}
 .form{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
-.form label{display:flex;flex-direction:column;gap:4px;font:10px var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.form label,.form .flab{display:flex;flex-direction:column;gap:4px;font:10px var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
 .empty{padding:30px 10px;text-align:center;color:var(--muted)}
 .msg{margin-top:8px;font-size:13px}.msg.err{color:var(--neg)}.msg.ok{color:var(--pos)}
 .warn{background:var(--warn-bg);border:1px solid var(--warn-line);color:var(--warn);border-radius:10px;padding:8px 12px;font-size:13px;margin-bottom:10px}
@@ -149,6 +149,15 @@ td.num,th.num{text-align:right}
 .syd{text-align:right;font-size:13px}.syok{color:var(--pos)}.sywa{color:var(--warn);font-weight:600}
 @media(max-width:560px){.syg{grid-template-columns:1fr 1fr}.syg>div:first-child,.syh span:first-child{grid-column:1/-1}.syd{grid-column:1/-1}.syh span:last-child{display:none}}
 @media(max-width:560px){.op2{grid-template-columns:1fr}.kv{grid-template-columns:repeat(2,1fr)}.acc .hero b{font-size:19px}}
+/* v16 · Copia de cuentas */
+.tag.ld{background:var(--ok-bg,#e5f4e4);color:var(--pos);border-color:var(--ok-line)}.tag.cp{background:var(--info-bg);color:var(--info-tx);border-color:var(--info-line)}
+.cpg{margin:8px 0;border:1px solid var(--line-2);border-radius:8px;background:var(--card)}.cpg summary{cursor:pointer;padding:6px 10px;font-size:13px}
+.cpg table{width:100%;font-size:12px;border-collapse:collapse}.cpg th{font:10px var(--mono);color:var(--muted);text-align:left;padding:4px 8px;text-transform:uppercase}.cpg td{padding:4px 8px;border-top:1px solid var(--line-2)}
+.cpg .tbl{overflow:visible}.cpg .tbl th,.cpg .tbl td{white-space:normal;padding:4px 5px}
+.cpg .src{font-size:11px;color:var(--muted);padding:4px 10px 8px}.cpm{font-weight:700;color:var(--warn)}
+.cpb{border:1px solid var(--line-2);border-radius:8px;padding:10px 12px;margin-top:10px;background:var(--card)}
+.ejg{display:grid;grid-template-columns:1.4fr .7fr 1fr 1fr 1fr;gap:6px;align-items:center;font-size:13px}.ejg.h{font:10px var(--mono);color:var(--muted);text-transform:uppercase}
+@media(max-width:560px){.ejg{grid-template-columns:1fr 1fr}}
 </style></head><body>
 <div class="wrap" id="loginWrap">
   <div id="login" hidden><div class="card">
@@ -225,6 +234,8 @@ td.num,th.num{text-align:right}
       <div id="ctaDet"></div>
       <div class="sec"><h2>Tabla de cuentas</h2><span class="hint">Orden = rotación. Balance y mínimo se copian de la firma (Lucid) al sincronizar.</span></div>
       <div class="card tbl" id="ctaTabla"></div>
+      <div class="sec"><h2>Gestión de copias</h2><span class="hint">Copiador del broker: funded líder + challenge(s) copiada(s) = un grupo que funciona como una sola cuenta (una posición en la cola).</span><button type="button" class="pri" id="cpNuevo">＋ Nuevo grupo</button></div>
+      <div class="card" id="cpBox"></div>
       <div class="sec"><h2 id="ctaFormTit">Agregar cuenta</h2></div>
       <div class="card">
         <div class="form">
@@ -241,7 +252,7 @@ td.num,th.num{text-align:right}
           <label>Mínimo bloqueado en ($)<input id="fLockMin" type="number" value="25100"></label>
           <label>Se bloquea con un cierre de ($)<input id="fLockCierre" type="number" value="26100"></label>
           <label>Objetivo evaluación ($)<input id="fObj" type="number" value="1250"></label>
-          <label>Consistencia (%)<input id="fCons" type="number" value="50"></label>
+          <div class="flab">Consistency<span class="seg" id="fConsSeg"><button type="button" data-cons="sin">Sin consistency</button><button type="button" data-cons="con" class="on">Con %</button></span><input id="fCons" type="number" value="50" style="margin-top:4px"><small class="mut" style="text-transform:none;letter-spacing:0">Lo que se compró (lo dice la firma). Con «Con %» y vacío, la app pone 50 %; con «Sin consistency» no aplica ninguno.</small></div>
           <label>Orden<input id="fOrden" type="number"></label>
           <label>En rotación<select id="fActiva"><option>Sí</option><option>No</option></select></label>
           <label>Estado<select id="fEstado"><option>Activa</option><option>Pasada</option><option>Quemada</option></select></label>
@@ -325,6 +336,7 @@ const CH_R_PCT = 0.01, CH_MIN_PCT = 0.004;
 const CHK_BOTS = ['MT5 del challenge abierto y bot ORB activo', 'MT5 de Pepperstone abierto y bot ORB activo'];
 let CHK_ITEMS = ['Noticias y festivos de EE. UU. revisados', 'Sentado como tarde a las 15:15', 'Riesgo listo y Tradesea abierto en la cuenta en turno', 'Niveles marcados antes de las 15:25'];
 
+let GRUPOS = [], CPW = [], CP_MSG = ''; // v16 · Copia de cuentas: meta/copias.grupos
 let U = null, IS_ADMIN = false, TM = null, CUENTAS = [], TRADES = [], CHK = CHK_ITEMS.map(() => false), CHK_OPEN = true, QR_SAL = null, QR_MSG = '', EDIT_ID = null, MOVS = [], SEL_CTA = null, CHARTS = {};
 const $ = id => document.getElementById(id);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -404,7 +416,7 @@ function pasaFiltro(t) {
   if (GF.entrada && !c.tipos.includes(GF.entrada)) return false;
   if (GF.res && t.salida !== GF.res) return false;
   if (GF.sens && c.sens !== GF.sens) return false;
-  if (GF.cuenta && t.cuenta !== GF.cuenta) return false;
+  if (GF.cuenta && !tocaCuenta(t, GF.cuenta)) return false;
   if (GF.plan && c.plan !== GF.plan) return false;
   if (GF.ctx && ctxKey(t) !== GF.ctx) return false;
   return true;
@@ -465,8 +477,7 @@ function tablaGrupo(T, clave, orden, etiqueta, conPf) {
 // ---------- cálculo (port de Real_Codigo.gs) ----------
 function pnlCuenta(id, syncAt) {
   const r = { postSync: 0, hoy: 0, operoHoy: false, tpHoy: 0, dias: {} }, hoy = hoyES();
-  TRADES.forEach(t => {
-    if (t.cuenta !== id) return;
+  trCuenta(id).forEach(t => {
     const usd = num(t.usd);
     if (t.fecha === hoy) { r.hoy += usd; r.operoHoy = true; if (usd > 0) r.tpHoy++; }
     if (!syncAt || t.registrado > syncAt) { r.postSync += usd; r.dias[t.fecha] = (r.dias[t.fecha] || 0) + usd; }
@@ -505,9 +516,10 @@ function aplicarChallenge(e, c, pnl) {
   const obj = c.objetivo > 0 ? c.objetivo : null;
   e.objetivo = obj;
   e.faltan = obj ? Math.max(0, obj - (e.balance - c.tam)) : null;
-  e.tpMaxHoy = obj ? Math.max(0, obj * (c.consistencia > 0 ? c.consistencia / 100 : 0.5) - Math.max(0, pnl.hoy || 0)) : null;
+  e.tpMaxHoy = obj && !c.sinCons ? Math.max(0, obj * (c.consistencia > 0 ? c.consistencia / 100 : 0.5) - Math.max(0, pnl.hoy || 0)) : null;
   e.consAjuste = false; e.consAlcanzada = false; e.tpUsd = null;
-  if (obj) {
+  if (obj && c.sinCons) { e.target = '1,5R fijo'; e.tpUsd = 1.5 * e.riesgo; } // v16: «Sin consistency» → sin TP máx.
+  else if (obj) {
     if (e.tpMaxHoy < min) { e.consAlcanzada = true; e.consMin = min; e.target = '—'; e.tpUsd = 0; }
     else if (1.5 * e.riesgo <= e.tpMaxHoy) { e.target = '1,5R fijo'; e.tpUsd = 1.5 * e.riesgo; }
     else { e.consAjuste = true; e.tpUsd = Math.floor(e.tpMaxHoy); e.target = fmtR(e.riesgo > 0 ? Math.floor(e.tpMaxHoy / e.riesgo * 10) / 10 : 0) + ' fijo'; }
@@ -527,18 +539,20 @@ const targetR = txt => { const m = /(\d+(?:[.,]\d+)?)R/.exec(String(txt || ''));
 const r2 = x => x == null || isNaN(x) ? null : Math.round(x * 100) / 100;
 function capturaPlan(e, tu) {
   return { at: Date.now(), cuenta: e.c.id, fase: e.c.fase, balance: r2(e.balance), minimo: r2(e.minimo), riesgo: e.riesgo, riesgoPct: Math.round(e.riesgoPct * 1e5) / 1e5,
-    target: e.target, targetR: targetR(e.target), tpUsd: r2(e.tpUsd), tpMaxHoy: e.tpMaxHoy != null ? r2(e.tpMaxHoy) : null, estado: e.estado, enTurno: !!e.c.enTurno, cuentaTurno: tu ? tu.c.id : '' };
+    target: e.target, targetR: targetR(e.target), tpUsd: r2(e.tpUsd), tpMaxHoy: e.tpMaxHoy != null ? r2(e.tpMaxHoy) : null, estado: e.estado, enTurno: !!e.c.enTurno, cuentaTurno: tu ? tu.c.id : '', corte: !!e.consAjuste,
+    ...(e.grupo ? { grupo: { id: e.grupo.g.id, nombre: e.grupo.g.nombre, cuentas: e.grupo.filas.map(f => f.c.id), manda: e.grupo.manda ? e.grupo.manda.c.id : '', corte: !!e.consAjuste } } : {}) };
 }
 // % P&L sistema desde la captura: TP = target, SL = −1, BE = 0 (Manual no está en RF-22: se escribe a mano).
 function rrCaptura(cap, salida) { if (!cap) return null; if (salida === 'SL') return -1; if (salida === 'BE') return 0; if (salida === 'TP') return cap.targetR; return null; }
 const capTarget = cap => (cap.targetR != null ? fmtR(cap.targetR) : esc(cap.target || '—')) + (cap.tpUsd ? ' (+' + money(cap.tpUsd) + ')' : '');
-const capLinea = cap => 'Riesgo ' + money(cap.riesgo) + ' (' + pct(cap.riesgoPct) + ') · Target ' + capTarget(cap) + (cap.tpMaxHoy != null ? ' · TP máx. ' + money(cap.tpMaxHoy) : '') + ' · ' + (cap.enTurno ? 'En turno' : 'Reemplazo de hoy');
+const capLinea = cap => (cap.grupo ? esc(cap.grupo.nombre) + ' (copia 1:1) · ' : '') + 'Riesgo ' + money(cap.riesgo) + ' (' + pct(cap.riesgoPct) + ') · Target ' + capTarget(cap) + (cap.tpMaxHoy != null ? ' · TP máx. ' + money(cap.tpMaxHoy) : '') + ' · ' + (cap.enTurno ? 'En turno' : 'Reemplazo de hoy');
 function capKv(cap) {
   return '<div class="kv">' + [['Balance', money(cap.balance)], ['Mínimo', money(cap.minimo)], ['Riesgo', money(cap.riesgo) + ' · ' + pct(cap.riesgoPct)], ['Target', capTarget(cap)], ['TP máx. hoy', cap.tpMaxHoy != null ? money(cap.tpMaxHoy) : '—'],
     ['Estado', (ICON[cap.estado] || '') + ' ' + esc(cap.estado)], ['En turno', cap.enTurno ? 'Sí' : 'No · reemplazo']].map(x => '<div>' + x[0] + '<b>' + x[1] + '</b></div>').join('') + '</div>';
 }
 // Cuenta a operar ahora: la en turno, salvo que haya llegado hoy a su consistencia → la siguiente de la rotación (solo por hoy).
 function cuentaOperar(E) {
+  E = cola(E);
   const t = E.find(x => x.c.enTurno); if (!t) return null; if (!t.consAlcanzada) return t;
   const i = E.indexOf(t);
   for (let k = 1; k < E.length; k++) { const x = E[(i + k) % E.length]; if (!x.consAlcanzada) return x; }
@@ -546,7 +560,7 @@ function cuentaOperar(E) {
 }
 // SL en la cuenta de reemplazo: pasa al final de la cola (justo antes de la cuenta en turno); el turno no se mueve.
 function colaFinal(b, id) {
-  const act = CUENTAS.filter(c => c.activa && c.estado === 'Activa'), ti = act.findIndex(c => c.enTurno), x = act.find(c => c.id === id);
+  const act = CUENTAS.filter(c => enRot(c) && c.estado === 'Activa'), ti = act.findIndex(c => c.enTurno), x = act.find(c => c.id === id);
   if (ti < 0 || !x) return;
   const seq = act.slice(ti).concat(act.slice(0, ti)).filter(c => c.id !== id).concat([x]), ords = act.map(c => c.orden).sort((p, q) => p - q);
   seq.forEach((c, k) => b.set(uref('cuentas', c.id), { orden: ords[k] }, { merge: true }));
@@ -555,7 +569,7 @@ function estadoCuentas() {
   const ahora = new Date(), hoyNY = diaTz(ahora, 'America/New_York'), horaNY = parseInt(horaTz(ahora, 'America/New_York'), 10);
   const cerrado = d => d < hoyNY || (d === hoyNY && horaNY >= CIERRE_NY);
   const RD = TM ? reDecidir(MODELO_SEL) : null;
-  return CUENTAS.filter(c => c.activa && c.estado === 'Activa').map(c => {
+  return aplicarGrupos(CUENTAS.filter(c => c.estado === 'Activa' && (c.activa || grupoDeCopia(c.id))).map(c => {
     const pnl = pnlCuenta(c.id, c.syncAt);
     const syncDia = c.syncAt ? diaTz(new Date(c.syncAt), 'Europe/Madrid') : '';
     const m = (syncDia && c.tipoDD !== 'Estático') ? calcMinimo(c, pnl.dias, syncDia, cerrado) : { minimo: c.minimo, bloqueado: false };
@@ -564,8 +578,56 @@ function estadoCuentas() {
     reAplicarTarjeta(e, c, RD);
     decorarTarget(e);
     return Object.assign(e, { c, minimo: m.minimo, bloqueado: m.bloqueado, pnl, syncDias: c.syncAt ? Math.floor((ahora - c.syncAt) / 86400000) : 999 });
-  });
+  }));
 }
+// ---------- v16 · Copia de cuentas (mockup v3 aprobado 13/11/2026: Mockups/2026-11-13_copia-cuentas.html + .md) ----------
+// Grupo = funded líder + challenge(s) copiada(s): una sola posición en la cola. Copia 1:1: riesgo y target de la funded líder.
+// TP máx. hoy del grupo = el de la cuenta más restrictiva (en el grupo manda el % de consistency más bajo).
+// A: TP máx. ≥ target → normal · B: 0,4 % ≤ TP máx. < target → cortar las dos en el TP máx. · C: TP máx. < 0,4 % → grupo bloqueado hoy.
+const grupoDeLider = id => GRUPOS.find(g => g.lider === id) || null;
+const grupoDeCopia = id => GRUPOS.find(g => (g.copias || []).includes(id)) || null;
+const enRot = c => c.activa && !grupoDeCopia(c.id);        // cuentas que ocupan posición en la cola
+const cola = E => E.filter(e => !e.copiaDe);
+const consTxt = c => c.sinCons ? '— (sin)' : c.consistencia + ' %';
+// Trades de una cuenta: los suyos + su ejecución dentro de un trade copiado (resultado $ de esa cuenta).
+function trCuenta(id) {
+  const out = [];
+  TRADES.forEach(t => {
+    if (Array.isArray(t.ejecuciones) && t.ejecuciones.length) { const x = t.ejecuciones.find(j => j.cuenta === id); if (x) out.push(Object.assign({}, t, { cuenta: id, usd: num(x.usd), ejec: x })); }
+    else if (t.cuenta === id) out.push(t);
+  });
+  return out;
+}
+const tocaCuenta = (t, id) => t.cuenta === id || (Array.isArray(t.ejecuciones) && t.ejecuciones.some(j => j.cuenta === id));
+function aplicarGrupos(E) {
+  GRUPOS.forEach(g => {
+    const L = E.find(e => e.c.id === g.lider); if (!L) return;
+    const M = (g.copias || []).map(id => E.find(e => e.c.id === id)).filter(Boolean); if (!M.length) return;
+    M.forEach(m => { m.copiaDe = g.id; });
+    const todos = [L].concat(M), conC = todos.filter(x => !x.c.sinCons && x.c.consistencia > 0);
+    const pctG = conC.length ? Math.min(...conC.map(x => x.c.consistencia)) : null;
+    const filas = todos.map(x => {
+      const obj = x.c.objetivo > 0 ? x.c.objetivo : null, hoy = x.pnl.hoy || 0;
+      return { e: x, c: x.c, rol: x === L ? 'Líder' : 'Copia', hoy, min: x.c.tam * CH_MIN_PCT,
+        tp: obj && x.c.fase === 'Evaluación' && pctG != null && !x.c.sinCons ? Math.max(0, obj * pctG / 100 - Math.max(0, hoy)) : null,
+        faltan: obj && x.c.fase === 'Evaluación' ? Math.max(0, obj - (x.balance - x.c.tam)) : null };
+    });
+    const manda = filas.filter(f => f.tp != null).sort((a, b) => a.tp - b.tp)[0] || null;
+    const pasar = filas.filter(f => f.faltan != null).sort((a, b) => a.faltan - b.faltan)[0] || null;
+    const efMin = todos.slice().sort((a, b) => a.efectivo - b.efectivo)[0];
+    L.grupo = { g, filas, manda, pasar, pctG, nConC: conC.length, efMin, nombres: todos.map(x => x.c.nombre) };
+    L.tpOrig = L.tpUsd; L.targetOrig = L.target;
+    if (manda) {
+      L.tpMaxHoy = manda.tp;
+      const tR = targetR(L.target), tUsd = tR != null ? tR * L.riesgo : null;
+      if (manda.tp < manda.min) { L.consAlcanzada = true; L.consMin = manda.min; L.target = '—'; L.tpUsd = 0; }
+      else if (tUsd == null || tUsd > manda.tp) { L.consAjuste = true; L.tpUsd = Math.floor(manda.tp); L.target = fmtR(L.riesgo > 0 ? Math.floor(manda.tp / L.riesgo * 10) / 10 : 0) + ' fijo'; }
+      decorarTarget(L);
+    }
+  });
+  return E;
+}
+const nomE = e => e.grupo ? 'Grupo copia · ' + e.grupo.nombres.join(' + ') : e.c.nombre;
 
 // ---------- RF · Motor de gestión + Risk engine (mockups aprobados 13/11/2026: 2026-11-13_risk-engine.html, 2026-11-13_tarjeta-riesgo-modelo.html) ----------
 // Sustituye la regla del 12/10 (la gestión sale del BT) y la del 29/10 (simular con el riesgo real).
@@ -706,7 +768,7 @@ function reAplicarTarjeta(e, c, d) {
     if (e.consAlcanzada || !e.objetivo) return;
     const g = gestK(d.chK); if (!g) return;
     if (g.r == null) { e.target = g.tm; e.tpUsd = null; e.consAjuste = false; return; }
-    if (g.r * e.riesgo <= e.tpMaxHoy) { e.target = g.tm; e.tpUsd = g.r * e.riesgo; e.consAjuste = false; }
+    if (e.tpMaxHoy == null || g.r * e.riesgo <= e.tpMaxHoy) { e.target = g.tm; e.tpUsd = g.r * e.riesgo; e.consAjuste = false; }
     else { e.consAjuste = true; e.tpUsd = Math.floor(e.tpMaxHoy); e.target = fmtR(e.riesgo > 0 ? Math.floor(e.tpMaxHoy / e.riesgo * 10) / 10 : 0) + ' fijo'; }
     return;
   }
@@ -776,6 +838,8 @@ async function cargar() {
   const nw = await getDoc(uref('meta', 'noticias'));
   if (nw.exists()) NEWS = Array.isArray(nw.data().lista) ? nw.data().lista : [];
   else { NEWS = SEED_NEWS.slice(); await setDoc(uref('meta', 'noticias'), { lista: NEWS }); }
+  try { const cp = await getDoc(uref('meta', 'copias')); GRUPOS = cp.exists() && Array.isArray(cp.data().grupos) ? cp.data().grupos : []; } catch (e) { GRUPOS = []; }
+  CPW = JSON.parse(JSON.stringify(GRUPOS));
   try { const re = await getDoc(uref('meta', 'riskEngine')); RE_VIG = re.exists() && re.data().vig ? re.data().vig : {}; } catch (e) { RE_VIG = {}; }
   const ck = await getDoc(uref('meta', 'checklist'));
   if (IS_ADMIN && CHK_ITEMS.length === 4) CHK_ITEMS = CHK_BOTS.concat(CHK_ITEMS);
@@ -786,7 +850,7 @@ async function cargar() {
 function normCuenta(d) {
   return { id: String(d.id), nombre: d.nombre || d.id, firma: d.firma || '', fase: d.fase || 'Evaluación', tam: num(d.tam), dd: num(d.dd), dll: num(d.dll),
     balance: num(d.balance), minimo: num(d.minimo), orden: num(d.orden), enTurno: !!d.enTurno, activa: d.activa !== false, syncAt: d.syncAt || 0,
-    tipoDD: d.tipoDD || 'Trailing EOD', lockMin: num(d.lockMin), lockCierre: num(d.lockCierre), objetivo: num(d.objetivo), consistencia: num(d.consistencia) || 50,
+    tipoDD: d.tipoDD || 'Trailing EOD', lockMin: num(d.lockMin), lockCierre: num(d.lockCierre), objetivo: num(d.objetivo), sinCons: d.sinCons === true, consistencia: d.sinCons === true ? 0 : (num(d.consistencia) || 50),
     estado: d.estado || 'Activa', alta: d.alta || d.fechaPago || '', coste: num(d.coste), fechaPago: d.fechaPago || '', costeNota: d.costeNota || '',
     inactividad: num(d.inactividad) || 30, caducidad: d.caducidad || '' };
 }
@@ -823,10 +887,10 @@ function plegarMenu(min) {
 function renderHoy() {
   renderChk();
   if (!TM) { $('cards').innerHTML = '<div class="empty">Falta la Tabla maestra. Avisale a Javier.</div>'; return; }
-  const E = estadoCuentas(), RD = reDecidir(MODELO_SEL);
-  const viejas = E.filter(e => e.syncDias > 7);
+  const EA = estadoCuentas(), E = cola(EA), RD = reDecidir(MODELO_SEL);
+  const viejas = EA.filter(e => e.syncDias > 7);
   const op = cuentaOperar(E), tu = E.find(x => x.c.enTurno);
-  const avCons = tu && tu.consAlcanzada ? '<div class="warn">✓ ' + esc(tu.c.nombre) + ' bloqueada hoy por consistencia (TP máx. hoy ' + money(tu.tpMaxHoy) + ' < mín. ' + money(tu.consMin) + ' = 0,4 %): ' + (op ? 'hoy se opera <b>' + esc(op.c.nombre) + '</b>' : '<b>no queda otra cuenta para operar hoy</b>') + '. Mañana vuelve ' + esc(tu.c.nombre) + ' como primera opción.</div>' : '';
+  const avCons = tu && tu.consAlcanzada ? '<div class="warn">✓ ' + esc(nomE(tu)) + (tu.grupo ? ' bloqueado' : ' bloqueada') + ' hoy por consistencia (TP máx. hoy ' + money(tu.tpMaxHoy) + ' < mín. ' + money(tu.consMin) + ' = 0,4 %): ' + (op ? 'hoy se opera <b>' + esc(nomE(op)) + '</b>' : '<b>no queda otra cuenta para operar hoy</b>') + '. Mañana vuelve ' + esc(nomE(tu)) + ' como primera opción.</div>' : '';
   $('avisos').innerHTML = resetHtml() + avCons + (E.length && !E.some(e => e.c.enTurno) ? '<div class="warn">Ninguna cuenta está en turno: marcá una en Cuentas.</div>' : '')
     + (viejas.length ? '<div class="warn">Hace más de 7 días que no sincronizás con la firma: ' + viejas.map(e => esc(e.c.nombre)).join(', ') + '. Actualizá balance y mínimo en Cuentas.</div>' : '')
     + avisosCuentas().map(a => '<div class="warn' + (a.bad ? ' bad' : '') + '">' + a.t + '</div>').join('');
@@ -835,9 +899,10 @@ function renderHoy() {
   const ult = TRADES.filter(x => x.fecha === hoy && x.captura).sort((a, b) => num(b.registrado) - num(a.registrado))[0] || null;
   $('cards').innerHTML = E.slice().sort((a, b) => rk(b) - rk(a)).map(e => {
     const c = e.c, t = e === op;
+    if (e.grupo) return tarjetaGrupo(e, t, tu, op, RD, ult, E);
     return '<div class="acc' + (t ? ' turno' : '') + (t && e.consAjuste ? ' cons' : '') + '"><div class="top"><span class="nm">' + esc(c.nombre) + '</span><span class="tg">' + (c.enTurno ? 'EN TURNO · ' : t ? 'OPERAR AHORA · REEMPLAZO DE HOY · ' : '') + (c.enTurno && e.consAlcanzada ? 'BLOQUEADA HOY · ' : '') + esc(c.fase) + (c.fase === 'Funded' ? ' · umbral Crítica ' + Math.round(e.umbral * 100) + ' %' : '') + '</span></div>'
       + (e.consAlcanzada ? '<div class="warn">⛔ Bloqueada hoy por consistencia: TP máx. hoy ' + money(e.tpMaxHoy) + ' (mín. ' + money(e.consMin) + ' = 0,4 %). <b>No operar más hoy en esta cuenta.</b> Mañana se empieza por esta cuenta.</div>' : '')
-      + (t && !c.enTurno && tu && tu.consAlcanzada ? '<div class="warn">↪ Pasa a esta cuenta porque <b>' + esc(tu.c.nombre) + ' está bloqueada hoy</b> por consistencia (TP máx. hoy ' + money(tu.tpMaxHoy) + ' < ' + money(tu.consMin) + ' = 0,4 %).</div>' : '')
+      + (t && !c.enTurno && tu && tu.consAlcanzada ? '<div class="warn">↪ Pasa a esta cuenta porque <b>' + esc(nomE(tu)) + (tu.grupo ? ' está bloqueado hoy' : ' está bloqueada hoy') + '</b> por consistencia (TP máx. hoy ' + money(tu.tpMaxHoy) + ' < ' + money(tu.consMin) + ' = 0,4 %).</div>' : '')
       + (t ? reChipsHtml() : '') + (t ? (ult ? '<div class="op2">' + operasteHtml(ult) : '') + '<div class="hero"><span>' + (ult ? '→ PRÓXIMO TRADE · ' : '') + (e.consAjuste ? 'OPERAR HOY · AJUSTADO POR CONSISTENCIA' : c.enTurno ? 'OPERAR HOY' : 'OPERAR HOY (SOLO POR HOY)') + '</span><b' + (e.riesgo > e.efectivo ? ' class="neg"' : '') + '>Riesgo ' + money(e.riesgo) + ' · ' + pct(e.riesgoPct) + '</b><b>' + esc(e.targetTxt) + '</b><div class="src">' + esc(reFuenteTxt(RD, MODELO_SEL)) + '</div></div>' + (ult ? '</div>' : '')
         + (e.consAjuste ? '<div class="warn">⚠ Consistencia: quedan <b>' + money(e.tpMaxHoy) + '</b> de TP máx. hoy. Un TP a 1,5R (+' + money(1.5 * e.riesgo) + ') la rompería → <b>cortar en +' + money(e.tpUsd) + '</b> (≈' + esc(e.target.replace(' fijo', '')) + ' con el riesgo recomendado).</div>' : '')
         + (e.riesgo > e.efectivo ? '<div class="warn bad">⚠ No se puede arriesgar ' + money(e.riesgo) + ': el margen efectivo es ' + money(e.efectivo) + '. Solo si el SL real entra con 1 MNQ dentro de ' + money(e.efectivo) + '; si no, plan B.</div>' : '') : '')
@@ -845,10 +910,40 @@ function renderHoy() {
       + '<div>Estado<b>' + ICON[e.estado] + ' ' + e.estado + '</b></div><div>Riesgo<b' + (e.riesgo > e.efectivo ? ' class="neg"' : '') + '>' + money(e.riesgo) + ' · ' + pct(e.riesgoPct) + '</b></div><div>Target<b>' + esc(e.targetTxt) + '</b></div><div>SLs que aguanta<b>' + e.aguanta + '</b></div>'
       + (e.objetivo ? '<div>TP máx. hoy<b>' + money(e.tpMaxHoy) + '</b></div><div>Faltan para pasar<b>' + money(e.faltan) + '</b></div>' : '')
       + (e.avisoCons ? '<div>Consistencia<b>' + esc(e.avisoCons) + '</b></div>' : '') + (e.resetRec ? '<div>Aviso<b>Reset recomendado</b></div>' : '') + '</div>'
-      + (t ? noticiasLinea() + planB(E, e) + qrHtml() : '') + '</div>';
+      + (t ? noticiasLinea() + planB(E, e) + qrHtml(e) : '') + '</div>';
   }).join('');
   if ($('riskBox')) $('riskBox').innerHTML = riskPanelHtml(reBase());
   pintarNoticias();
+}
+// v16 · tarjeta del grupo de copia (una posición en la cola): desplegable con las cuentas y casos A/B/C.
+const topeTxt = (g, rol) => rol === 'Líder' && num(g.tope) > 0 ? 'Tope diario ' + money(num(g.tope)) : 'Sin tope diario';
+const faseCorta = c => c.fase === 'Evaluación' ? 'Challenge' : c.fase;
+function grupoDesplegable(e) {
+  const G = e.grupo, m = G.manda;
+  return '<details class="cpg"><summary><b>' + esc(G.g.nombre) + '</b> · ' + G.filas.length + ' cuentas · ' + (m ? 'manda <b>' + esc(m.c.nombre) + '</b> (TP máx. hoy ' + money(m.tp) + ')' : 'sin consistency') + '</summary>'
+    + '<div class="tbl"><table><tr><th>Cuenta</th><th>Rol</th><th>Consistency</th><th>Ganado hoy</th><th>TP máx. hoy</th><th>Broker</th></tr>'
+    + G.filas.map(f => '<tr><td><b>' + esc(f.c.nombre) + '</b> · ' + esc(faseCorta(f.c)) + '</td><td><span class="tag ' + (f.rol === 'Líder' ? 'ld' : 'cp') + '">' + f.rol + '</span></td><td>' + consTxt(f.c) + '</td><td>' + money(f.hoy) + '</td><td' + (f === m ? ' class="cpm"' : '') + '>' + (f.tp == null ? '—' : money(f.tp) + (f === m ? ' ◂ manda' : '')) + '</td><td><span class="pill">' + topeTxt(G.g, f.rol) + '</span></td></tr>').join('')
+    + '</table></div><div class="src">Manda la cuenta más restrictiva' + (G.pctG != null ? ' (consistency del grupo: ' + G.pctG + ' %)' : '') + '. Mínimo para operar = 0,4 % de la cuenta' + (m ? ' (' + money(m.min) + ' en ' + Math.round(m.c.tam / 1000) + 'K)' : '') + '. Para cambiar el grupo: <a data-nav="cuentas" style="cursor:pointer;color:var(--real)">Cuentas → Gestión de copias</a>.</div></details>';
+}
+function tarjetaGrupo(e, t, tu, op, RD, ult, E) {
+  const c = e.c, G = e.grupo, m = G.manda, p = G.pasar, n = G.filas.length, ef = G.efMin;
+  let h = '<div class="acc' + (t ? ' turno' : '') + (t && e.consAjuste ? ' cons' : '') + '"><div class="top"><span class="nm">' + esc(nomE(e)) + '</span><span class="tg">' + (c.enTurno ? 'EN TURNO · ' : t ? 'OPERAR AHORA · REEMPLAZO DE HOY · ' : '') + (c.enTurno && e.consAlcanzada ? 'BLOQUEADO HOY · ' : '') + '1 GRUPO = 1 CUENTA</span></div>' + grupoDesplegable(e);
+  if (e.consAlcanzada) h += '<div class="warn bad">⛔ <b>Grupo bloqueado hoy por consistencia.</b> TP máx. hoy de ' + esc(m.c.nombre) + ': <b>' + money(m.tp) + '</b> (mínimo ' + money(m.min) + ' = 0,4 %). No operar más hoy en el grupo. Mañana se empieza por este grupo.</div>'
+    + (op && op !== e ? '<div class="pb"><div class="pbl">HOY SE OPERA</div><b>→ siguiente de la cola: ' + esc(nomE(op)) + '</b> · ' + esc(op.grupo ? 'Grupo de copia' : faseCorta(op.c)) + '</div>' : '');
+  if (t && !c.enTurno && tu && tu.consAlcanzada) h += '<div class="warn">↪ Pasa a este grupo porque <b>' + esc(nomE(tu)) + (tu.grupo ? ' está bloqueado hoy' : ' está bloqueada hoy') + '</b> por consistencia (TP máx. hoy ' + money(tu.tpMaxHoy) + ' < ' + money(tu.consMin) + ' = 0,4 %).</div>';
+  if (t) {
+    const tR = targetR(e.targetOrig);
+    h += reChipsHtml() + (ult ? '<div class="op2">' + operasteHtml(ult) : '') + '<div class="hero"><span>' + (ult ? '→ PRÓXIMO TRADE · ' : '') + (e.consAjuste ? 'OPERAR HOY · AJUSTADO POR CONSISTENCIA' : 'OPERAR HOY · ' + (n === 2 ? 'LAS DOS CUENTAS' : 'LAS ' + n + ' CUENTAS')) + '</span><b' + (e.riesgo > ef.efectivo ? ' class="neg"' : '') + '>Riesgo ' + money(e.riesgo) + ' · ' + pct(e.riesgoPct) + '</b><b>' + esc(e.targetTxt) + '</b>'
+      + '<div class="src">Riesgo y target: escalera de la funded (' + ICON[e.estado] + ' ' + esc(e.estado) + ') · ' + esc(reFuenteTxt(RD, MODELO_SEL)) + ' · copia 1:1</div></div>' + (ult ? '</div>' : '');
+    if (e.consAjuste) h += '<div class="warn">⚠ Consistencia: a ' + esc(m.c.nombre) + ' le quedan <b>' + money(m.tp) + '</b> de TP máx. hoy. ' + (tR != null ? 'Un TP a ' + fmtR(tR) + ' (+' + money(tR * e.riesgo) + ') la rompería' : 'El target vigente (' + esc(e.targetOrig) + ') podría romperla') + ' → <b>cortar las dos en +' + money(e.tpUsd) + '</b>.</div>';
+    if (e.riesgo > ef.efectivo) h += '<div class="warn bad">⚠ No se puede arriesgar ' + money(e.riesgo) + ': el margen efectivo de ' + esc(ef.c.nombre) + ' es ' + money(ef.efectivo) + '. Solo si el SL real entra con 1 MNQ dentro de ' + money(ef.efectivo) + '; si no, plan B.</div>';
+  }
+  h += '<div class="kv"><div>Balance líder<b>' + money(e.balance) + '</b></div><div>Mínimo líder<b>' + (e.bloqueado ? '🔒 ' : '') + money(e.minimo) + '</b></div><div>Margen efectivo<b>' + money(e.efectivo) + ' · ' + Math.round(e.pct * 100) + ' %</b></div>'
+    + '<div>Estado<b>' + ICON[e.estado] + ' ' + e.estado + '</b></div><div>SLs que aguanta<b>' + e.aguanta + '</b></div>'
+    + G.filas.filter(f => f.faltan != null).map(f => '<div>' + esc(f.c.nombre) + ' · faltan para pasar<b>' + money(f.faltan) + '</b></div>').join('') + '</div>';
+  if (t && p) h += '<div class="' + (e.tpUsd != null && p.faltan <= e.tpUsd ? 'warn' : 'pb') + '">🎯 <b>Si un trade llega a lo que falta para pasar ' + esc(p.c.nombre) + '</b> (' + money(p.faltan) + '): <b>cortar ahí y cerrar las dos.</b></div>';
+  if (t) h += noticiasLinea() + planB(E, e) + '<div class="pb"><div class="pbl">SI ES SL</div>El turno pasa a la siguiente de la cola (rotación actual). El grupo cuenta como <b>una</b> posición en la cola.</div>' + qrHtml(e);
+  return h + '</div>';
 }
 // Línea «Hoy noticias» en la tarjeta en turno y color de la tarjeta durante la ventana (±5 min) o todo el día si es festivo. Solo aviso, no bloquea (08/11).
 function noticiasLinea() {
@@ -875,12 +970,14 @@ function planB(E, e) {
   const i = E.indexOf(e); if (E.length < 2 || i < 0) return '';
   let b = null; for (let k = 1; k < E.length; k++) { const x = E[(i + k) % E.length]; if (!x.consAlcanzada) { b = x; break; } }
   if (!b) return '';
-  return '<div class="pb"><div class="pbl">PLAN B · SI NO ENTRA EN ESTA CUENTA</div><b>' + esc(b.c.nombre) + '</b> · ' + esc(b.c.fase) + ' · riesgo ' + money(b.riesgo) + ' · ' + esc(b.targetTxt)
+  return '<div class="pb"><div class="pbl">PLAN B · ' + (e.grupo ? 'SI EL SL NO ENTRA EN EL GRUPO' : 'SI NO ENTRA EN ESTA CUENTA') + '</div><b>' + esc(nomE(b)) + '</b> · ' + esc(b.grupo ? 'Grupo de copia' : b.c.fase) + ' · riesgo ' + money(b.riesgo) + ' · ' + esc(b.targetTxt)
     + (b.objetivo ? ' · TP máx. hoy ' + money(b.tpMaxHoy) + ' · faltan ' + money(b.faltan) + ' para pasar' : '') + (b.resetRec ? ' · reset recomendado' : '') + '</div>';
 }
-function qrHtml() {
+function qrHtml(e) {
+  const G = e && e.grupo;
   return '<div class="qr"><div class="ql">REGISTRAR OPERACIÓN</div><div class="qb">' + ['TP', 'SL', 'BE'].map(s => '<button type="button" data-qr="' + s + '">' + s + '</button>').join('')
-    + '<input id="qrAmt" type="number" step="0.5" placeholder="Monto $"></div><input id="qrNota" type="text" placeholder="Nota rápida (opcional)" style="width:100%;margin-top:8px">'
+    + '<input id="qrAmt" type="number" step="0.5" placeholder="Monto $"></div>' + (G ? '<div class="mut" style="font-size:11px;margin-top:4px">P&amp;L de la líder (' + esc(e.c.nombre) + '); las copias llevan el mismo trade (1:1).</div>' : '')
+    + '<input id="qrNota" type="text" placeholder="Nota rápida (opcional)" style="width:100%;margin-top:8px">'
     + '<div style="display:flex;justify-content:flex-end;margin-top:8px"><button type="button" class="pri" id="qrGo">Guardar</button></div><div class="qm" id="qrMsg">' + esc(QR_MSG) + '</div></div>';
 }
 function pintarQr() {
@@ -889,19 +986,49 @@ function pintarQr() {
 async function qrGuardar(enReset) {
   const msg = t => { QR_MSG = t; if ($('qrMsg')) $('qrMsg').textContent = t; };
   if (!QR_SAL) return msg('Elegí TP, SL o BE.');
-  let usd = parseFloat($('qrAmt').value);
-  if (isNaN(usd)) return msg('Poné el monto.');
-  if (QR_SAL === 'SL') usd = -Math.abs(usd); else if (QR_SAL === 'TP') usd = Math.abs(usd);
-  const E = estadoCuentas(), e = cuentaOperar(E), tu = E.find(x => x.c.enTurno);
+  const E = estadoCuentas(), e = cuentaOperar(E), tu = cola(E).find(x => x.c.enTurno);
   if (!e) return msg(tu ? 'No queda cuenta para operar hoy (consistencia alcanzada).' : 'No hay cuenta en turno.');
+  const firma = v => QR_SAL === 'SL' ? -Math.abs(v) : QR_SAL === 'TP' ? Math.abs(v) : v;
+  let usd = parseFloat($('qrAmt') ? $('qrAmt').value : '');
+  if (isNaN(usd)) return msg('Poné el monto.');
+  usd = firma(usd);
+  // v16: en un grupo el P&L se vincula a la líder y las copias llevan el mismo trade (1:1)
+  const ejec = e.grupo ? e.grupo.filas.map(f => ({ cuenta: f.c.id, rol: f.rol, usd })) : null;
   if (enReset === undefined) return avisoReset(hoyES(), x => qrGuardar(x));
   // RF-22: confirmar con el plan de este momento; esa captura es la que se guarda.
   const cap = capturaPlan(e, tu), sal = QR_SAL, nota = $('qrNota').value.trim();
+  const pasoCorte = pasaCorte(cap, sal, usd);
   let o = $('trOv'); if (!o) { o = document.createElement('div'); o.id = 'trOv'; document.body.appendChild(o); }
-  o.innerHTML = '<div class="bx" style="max-width:480px"><b>Registrar ' + sal + ' ' + money2(usd) + ' · ' + esc(e.c.nombre) + '</b><div class="mut" style="font-size:12px;margin:6px 0 2px">Se guarda con el trade el plan de este momento (no se recalcula nunca):</div>'
-    + capKv(cap) + '<div class="row" style="justify-content:flex-end;gap:8px;margin-top:12px"><button type="button" id="qrNo">Cancelar</button><button type="button" class="pri" id="qrSi">Guardar</button></div></div>';
+  o.innerHTML = '<div class="bx" style="max-width:520px"><b>Registrar ' + sal + ' ' + money2(usd) + ' · ' + esc(nomE(e)) + '</b><div class="mut" style="font-size:12px;margin:6px 0 2px">Se guarda con el trade el plan de este momento (no se recalcula nunca):</div>'
+    + capKv(cap) + (pasoCorte ? motivoHtml(cap, usd, '') : '') + '<div class="msg err" id="qrOvMsg"></div><div class="row" style="justify-content:flex-end;gap:8px;margin-top:12px"><button type="button" id="qrNo">Cancelar</button><button type="button" class="pri" id="qrSi">Guardar</button></div></div>';
+  let mot = null;
+  o.querySelectorAll('[data-qmot]').forEach(b => { b.onclick = ev => { ev.stopPropagation(); mot = b.dataset.qmot; o.querySelectorAll('[data-qmot]').forEach(x => x.classList.toggle('on', x === b)); $('qrMotTxt').hidden = mot !== 'otro'; }; });
   $('qrNo').onclick = () => o.remove();
-  $('qrSi').onclick = () => { $('qrSi').disabled = true; qrConfirmar({ e, tu, usd, sal, nota, cap, enReset }).finally(() => o.remove()); };
+  $('qrSi').onclick = () => {
+    let m = null;
+    if (pasoCorte) {
+      if (!mot) { $('qrOvMsg').textContent = 'Elegí por qué se pasó del corte.'; return; }
+      m = { tipo: mot, texto: mot === 'otro' ? $('qrMotTxt').value.trim() : MOTIVOS.find(x => x[0] === mot)[1], corte: cap.tpUsd, corteR: cap.targetR, tpMax: cap.tpMaxHoy };
+      if (mot === 'otro' && !m.texto) { $('qrOvMsg').textContent = 'Escribí el motivo.'; return; }
+    }
+    $('qrSi').disabled = true; qrConfirmar({ e, tu, usd, sal, nota, cap, enReset, ejec, mot: m }).finally(() => o.remove());
+  };
+}
+// v16 · si el resultado pasó el corte del día (caso B del grupo), la app pide el motivo.
+const corteDe = cap => !!cap && (cap.corte === true || !!(cap.grupo && cap.grupo.corte));
+const pasaCorte = (cap, sal, usd) => corteDe(cap) && cap.tpMaxHoy != null && (sal === 'TP' || sal === 'Manual') && usd > cap.tpMaxHoy;
+const MOTIVOS = [['precio', 'El precio corrió, no dio tiempo a poner el TP'], ['target', 'Busqué más que el target'], ['otro', 'Otro (texto)']];
+function motivoHtml(cap, usd, sel, enForm) {
+  return '<div class="warn" style="margin-top:10px"><b>¿Por qué se pasó?</b> Corte planificado +' + money(cap.tpUsd) + (cap.targetR != null ? ' (≈' + fmtR(cap.targetR) + ')' : '') + ' · TP máx. hoy ' + money(cap.tpMaxHoy) + ' y cerró en +' + money(usd) + '.<div class="chips" style="margin-top:6px">'
+    + MOTIVOS.map(([k, l]) => '<button type="button" class="chip' + (sel === k ? ' on' : '') + '" ' + (enForm ? 'data-fk="motivo" data-fv="' + k + '"' : 'data-qmot="' + k + '"') + '>' + esc(l) + '</button>').join('') + '</div>'
+    + (enForm ? (sel === 'otro' ? '<input data-fin="motivoTxt" value="' + esc(F.motivoTxt || '') + '" placeholder="Motivo (texto)" style="width:100%;margin-top:6px">' : '') : '<input id="qrMotTxt" placeholder="Motivo (texto)" hidden style="width:100%;margin-top:6px">')
+    + '<div class="mut" style="font-size:11px;margin-top:4px">«El precio corrió» → incidencia de ejecución: plan respetado, % P&amp;L sistema = R del corte. «Busqué más que el target» → plan no respetado (P2), % P&amp;L sistema = R del target vigente.</div></div>';
+}
+function aplicarMotivo(o, m) {
+  if (!m) return;
+  o.motivoCorte = m;
+  if (m.tipo === 'precio') o.incidencia = 'Ejecución';
+  if (m.tipo === 'target') { o.plan = 'No'; o.preguntas = Array.from(new Set((o.preguntas || []).concat(['P2']))); }
 }
 async function qrConfirmar(p) {
   const msg = t => { QR_MSG = t; if ($('qrMsg')) $('qrMsg').textContent = t; };
@@ -915,14 +1042,16 @@ async function qrConfirmar(p) {
     if (rr != null) t.rr = rr;
     t.contexto = ctxCalc(t.fecha, t.hora); // «Operado en noticias» automático (±5 min o festivo)
     if (enReset) { t.plan = 'No'; t.preguntas = ['P5']; t.enReset = true; t.nota = NOTA_RESET + t.nota; }
+    if (p.ejec) { t.ejecuciones = p.ejec; t.grupo = { id: cap.grupo.id, nombre: cap.grupo.nombre }; }
+    aplicarMotivo(t, p.mot);
     const b = writeBatch(db);
     b.set(doc(ucol('trades')), t);
     let rot = 'Turno: sigue la misma cuenta.';
     if (sal === 'SL' && tu && e !== tu) {
       colaFinal(b, e.c.id);
-      rot = 'Turno: SL en el reemplazo → ' + e.c.nombre + ' pasa al final de la cola; mañana vuelve ' + tu.c.nombre + '.';
+      rot = 'Turno: SL en el reemplazo → ' + nomE(e) + ' pasa al final de la cola; mañana vuelve ' + nomE(tu) + '.';
     } else if (sal === 'SL') {
-      const act = CUENTAS.filter(c => c.activa);
+      const act = CUENTAS.filter(c => enRot(c));
       if (act.length > 1) {
         const sig = act[(act.findIndex(c => c.id === e.c.id) + 1) % act.length];
         act.forEach(c => b.set(uref('cuentas', c.id), { enTurno: c.id === sig.id }, { merge: true }));
@@ -931,7 +1060,7 @@ async function qrConfirmar(p) {
     }
     await b.commit();
     QR_SAL = null;
-    QR_MSG = 'Guardado #' + n + ' · ' + e.c.nombre + ' · ' + t.salida + ' ' + usd + ' $. ' + rot;
+    QR_MSG = 'Guardado #' + n + ' · ' + nomE(e) + ' · ' + t.salida + ' ' + usd + ' $' + (p.ejec ? ' (grupo, copia 1:1)' : '') + '. ' + rot;
     await cargar();
   } catch (err) { msg('Error: ' + err.message); if ($('qrGo')) $('qrGo').disabled = false; }
 }
@@ -976,10 +1105,53 @@ function renderNews() {
     : '<div class="empty">Todavía no hay días con noticias cargadas (se cargan desde la checklist del Journal).</div>';
 }
 function renderCuentas() {
-  $('ctaTabla').innerHTML = CUENTAS.length ? '<table><thead><tr><th>Orden</th><th>Cuenta</th><th>Fase</th><th class="num">Tamaño</th><th class="num">Balance firma</th><th class="num">Mínimo firma</th><th>Sincronizada</th><th>Turno</th><th>Rotación</th><th></th></tr></thead><tbody>'
-    + CUENTAS.map(c => '<tr><td>' + c.orden + '</td><td><b>' + esc(c.nombre) + '</b><div class="mut" style="font:11px var(--mono)">' + esc(c.id) + '</div></td><td>' + esc(c.fase) + '</td><td class="num">' + money(c.tam) + '</td><td class="num">' + money(c.balance) + '</td><td class="num">' + money(c.minimo) + '</td><td class="mut">' + (c.syncAt ? new Date(c.syncAt).toLocaleString('es-ES', { timeZone: 'Europe/Madrid', dateStyle: 'short', timeStyle: 'short' }) : '—') + '</td>'
-      + '<td>' + (c.enTurno ? '<b style="color:var(--real)">● En turno</b>' : (c.activa && c.estado === 'Activa') ? '<button class="link" type="button" data-turno="' + esc(c.id) + '">Poner en turno</button>' : '<span class="mut">—</span>') + '</td><td>' + (c.estado !== 'Activa' ? '<span class="tag ' + (c.estado === 'Quemada' ? 'q' : 'p') + '">' + esc(c.estado) + '</span>' : c.activa ? 'En rotación' : '<span class="tag r">Reserva</span>') + '</td><td><button class="link" type="button" data-edit="' + esc(c.id) + '">✎ Editar / sincronizar</button></td></tr>').join('') + '</tbody></table>'
+  const ordV = c => { const g = grupoDeCopia(c.id), l = g && CUENTAS.find(x => x.id === g.lider); return l ? l.orden + 0.001 : c.orden; };
+  const L = CUENTAS.slice().sort((a, b) => ordV(a) - ordV(b));
+  const grpTd = c => { const gl = grupoDeLider(c.id), gc = grupoDeCopia(c.id); return gl ? '<span class="tag ld">Líder · ' + esc(gl.nombre) + '</span>' : gc ? '<span class="tag cp">Copia · ' + esc(gc.nombre) + '</span>' : '<span class="mut">—</span>'; };
+  $('ctaTabla').innerHTML = CUENTAS.length ? '<table><thead><tr><th>Orden</th><th>Cuenta</th><th>Fase</th><th class="num">Tamaño</th><th class="num">Balance firma</th><th class="num">Mínimo firma</th><th>Sincronizada</th><th>Grupo de copia</th><th>Turno</th><th>Rotación</th><th></th></tr></thead><tbody>'
+    + L.map(c => '<tr><td>' + Math.floor(ordV(c)) + '</td><td><b>' + esc(c.nombre) + '</b><div class="mut" style="font:11px var(--mono)">' + esc(c.id) + '</div></td><td>' + esc(c.fase) + '</td><td class="num">' + money(c.tam) + '</td><td class="num">' + money(c.balance) + '</td><td class="num">' + money(c.minimo) + '</td><td class="mut">' + (c.syncAt ? new Date(c.syncAt).toLocaleString('es-ES', { timeZone: 'Europe/Madrid', dateStyle: 'short', timeStyle: 'short' }) : '—') + '</td>'
+      + '<td>' + grpTd(c) + '</td><td>' + (grupoDeCopia(c.id) && c.estado === 'Activa' ? '<span class="mut">(con su grupo)</span>' : c.enTurno ? '<b style="color:var(--real)">● En turno</b>' : (c.activa && c.estado === 'Activa') ? '<button class="link" type="button" data-turno="' + esc(c.id) + '">Poner en turno</button>' : '<span class="mut">—</span>') + '</td><td>' + (c.estado !== 'Activa' ? '<span class="tag ' + (c.estado === 'Quemada' ? 'q' : 'p') + '">' + esc(c.estado) + '</span>' : c.activa ? 'En rotación' : '<span class="tag r">Reserva</span>') + '</td><td><button class="link" type="button" data-edit="' + esc(c.id) + '">✎ Editar / sincronizar</button></td></tr>').join('') + '</tbody></table>'
     : '<div class="empty">Sin cuentas todavía.</div>';
+  renderCopias();
+}
+// v16 · Gestión de copias: crear / editar / deshacer grupos (meta/copias). Tope diario del broker = solo recordatorio.
+function renderCopias() {
+  if (!$('cpBox')) return;
+  const act = CUENTAS.filter(c => c.estado === 'Activa'), nm = c => esc(c.nombre) + ' · ' + esc(faseCorta(c));
+  const usada = (id, gi) => CPW.some((g, k) => k !== gi && (g.lider === id || (g.copias || []).includes(id)));
+  $('cpBox').innerHTML = (CPW.length ? CPW.map((g, gi) => {
+    const l = CUENTAS.find(c => c.id === g.lider), ids = [g.lider].concat(g.copias || []).filter(Boolean), cs = ids.map(id => CUENTAS.find(c => c.id === id)).filter(Boolean);
+    const conC = cs.filter(c => !c.sinCons && c.consistencia > 0), pctG = conC.length ? Math.min(...conC.map(c => c.consistencia)) : null;
+    const opL = act.filter(c => c.fase === 'Funded' && !usada(c.id, gi) && !(g.copias || []).includes(c.id));
+    return '<div class="cpb"><div class="row" style="justify-content:space-between"><b>' + esc(g.nombre) + '</b><span class="mut" style="font:12px var(--mono)">orden en la cola: ' + (l ? l.orden : '—') + '</span></div>'
+      + '<div class="form" style="margin-top:8px"><label>Cuenta líder<select data-cpl="' + gi + '"><option value="">Elegí la funded…</option>' + opL.map(c => '<option value="' + esc(c.id) + '"' + (g.lider === c.id ? ' selected' : '') + '>' + nm(c) + '</option>').join('') + '</select></label>'
+      + '<div class="flab">Cuentas copia' + (g.copias || []).map((id, ci) => '<span class="row" style="gap:4px;flex-wrap:nowrap"><select data-cpc="' + gi + '|' + ci + '" style="flex:1"><option value="">Elegí…</option>' + act.filter(c => c.id === id || (c.id !== g.lider && !usada(c.id, gi) && !(g.copias || []).includes(c.id))).map(c => '<option value="' + esc(c.id) + '"' + (id === c.id ? ' selected' : '') + '>' + nm(c) + '</option>').join('') + '</select><button type="button" class="link" data-cpq="' + gi + '|' + ci + '" title="Quitar">✕</button></span>').join('')
+      + '<button type="button" class="link" data-cpa="' + gi + '" style="text-align:left;text-transform:none">＋ añadir otra cuenta</button></div>'
+      + '<label>Tope diario en el broker · líder ($)<input type="number" data-cpt="' + gi + '" value="' + esc(g.tope ?? '') + '" placeholder="sin tope"><small class="mut" style="text-transform:none;letter-spacing:0">Copias: sin tope. Recordatorio: la app no lo calcula; el corte de las copias lo marca la tarjeta.</small></label></div>'
+      + '<div style="margin-top:8px;font-size:13px"><b>Consistency del grupo:</b> ' + (pctG != null ? pctG + ' % (la más restrictiva)' : 'sin consistency') + (conC.length < 2 ? ' <span class="pill" style="margin-left:6px">Pendiente · se activa con 2+ cuentas con consistency</span>' : '') + '</div>'
+      + '<div class="mut" style="font-size:12px;margin-top:4px">Con varias cuentas (o una funded con consistency), el margen efectivo del grupo usa el % más bajo (p. ej. 40 % frente a 50 % → 40 %).</div>'
+      + '<div class="row" style="margin-top:10px;gap:8px"><button type="button" class="pri" data-cpg="' + gi + '">Guardar grupo</button><button type="button" data-cpd="' + gi + '">Deshacer grupo</button></div></div>';
+  }).join('') : '<div class="empty">Sin grupos de copia. «＋ Nuevo grupo» para crear uno.</div>')
+    + '<div class="mut" style="font-size:12px;margin-top:8px">Se configura una vez. La tarjeta de riesgo muestra el grupo en su desplegable; acá se crea, se cambia o se deshace. La copia no se apaga nunca: las cuentas del grupo llevan siempre los mismos trades.</div><div class="msg" id="cpMsg">' + esc(CP_MSG) + '</div>';
+}
+async function guardarCopias(gi) {
+  const g = CPW[gi], m = t => { CP_MSG = t; if ($('cpMsg')) { $('cpMsg').textContent = t; $('cpMsg').className = 'msg err'; } };
+  if (gi != null && g) {
+    g.copias = (g.copias || []).filter(Boolean);
+    const l = CUENTAS.find(c => c.id === g.lider);
+    if (!l) return m('Elegí la cuenta líder (funded).');
+    if (l.fase !== 'Funded') return m('La líder tiene que ser una funded.');
+    if (!g.copias.length) return m('Añadí al menos una cuenta copia.');
+    if (new Set([g.lider].concat(g.copias)).size !== g.copias.length + 1) return m('Una cuenta no puede estar dos veces en el grupo.');
+    if (CPW.some((x, k) => k !== gi && [x.lider].concat(x.copias || []).some(id => id === g.lider || g.copias.includes(id)))) return m('Alguna cuenta ya está en otro grupo.');
+    g.tope = g.tope === '' || g.tope == null ? '' : num(g.tope);
+  }
+  const grupos = CPW.filter(x => x.lider && (x.copias || []).filter(Boolean).length).map(x => ({ id: x.id, nombre: x.nombre, lider: x.lider, copias: (x.copias || []).filter(Boolean), tope: x.tope ?? '' }));
+  const b = writeBatch(db);
+  b.set(uref('meta', 'copias'), { grupos, actualizado: Date.now() });
+  // Una copia no ocupa posición en la cola: si estaba en turno, el turno pasa a su líder.
+  grupos.forEach(x => { const t = CUENTAS.find(c => x.copias.includes(c.id) && c.enTurno); if (t) CUENTAS.forEach(c => b.set(uref('cuentas', c.id), { enTurno: c.id === x.lider }, { merge: true })); });
+  try { await b.commit(); CP_MSG = gi != null ? '✓ Grupo guardado.' : '✓ Grupo deshecho.'; await cargar(); if ($('cpMsg')) $('cpMsg').className = 'msg ok'; } catch (e) { m('Error: ' + e.message); }
 }
 // ---------- formulario completo de trade (v6) · estrategia Nasdaq · misma lógica que Real_Codigo.gs (rjArmarFila) ----------
 const CAT = {
@@ -1063,8 +1235,15 @@ function nuevoForm(base) {
   const E = TM ? estadoCuentas() : [], turno = cuentaOperar(E), now = new Date();
   F = Object.assign({ estrategia: 'Nasdaq', cuenta: turno ? turno.c.id : '', estado: turno ? turno.estado : '', salida: '', usd: '', rr: '', riesgoManual: '', plan: '', preguntas: [], sensacion: '',
     fecha: hoyES(), horaAp: horaTz(now, 'Europe/Madrid'), horaCi: horaTz(now, 'Europe/Madrid'), setup: '', modelo: '', zona: '', tipos: [], mfe: '', volvioBE: '', mfeAntesBE: '', abierto: false, rCierre: '',
-    poi: 'Ninguno', distPoi: '', quePaso: '', bePoi: '', puntoLiq: '', distLiq: '', fvg: '', fvgTf: [], fvgUb: '', fvgDir: '', fvgRe: '', fvgDist: '', linkHtf: '', linkLtf: '', reflexion: '', captura: null }, base || {});
+    poi: 'Ninguno', distPoi: '', quePaso: '', bePoi: '', puntoLiq: '', distLiq: '', fvg: '', fvgTf: [], fvgUb: '', fvgDir: '', fvgRe: '', fvgDist: '', linkHtf: '', linkLtf: '', reflexion: '', captura: null, grupo: '', grupoNombre: '', ejL: [], motivo: '', motivoTxt: '' }, base || {});
+  if (!base && turno && turno.grupo) ponerGrupoForm(turno.grupo.g);
   F.p0Manual = !!(base && base.p0); if (!F.p0Manual) autoP0();
+}
+// v16 · trade copiado: una ejecución por cuenta del grupo (la 1.ª es la líder y usa «Resultado ($)» del trade).
+function ponerGrupoForm(g) {
+  if (!g) { F.grupo = ''; F.grupoNombre = ''; F.ejL = []; return; }
+  F.grupo = g.id; F.grupoNombre = g.nombre;
+  F.ejL = [{ cuenta: g.lider, rol: 'Líder' }].concat((g.copias || []).map(id => ({ cuenta: id, rol: 'Copia' }))).filter(j => CUENTAS.some(c => c.id === j.cuenta && c.estado === 'Activa'));
 }
 function formDeTrade(t) {
   const d = t.detalle || {}, g = (k, alt) => t[k] !== undefined && t[k] !== '' ? t[k] : (d[alt] !== undefined ? d[alt] : '');
@@ -1080,6 +1259,8 @@ function formDeTrade(t) {
     puntoLiq: g('puntoLiq', 'Punto de Liquidez'), distLiq: n(g('distLiq', 'Distancia Liquidez (R)')),
     fvg: g('fvg', 'FVG HTF Presente'), fvgTf: lista('fvgTf', 'FVG HTF Temporalidad', '|'), fvgUb: g('fvgUb', 'FVG HTF Ubicación'), fvgDir: g('fvgDir', 'FVG HTF Dirección'), fvgRe: g('fvgRe', 'FVG HTF Reacciona'), fvgDist: n(g('fvgDist', 'FVG HTF Distancia (R)')),
     p0: t.p0 || '', p0Falta: t.p0Falta || [], captura: t.captura || null,
+    grupo: t.grupo ? t.grupo.id : '', grupoNombre: t.grupo ? t.grupo.nombre : '', motivo: t.motivoCorte ? t.motivoCorte.tipo : '', motivoTxt: t.motivoCorte && t.motivoCorte.tipo === 'otro' ? t.motivoCorte.texto : '',
+    ejL: Array.isArray(t.ejecuciones) ? t.ejecuciones.map(j => ({ cuenta: j.cuenta, rol: j.rol })) : [],
     linkHtf: g('linkHtf', 'Link HTF'), linkLtf: g('linkLtf', 'Link LTF'), reflexion: t.completo || t.migrado ? (t.nota || '') : String(t.nota || '').replace(/^Registro rápido: /, '') };
 }
 function abrirForm(id) {
@@ -1098,24 +1279,25 @@ const campo = (l, h, cls) => '<label class="fc' + (cls ? ' ' + cls : '') + '"><s
 function renderForm() {
   if (!$('frmBox')) return;
   if (!F) nuevoForm();
-  const ctas = F_EDIT ? CUENTAS : CUENTAS.filter(c => c.estado === 'Activa'), num = v => parseFloat(String(v).replace(',', '.')), mfe = num(F.mfe), rr = num(F.rr), hayPoi = F.poi && F.poi !== 'Ninguno';
+  const ctas = F_EDIT ? CUENTAS : CUENTAS.filter(c => c.estado === 'Activa' && !grupoDeCopia(c.id)), num = v => parseFloat(String(v).replace(',', '.')), mfe = num(F.mfe), rr = num(F.rr), hayPoi = F.poi && F.poi !== 'Ninguno';
   const c = CUENTAS.find(x => x.id === F.cuenta), usd = num(F.usd), cap = F.captura, rrCap = cap ? rrCaptura(cap, F.salida) : null;
   const riesgo = cap ? cap.riesgo : rr === 0 ? num(F.riesgoManual) : (isNaN(usd) || isNaN(rr) || !rr ? NaN : Math.abs(usd / rr));
   const t = F_EDIT ? TRADES.find(x => x._id === F_EDIT) : null;
   let h = '<div class="sec"><h2>' + (t ? (t.rapido && !t.completo ? 'Completar registro rápido #' : 'Editar trade #') + esc(t.num) : 'Nuevo trade real') + '</h2><span class="hint">Estrategia</span>' + '<div class="chips"><button type="button" class="chip on">Nasdaq</button><button type="button" class="chip" disabled>Zonas · pronto</button><button type="button" class="chip" disabled>Liquidez · pronto</button></div></div>';
   h += '<div class="card fsec"><div class="ft">1 · Cuenta y resultado</div>'
     + (cap ? '<div class="opc" style="margin-bottom:10px"><div class="oph"><span>🔒 Plan al abrir (solo lectura)</span></div>' + capLinea(cap) + '</div>' : '') + '<div class="fg">'
-    + campo('Cuenta *', '<select data-fin="cuenta"><option value="">Elegí…</option>' + ctas.map(x => '<option value="' + esc(x.id) + '"' + (F.cuenta === x.id ? ' selected' : '') + '>' + esc(x.nombre) + (x.enTurno ? ' · en turno' : '') + '</option>').join('') + '</select>')
+    + campo(F.ejL.length ? 'Cuenta / grupo *' : 'Cuenta *', '<select data-fin="cuenta"><option value="">Elegí…</option>' + ctas.map(x => { const g = !F_EDIT ? grupoDeLider(x.id) : null; return '<option value="' + esc(x.id) + '"' + (F.cuenta === x.id ? ' selected' : '') + '>' + (g ? esc(g.nombre) + ' · ' + esc([x.id].concat(g.copias || []).map(id => (CUENTAS.find(c => c.id === id) || {}).nombre || id).join(' + ')) : esc(x.nombre)) + (x.enTurno ? (g ? ' (en turno)' : ' · en turno') : '') + '</option>'; }).join('') + '</select>')
     + campo('Estado de la cuenta al entrar *', sel('estado', ESTADOS.concat(['Challenge'])))
     + campo('Cómo saliste *', chips('salida', CAT.salida))
-    + campo('Resultado ($) *', inp('usd', 'number', '−79,50'))
+    + campo('Resultado ($) *' + (F.ejL.length ? ' · P&amp;L de la líder, copias 1:1' : ''), inp('usd', 'number', '−79,50'))
     + (cap && rrCap != null ? campo('% P&amp;L sistema (R) · automático desde la captura', '<input type="text" readonly value="' + (rrCap > 0 ? '+' : '') + String(rrCap).replace('.', ',') + '">')
       : campo('% P&amp;L sistema (R) * · 2 = TP, −1 = SL', inp('rr', 'number', '−1')))
     + (rr === 0 && !cap ? campo('Riesgo usado ($) · opcional en BE', inp('riesgoManual', 'number')) : campo('Riesgo real · P&amp;L real', '<div class="ro">' + (isNaN(riesgo) || !c ? '—' : money2(riesgo) + ' · ' + (riesgo / c.tam * 100).toFixed(2).replace('.', ',') + ' % · P&amp;L ' + (isNaN(usd) ? '—' : (usd / c.tam * 100).toFixed(2).replace('.', ',') + ' %')) + '</div>'))
     + (F.fecha >= P0_DESDE ? campo('P0 · ¿Sesión preparada? * (de la checklist de Hoy)', chips('p0', ['Sí', 'No']) + (F.p0 === 'No' && F.p0Falta && F.p0Falta.length ? '<div class="warn bad" style="margin:4px 0 0;padding:5px 8px;font-size:12px">Faltó: ' + esc(F.p0Falta.join(' · ')) + '</div>' : '')) : '')
     + campo('¿Seguiste el plan? *' + (F.p0 === 'No' ? ' <span class="mut">· No automático por P0</span>' : ''), chips('plan', ['Sí', 'No']))
     + (F.plan === 'No' ? campo('¿Qué pregunta falló? * (va al comienzo de la reflexión)', chips('preguntas', CAT.preguntas, true, PREG_TXT), 'w2') : '')
-    + campo('Sensación al ejecutar *', sel('sensacion', CAT.sensaciones)) + '</div></div>';
+    + campo('Sensación al ejecutar *', sel('sensacion', CAT.sensaciones))
+    + (pasaCorte(cap, F.salida, num(F.usd)) ? campo('Si el resultado pasó el corte del día *', motivoHtml(cap, num(F.usd), F.motivo, true), 'w3') : '') + '</div></div>';
   h += '<div class="card fsec"><div class="ft">2 · Setup</div><div class="fg">'
     + campo('Fecha *', inp('fecha', 'date')) + campo('Hora apertura * (Madrid)', inp('horaAp', 'time')) + campo('Hora cierre *', inp('horaCi', 'time'))
     + campo('Setup *', chips('setup', CAT.setup)) + campo('Modelo de entrada *', sel('modelo', CAT.modelos)) + campo('Zona *', sel('zona', CAT.zonas))
@@ -1165,6 +1347,15 @@ function validarTrade(f) {
   if (f.plan !== 'Sí' && f.plan !== 'No') return falta('¿Seguiste el plan?', 'plan');
   const fallidas = f.plan === 'No' ? CAT.preguntas.filter(p => f.preguntas.includes(p)) : [];
   if (f.plan === 'No' && !fallidas.length) return falta('¿Qué pregunta falló? (al menos una, P0–P6)', 'preguntas');
+  // v16 · trade copiado: el P&L se vincula a la líder y las copias llevan el mismo resultado (1:1)
+  let motivo = null;
+  const ejec = f.ejL && f.ejL.length ? f.ejL.map(j => ({ cuenta: j.cuenta, rol: j.rol, usd })) : null;
+  if (pasaCorte(cap, f.salida, usd)) {
+    if (!MOTIVOS.some(m => m[0] === f.motivo)) return falta('¿Por qué se pasó del corte?', 'motivo');
+    if (f.motivo === 'otro' && !String(f.motivoTxt || '').trim()) return falta('el motivo (texto)', 'motivoTxt');
+    if (f.motivo === 'target' && (f.plan !== 'No' || !fallidas.includes('P2'))) return err('Con «Busqué más que el target» el plan es No y falla P2', 'plan');
+    motivo = { tipo: f.motivo, texto: f.motivo === 'otro' ? String(f.motivoTxt).trim() : MOTIVOS.find(m => m[0] === f.motivo)[1], corte: cap.tpUsd, corteR: cap.targetR, tpMax: cap.tpMaxHoy };
+  }
   if (!en(CAT.sensaciones, f.sensacion)) return falta('Sensación al ejecutar', 'sensacion');
   if (!/^\d{4}-\d{2}-\d{2}$/.test(f.fecha)) return falta('Fecha', 'fecha');
   if (!/^\d{1,2}:\d{2}$/.test(f.horaAp)) return falta('Hora apertura', 'horaAp');
@@ -1239,12 +1430,16 @@ function validarTrade(f) {
     poi: hayPoi ? f.poi : 'Ninguno', distPoi, fueraPlan: fuera, quePaso, bePoi, puntoLiq, distLiq, llegoLiq, fvg: f.fvg, fvgTf, fvgUb, fvgDir, fvgRe, fvgDist,
     linkHtf: f.linkHtf || '', linkLtf: f.linkLtf || '', nota: reflexion, p6, cuentaStats, gestiones: gest, target, completo: true, contexto: ctxCalc(f.fecha, f.horaAp) };
   if (cap) o.captura = cap;
+  if (ejec) { o.ejecuciones = ejec; o.grupo = { id: f.grupo || '', nombre: f.grupoNombre || '' }; }
+  if (motivo) { o.motivoCorte = motivo; if (motivo.tipo === 'precio') o.incidencia = 'Ejecución'; }
   o.detalle = { 'Fecha': fmtF(o.fecha), 'Hora Apertura': o.hora, 'Hora Cierre': o.horaCi, 'Cuenta': o.cuenta, 'Estado al Entrar': o.estado, 'Cómo Salió': o.salida, 'Resultado ($)': String(usd), '% P&L Sistema': String(rr), 'Riesgo Usado ($)': String(riesgo), 'Riesgo Real (%)': String(riesgoPct), 'P&L Real (%)': String(pnlPct),
     '¿Siguió el Plan?': o.plan, 'Sesión Preparada (P0)': o.p0, 'Preguntas Fallidas': fallidas.join(', '), 'Sensación': o.sensacion, 'Setup': o.setup, 'Modelo': o.modelo, 'Zona': o.zona, 'Tipo de Entrada': tipos.join(' | '), 'MFE (R)': String(mfe),
     'Volvió a BE tras 1R': volvio, 'MFE antes de BE (R)': String(mfeAntes), 'Seguía Abierto 19:00': abierto ? 'Sí' : 'No', 'R al Cierre': String(rCierre), 'POI en el Camino': o.poi, 'Distancia POI (R)': String(distPoi), 'Fuera de Plan': fuera, 'Qué Pasó en el POI': quePaso, 'BE en el POI': bePoi,
     'Punto de Liquidez': puntoLiq, 'Distancia Liquidez (R)': String(distLiq), 'Llegó a Liquidez': llegoLiq, 'R 1R fijo': String(gest.g1), 'R 1,5R fijo': String(gest.g15), 'R 2R fijo': String(gest.g2), 'R 1,5R + BE 1R': String(gest.be15), 'R 2R + BE 1R': String(gest.be2), 'R 2R + BE POI': String(gest.poi), 'R Liquidez + BE 2R': String(gest.liq),
     'Contexto': ctxTexto(o.contexto), 'Gestión Plan (Tabla maestra)': target,'Plan al abrir (captura)': cap ? capLinea(cap) : '', 'Link HTF': o.linkHtf, 'Link LTF': o.linkLtf, 'Reflexión': reflexion, 'P6 Pendiente': p6, 'Cuenta para Estadística': cuentaStats,
     'FVG HTF Presente': o.fvg, 'FVG HTF Temporalidad': fvgTf.join(' | '), 'FVG HTF Ubicación': fvgUb, 'FVG HTF Dirección': fvgDir, 'FVG HTF Reacciona': fvgRe, 'FVG HTF Distancia (R)': String(fvgDist) };
+  if (ejec) o.detalle['Ejecuciones (copia)'] = ejec.map(j => ((CUENTAS.find(x => x.id === j.cuenta) || {}).nombre || j.cuenta) + ' · ' + j.rol + ' · ' + j.usd + ' $').join(' | ');
+  if (motivo) o.detalle['Pasó el corte del día'] = motivo.texto + (motivo.tipo === 'precio' ? ' (incidencia de ejecución, plan respetado)' : motivo.tipo === 'target' ? ' (plan no respetado, P2)' : '');
   Object.keys(o.detalle).forEach(k => { if (o.detalle[k] === '' || o.detalle[k] === 'undefined') delete o.detalle[k]; });
   return { o, c };
 }
@@ -1265,7 +1460,7 @@ async function guardarTrade(enReset) {
       if (o.salida === 'SL' && tuH && tuH.consAlcanzada && o.cuenta !== tuH.c.id && o.fecha === hoyES()) {
         colaFinal(b, o.cuenta); rot = ' Turno: SL en el reemplazo → pasa al final de la cola; mañana vuelve ' + tuH.c.nombre + '.';
       } else if (o.salida === 'SL') {
-        const act = CUENTAS.filter(c => c.activa && c.estado === 'Activa'), i = act.findIndex(c => c.id === o.cuenta);
+        const act = CUENTAS.filter(c => enRot(c) && c.estado === 'Activa'), i = act.findIndex(c => c.id === o.cuenta);
         if (act.length > 1 && i > -1) { const sig = act[(i + 1) % act.length]; act.forEach(c => b.set(uref('cuentas', c.id), { enTurno: c.id === sig.id }, { merge: true })); rot = ' Turno: SL → pasa a ' + sig.nombre + '.'; }
       }
     }
@@ -1383,8 +1578,12 @@ function llenarForm(c) {
   const v = (id, x) => { $(id).value = x == null ? '' : x; };
   v('fNombre', c?.nombre ?? ''); v('fId', c?.id ?? ''); v('fFirma', c?.firma ?? 'Lucid'); v('fFase', c?.fase ?? 'Evaluación'); v('fTam', c?.tam ?? 25000); v('fDd', c?.dd ?? 1000);
   v('fDll', c && c.dll ? c.dll : ''); v('fBal', c?.balance ?? ''); v('fMin', c?.minimo ?? ''); v('fTipo', c?.tipoDD ?? 'Trailing EOD'); v('fLockMin', c ? (c.lockMin || '') : 25100); v('fLockCierre', c ? (c.lockCierre || '') : 26100);
-  v('fObj', c ? (c.objetivo || '') : 1250); v('fCons', c ? (c.consistencia || 50) : 50); v('fOrden', c?.orden ?? (CUENTAS.reduce((m, x) => Math.max(m, x.orden), 0) + 1)); v('fActiva', c && !c.activa ? 'No' : 'Sí'); v('fEstado', c ? c.estado : 'Activa'); v('fAlta', c ? c.alta : hoyES()); v('fCoste', c ? (c.coste || '') : ''); v('fInact', c ? c.inactividad : 30); v('fCad', c ? c.caducidad : '');
+  v('fObj', c ? (c.objetivo || '') : 1250); v('fCons', c ? (c.sinCons ? '' : (c.consistencia || 50)) : 50); consSeg(!!(c && c.sinCons)); v('fOrden', c?.orden ?? (CUENTAS.reduce((m, x) => Math.max(m, x.orden), 0) + 1)); v('fActiva', c && !c.activa ? 'No' : 'Sí'); v('fEstado', c ? c.estado : 'Activa'); v('fAlta', c ? c.alta : hoyES()); v('fCoste', c ? (c.coste || '') : ''); v('fInact', c ? c.inactividad : 30); v('fCad', c ? c.caducidad : '');
   $('ctaMsg').textContent = c ? 'Para sincronizar: copiá balance y mínimo de la firma y guardá.' : ''; $('ctaMsg').className = 'msg';
+}
+function consSeg(sin) {
+  document.querySelectorAll('#fConsSeg [data-cons]').forEach(b => b.classList.toggle('on', (b.dataset.cons === 'sin') === sin));
+  $('fCons').hidden = sin;
 }
 async function guardarCuenta() {
   const m = (t, ok) => { $('ctaMsg').textContent = t; $('ctaMsg').className = 'msg ' + (ok ? 'ok' : 'err'); };
@@ -1396,7 +1595,7 @@ async function guardarCuenta() {
   if (!(tam > 0 && dd > 0 && bal > 0 && min > 0)) return m('Completá tamaño, DD inicial, balance y mínimo.');
   const prev = CUENTAS.find(c => c.id === EDIT_ID);
   const d = { id, nombre: $('fNombre').value.trim() || id, firma: $('fFirma').value.trim(), fase: $('fFase').value, tam, dd, dll: num($('fDll').value), balance: bal, minimo: min,
-    tipoDD: $('fTipo').value, lockMin: num($('fLockMin').value), lockCierre: num($('fLockCierre').value), objetivo: num($('fObj').value), consistencia: num($('fCons').value) || 50, orden: num($('fOrden').value), activa: $('fActiva').value === 'Sí' && $('fEstado').value === 'Activa',
+    tipoDD: $('fTipo').value, lockMin: num($('fLockMin').value), lockCierre: num($('fLockCierre').value), objetivo: num($('fObj').value), sinCons: $('fCons').hidden, consistencia: $('fCons').hidden ? 0 : (num($('fCons').value) || 50), orden: num($('fOrden').value), activa: $('fActiva').value === 'Sí' && $('fEstado').value === 'Activa',
     estado: $('fEstado').value, alta: $('fAlta').value, coste: num($('fCoste').value), inactividad: num($('fInact').value) || 30, caducidad: $('fCad').value,
     enTurno: prev ? prev.enTurno : !CUENTAS.some(c => c.enTurno) };
   if (!prev || prev.balance !== bal || prev.minimo !== min || !prev.syncAt) d.syncAt = Date.now(); else d.syncAt = prev.syncAt;
@@ -1416,7 +1615,7 @@ function compras() {
   return L.concat(MOVS).sort((a, b) => String(b.fecha).localeCompare(String(a.fecha)));
 }
 function ultimaActividad(c) {
-  const t = TRADES.filter(x => x.cuenta === c.id).map(x => x.fecha).sort().pop();
+  const t = trCuenta(c.id).map(x => x.fecha).sort().pop();
   return [t, c.alta].filter(Boolean).sort().pop() || '';
 }
 function avisosCuentas() {
@@ -1439,7 +1638,7 @@ function avisosCuentas() {
 // Antes de un reset no hay ancla: ese tramo sigue partiendo del tamaño de la cuenta.
 const balApp = c => r2(c.balance + pnlCuenta(c.id, c.syncAt).postSync);
 function serieCuenta(c) {
-  const ev = TRADES.filter(t => t.cuenta === c.id).map(t => ({ f: t.fecha + ' ' + (t.hora || ''), v: num(t.usd) }))
+  const ev = trCuenta(c.id).map(t => ({ f: t.fecha + ' ' + (t.hora || ''), v: num(t.usd) }))
     .concat(MOVS.filter(m => m.cuenta === c.id && m.tipo === 'Retiro').map(m => ({ f: m.fecha + ' 23:59', v: -num(m.importe), r: true })))
     .concat(MOVS.filter(m => m.cuenta === c.id && m.tipo === 'Reset').map(m => ({ f: m.fecha + ' 00:00', reset: true })))
     .sort((a, b) => a.f.localeCompare(b.f));
@@ -1473,7 +1672,7 @@ function valoresApp(c) {
 // registrados, aunque esté en reserva (se opera por inactividad). Con id (icono ⟳ de la tarjeta): solo esa. Regla de Javier, 13/11/2026.
 const SYNC_ULT_TRADES = 10;
 function abrirSync(id) {
-  const ult = new Set(TRADES.slice().sort((a, b) => num(b.registrado) - num(a.registrado)).slice(0, SYNC_ULT_TRADES).map(t => t.cuenta));
+  const ult = new Set(TRADES.slice().sort((a, b) => num(b.registrado) - num(a.registrado)).slice(0, SYNC_ULT_TRADES).flatMap(t => Array.isArray(t.ejecuciones) && t.ejecuciones.length ? t.ejecuciones.map(j => j.cuenta) : [t.cuenta]));
   SYNC_L = CUENTAS.filter(c => c.estado === 'Activa' && (id ? c.id === id : (c.activa || ult.has(c.id))))
     .sort((a, b) => (b.enTurno - a.enTurno) || (b.activa - a.activa) || (a.orden - b.orden)).map(c => Object.assign({ c }, valoresApp(c)));
   if (!SYNC_L.length) return;
@@ -1521,7 +1720,7 @@ function spark(pts, color) {
   return '<svg class="mini" viewBox="0 0 200 34" preserveAspectRatio="none"><polyline fill="none" stroke="' + color + '" stroke-width="1.6" points="' + pts.map((p, i) => (i / (pts.length - 1) * 200).toFixed(1) + ',' + (31 - (p.y - mn) / r * 28).toFixed(1)).join(' ') + '"/></svg>';
 }
 function statsCuenta(c) {
-  const T = TRADES.filter(t => t.cuenta === c.id), tp = T.filter(t => t.salida === 'TP').length, sl = T.filter(t => t.salida === 'SL').length;
+  const T = trCuenta(c.id), tp = T.filter(t => t.salida === 'TP').length, sl = T.filter(t => t.salida === 'SL').length;
   const g = T.filter(t => t.usd > 0).reduce((a, t) => a + num(t.usd), 0), p = -T.filter(t => t.usd < 0).reduce((a, t) => a + num(t.usd), 0);
   const ret = MOVS.filter(m => m.cuenta === c.id && m.tipo === 'Retiro'), inv = c.coste + MOVS.filter(m => m.cuenta === c.id && m.tipo !== 'Retiro').reduce((a, m) => a + num(m.importe), 0);
   return { n: T.length, tp, sl, be: T.length - tp - sl, wr: tp + sl ? tp / (tp + sl) : null, pf: p ? g / p : null, bruto: ret.reduce((a, m) => a + num(m.importe), 0), neto: ret.reduce((a, m) => a + netoMov(m), 0), nRet: ret.length, inv };
@@ -1529,7 +1728,7 @@ function statsCuenta(c) {
 function grupoDe(c) { return c.estado === 'Quemada' ? 'Quemadas' : c.estado === 'Pasada' ? 'Pasadas' : !c.activa ? 'Reserva' : c.fase === 'Funded' ? 'Fondeadas' : 'Challenges'; }
 // Cuentas (mockup 13/11/2026): KPIs, portfolio equity, filtros Fase/Estado y tarjetas agrupadas por fase. Las acciones de siempre se mantienen.
 const estadoFiltro = c => c.estado === 'Quemada' ? 'quemadas' : c.estado === 'Pasada' ? 'pasadas' : c.activa ? 'activas' : 'pausadas';
-function rachaSL(c) { const L = cronol(TRADES.filter(t => t.cuenta === c.id)); let n = 0; for (let i = L.length - 1; i >= 0 && L[i].salida === 'SL'; i--) n++; return n; }
+function rachaSL(c) { const L = cronol(trCuenta(c.id)); let n = 0; for (let i = L.length - 1; i >= 0 && L[i].salida === 'SL'; i--) n++; return n; }
 function renderCtaPage() {
   if (!$('ctaKpis')) return;
   const E = TM ? estadoCuentas() : [], act = CUENTAS.filter(c => c.estado === 'Activa'), fund = act.filter(c => c.fase === 'Funded'), ch = act.filter(c => c.fase === 'Evaluación');
@@ -1557,7 +1756,7 @@ function renderCtaPage() {
   // detalle
   const c = CUENTAS.find(x => x.id === SEL_CTA);
   if (!c) { $('ctaDet').innerHTML = ''; return; }
-  const st = statsCuenta(c), pts = serieCuenta(c), eq = pts[pts.length - 1].y, T = TRADES.filter(t => t.cuenta === c.id), R = MOVS.filter(m => m.cuenta === c.id && m.tipo === 'Retiro');
+  const st = statsCuenta(c), pts = serieCuenta(c), eq = pts[pts.length - 1].y, T = trCuenta(c.id), R = MOVS.filter(m => m.cuenta === c.id && m.tipo === 'Retiro');
   const mes = {}; T.forEach(t => { const k = t.fecha.slice(0, 7); mes[k] = (mes[k] || 0) + num(t.usd); });
   $('ctaDet').innerHTML = '<div class="sec"><h2>' + esc(c.nombre) + '</h2><span class="hint">' + esc(c.id) + ' · ' + esc(c.firma) + ' · alta ' + fmtF(c.alta) + (c.caducidad ? ' · caduca ' + fmtF(c.caducidad) : '') + '</span><button class="link" type="button" data-edit="' + esc(c.id) + '">✎ Editar / sincronizar</button></div>'
     + '<div class="kpis">' + [['Equity', money(eq)], ['Profit', '<span class="' + (eq - c.tam < 0 ? 'neg' : 'pos') + '">' + money(eq - c.tam + st.bruto) + '</span>'], ['Trades', st.n + ' · ' + st.tp + ' TP · ' + st.sl + ' SL · ' + st.be + ' BE'], ['Winrate', st.wr == null ? '—' : Math.round(st.wr * 100) + ' %'], ['Profit factor', st.pf == null ? '—' : st.pf.toFixed(2).replace('.', ',')], ['Retirado (neto)', money(st.neto) + ' · ' + st.nRet + ' retiro' + (st.nRet === 1 ? '' : 's')], ['Invertido', money2(st.inv)]].map(k => '<div class="kpi"><div class="l">' + k[0] + '</div><div class="v" style="font-size:17px">' + k[1] + '</div></div>').join('') + '</div>'
@@ -1631,8 +1830,8 @@ async function renumerar() {
   const b = writeBatch(db); L.forEach((c, i) => b.set(uref('cuentas', c.id), { orden: i + 1 }, { merge: true })); await b.commit();
 }
 async function pasarTurno(id) {
-  const act = CUENTAS.filter(c => c.activa && c.id !== id); if (!act.length) return;
-  const i = CUENTAS.findIndex(c => c.id === id), sig = CUENTAS.slice(i + 1).concat(CUENTAS.slice(0, i)).find(c => c.activa && c.id !== id) || act[0];
+  const act = CUENTAS.filter(c => enRot(c) && c.id !== id); if (!act.length) return;
+  const i = CUENTAS.findIndex(c => c.id === id), sig = CUENTAS.slice(i + 1).concat(CUENTAS.slice(0, i)).find(c => enRot(c) && c.id !== id) || act[0];
   await setDoc(uref('cuentas', sig.id), { enTurno: true }, { merge: true });
 }
 // Contabilidad (mockup 13/11/2026): pestañas Resumen / Firmas / Retiros / Compras.
@@ -1732,6 +1931,12 @@ document.addEventListener('click', async ev => {
   if (el.id === 'qrGo') return qrGuardar();
   if (el.id === 'chkHead') { CHK_OPEN = !CHK_OPEN; renderChk(); return; }
   if (el.id === 'btnCta') return guardarCuenta();
+  if (el.dataset.cons) return consSeg(el.dataset.cons === 'sin');
+  if (el.id === 'cpNuevo') { const usadas = CPW.map(g => g.nombre); let i = 0; while (usadas.includes('Grupo ' + String.fromCharCode(65 + i))) i++; CPW.push({ id: 'g' + Date.now(), nombre: 'Grupo ' + String.fromCharCode(65 + i), lider: '', copias: [''], tope: 600 }); CP_MSG = ''; return renderCopias(); }
+  if (el.dataset.cpa != null) { CPW[+el.dataset.cpa].copias.push(''); return renderCopias(); }
+  if (el.dataset.cpq) { const [g, c] = el.dataset.cpq.split('|').map(Number); CPW[g].copias.splice(c, 1); return renderCopias(); }
+  if (el.dataset.cpg != null) return guardarCopias(+el.dataset.cpg);
+  if (el.dataset.cpd != null) { const g = CPW[+el.dataset.cpd]; if (!confirm('¿Deshacer ' + g.nombre + '? Las cuentas vuelven a la rotación cada una por su lado.')) return; CPW.splice(+el.dataset.cpd, 1); return guardarCopias(null); }
   if (el.id === 'btnCtaNueva') return llenarForm(null);
   if (el.dataset.edit) { llenarForm(CUENTAS.find(c => c.id === el.dataset.edit)); $('ctaFormTit').scrollIntoView({ behavior: 'smooth' }); return; }
   if (el.dataset.turno) return ponerTurno(el.dataset.turno);
@@ -1745,6 +1950,7 @@ document.addEventListener('click', async ev => {
     if (k === 'p0') { F.p0Manual = true; aplicarP0(); }
     if (k === 'plan' && F.p0 === 'No') F.plan = 'No';
     if (k === 'preguntas' && v === 'P0') { F.p0Manual = true; F.p0 = F.preguntas.includes('P0') ? 'No' : (F.fecha >= P0_DESDE ? 'Sí' : ''); if (F.p0 === 'No') F.plan = 'No'; }
+    if (k === 'motivo' && F.motivo === 'target') { F.plan = 'No'; if (!F.preguntas.includes('P2')) F.preguntas = F.preguntas.concat(['P2']); }
     if (k === 'salida') { const u = parseFloat(String(F.usd).replace(',', '.')); if (!isNaN(u)) F.usd = String(v === 'SL' ? -Math.abs(u) : v === 'TP' ? Math.abs(u) : u); if (v === 'SL') F.rr = '-1'; else if (v === 'BE') F.rr = '0'; else if (v === 'TP' && parseFloat(F.rr) < 0) F.rr = ''; }
     renderForm(); return; }
   if (el.id === 'frmSave') return guardarTrade();
@@ -1789,12 +1995,16 @@ document.addEventListener('change', ev => {
     if (fk === 'usd' && (F.salida === 'SL' || F.salida === 'TP')) { const u = parseFloat(String(F.usd).replace(',', '.')); if (!isNaN(u)) F.usd = String(F.salida === 'SL' ? -Math.abs(u) : Math.abs(u)); }
     if (fk === 'fecha') autoP0();
     if (fk === 'cuenta' && TM) { const e = estadoCuentas().find(x => x.c.id === F.cuenta); if (e) F.estado = e.estado; }
+    if (fk === 'cuenta' && !F_EDIT) ponerGrupoForm(grupoDeLider(F.cuenta));
     if (fk === F_ERR) { F_ERR = ''; const x = ev.target.closest('.fc'); if (x) x.classList.remove('err'); }
     if (['cuenta', 'usd', 'rr', 'mfe', 'poi', 'distPoi', 'abierto', 'fvgUb', 'fecha'].includes(fk)) setTimeout(() => { const a = document.activeElement && document.activeElement.dataset ? document.activeElement.dataset.fin : null; renderForm(); if (a) { const e = document.querySelector('[data-fin="' + a + '"]'); if (e) e.focus(); } }, 0);
     return;
   }
   const tg = ev.target;
   if (tg.dataset && tg.dataset.gf) { if (tg.value) GF[tg.dataset.gf] = tg.value; else delete GF[tg.dataset.gf]; return render(); }
+  if (tg.dataset && tg.dataset.cpl != null) { CPW[+tg.dataset.cpl].lider = tg.value; return renderCopias(); }
+  if (tg.dataset && tg.dataset.cpc) { const [g, c] = tg.dataset.cpc.split('|').map(Number); CPW[g].copias[c] = tg.value; return renderCopias(); }
+  if (tg.dataset && tg.dataset.cpt != null) { CPW[+tg.dataset.cpt].tope = tg.value; return; }
   if (tg.id === 'ctaFase' || tg.id === 'ctaEst') { CTA_F = { fase: $('ctaFase').value, est: $('ctaEst').value }; return renderCtaPage(); }
   if (tg.id === 'nqSel') { NQ.nuevo = tg.value === '__nuevo'; NQ.sel = NQ.nuevo ? '' : tg.value; return renderChk(); }
   if (tg.id === 'nqHora') { NQ.hora = tg.value; return; }
