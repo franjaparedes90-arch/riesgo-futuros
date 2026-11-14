@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><title>RF-39 · Rotación desde la tabla de Cuentas (mockup)</title>
+<style>
+body{font:14px system-ui,sans-serif;background:#0f1419;color:#e6e6e6;margin:0;padding:24px}
+h1{font-size:18px;margin:0 0 4px}h2{font-size:15px;margin:28px 0 8px;color:#9bb}
+.mut{color:#889;font-size:12px}
+table{border-collapse:collapse;width:100%;margin-top:8px}
+th,td{padding:8px 10px;border-bottom:1px solid #243;text-align:left;white-space:nowrap}
+th{color:#9bb;font-weight:600;font-size:12px}
+.num{text-align:right}
+.tag{padding:2px 8px;border-radius:10px;font-size:12px}
+.tag.r{background:#5a4a1a;color:#ffd97a}.tag.q{background:#5a1a1a;color:#ff9a9a}.tag.p{background:#1a4a2a;color:#9affb0}
+.rot{cursor:pointer;border-bottom:1px dashed #556;user-select:none}
+.rot:hover{color:#fff}
+.turno{color:#4fc3f7;font-weight:700}
+.link{background:none;border:0;color:#7fb3ff;cursor:pointer;padding:0;font:inherit;text-decoration:underline}
+.note{background:#172028;border-left:3px solid #4fc3f7;padding:10px 14px;margin:10px 0;border-radius:4px}
+.toast{display:inline-block;background:#233;border:1px solid #4a6;color:#bfe;padding:6px 10px;border-radius:6px;font-size:12px;margin-top:6px}
+kbd{background:#223;border:1px solid #445;border-radius:3px;padding:0 5px;font-size:11px}
+</style></head><body>
+<h1>RF-39 · Rotación desde la tabla de Cuentas</h1>
+<div class="mut">Mockup 14/11/2026 · pantalla Cuentas · solo cambia la columna <b>Rotación</b> y el alta en Gestión de copias. Nada más se toca.</div>
+
+<h2>1 · Columna Rotación con doble clic (igual que Turno)</h2>
+<table>
+<thead><tr><th>Orden</th><th>Cuenta</th><th>Fase</th><th class="num">Balance firma</th><th>Grupo de copia</th><th>Turno</th><th>Rotación</th><th></th></tr></thead>
+<tbody>
+<tr><td>1</td><td><b>PRO001</b><div class="mut">LFF025-O6T7X58R-PRO001</div></td><td>Funded</td><td class="num">24.561,50 $</td><td>Grupo A (líder)</td><td class="turno">● En turno</td><td><span class="rot" title="Doble clic → a reserva">En rotación</span></td><td><button class="link">✎ Editar / sincronizar</button></td></tr>
+<tr><td>2</td><td><b>Cuenta 003</b><div class="mut">LFF025-…-003</div></td><td>Evaluación</td><td class="num">25.120,00 $</td><td>Grupo A (copia)</td><td class="mut">(con su grupo)</td><td><span class="rot" title="Doble clic → a reserva">En rotación</span></td><td><button class="link">✎ Editar / sincronizar</button></td></tr>
+<tr><td>3</td><td><b>Cuenta 004</b><div class="mut">LFF025-…-004</div></td><td>Evaluación</td><td class="num">25.000,00 $</td><td>—</td><td><button class="link">Poner en turno</button></td><td><span class="rot" title="Doble clic → a reserva">En rotación</span></td><td><button class="link">✎ Editar / sincronizar</button></td></tr>
+<tr><td>—</td><td><b>Cuenta 005</b><div class="mut">LFF025-…-005</div></td><td>Evaluación</td><td class="num">25.000,00 $</td><td>—</td><td class="mut">—</td><td><span class="rot tag r" title="Doble clic → en rotación (entra al final de la cola)">Reserva</span></td><td><button class="link">✎ Editar / sincronizar</button></td></tr>
+<tr><td>—</td><td><b>Cuenta 002</b><div class="mut">LFF025-…-002</div></td><td>Evaluación</td><td class="num">26.310,00 $</td><td>—</td><td class="mut">—</td><td><span class="tag p">Pasada</span></td><td><button class="link">✎ Editar / sincronizar</button></td></tr>
+<tr><td>—</td><td><b>TEST002</b><div class="mut">LFF025-…-TEST002</div></td><td>Evaluación</td><td class="num">23.900,00 $</td><td>—</td><td class="mut">—</td><td><span class="tag q">Quemada</span> <span class="mut">(solo con filtro «Quemadas»)</span></td><td><button class="link">✎ Editar / sincronizar</button></td></tr>
+</tbody></table>
+
+<div class="note">
+<b>Comportamiento</b><br>
+• Doble clic en <b>En rotación</b> → la cuenta pasa a <span class="tag r">Reserva</span> (sale de la cola; si estaba en turno, el turno pasa a la siguiente).<br>
+• Doble clic en <span class="tag r">Reserva</span> → pasa a <b>En rotación</b> y entra al <b>final de la cola</b> (mismo efecto que el botón «▶ Activar en rotación» de hoy).<br>
+• Sin confirmación: un doble clic por error se deshace con otro doble clic.<br>
+• <span class="tag p">Pasada</span> (= challenge aprobada, pendiente del botón «Pasar a Funded») no reacciona al doble clic.<br>
+• Las <span class="tag q">Quemadas</span> no se ven en la tabla: el filtro «Estado: activas» (ya existe) las deja fuera; solo aparecen eligiendo «Quemadas» en el filtro, para la contabilidad.<br>
+• Una cuenta <b>pausada por retiro</b> (RF-40, pendiente de definir) tampoco reacciona: vuelve sola a su rotación o grupo al confirmar el retiro.<br>
+• Tras el cambio aparece un aviso breve: <span class="toast">Cuenta 005 → en rotación (orden 4)</span><br>
+• El doble clic es la única forma de cambiar reserva ↔ rotación desde la tabla (el botón «▶ Activar en rotación» del panel de la cuenta se quita para no duplicar).
+</div>
+
+<h2>2 · Gestión de copias → rotación automática</h2>
+<div class="note">
+Al <b>vincular una cuenta a un grupo</b> (arrastrar y soltar en Gestión de copias):<br>
+• Si la cuenta está <b>Activa y en reserva</b> → pasa sola a <b>En rotación</b> (final de la cola) y sale el aviso <span class="toast">Cuenta 005 vinculada a Grupo A → en rotación</span><br>
+• Si está <span class="tag p">Pasada</span> o <span class="tag q">Quemada</span> → no se vincula; aviso: <span class="toast" style="border-color:#a64;color:#fdb">No se puede vincular: la cuenta no está activa</span><br>
+Al <b>quitar una cuenta del grupo</b> → se queda <b>En rotación</b> como cuenta sola (no vuelve a reserva).<br>Lo mismo al <b>pausar una cuenta por retiro</b>: la pausada sale de la cola, las demás siguen en rotación (p. ej. entra el challenge que iba después), y al confirmar el retiro vuelve a su grupo o rotación tal como estaba (detalle en RF-40).
+</div>
+
+<p class="mut">Decidido con Javier el 14/11/2026 (chat Inbox Riesgo Futuros). Implementar en Claude Code, sesión de Riesgo Futuros.</p>
+</body></html>
