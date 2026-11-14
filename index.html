@@ -1829,6 +1829,8 @@ function avisosCuentas() {
 // RF-27 · curva anclada al balance real (mockup RF-27_curva_anclada, Javier 13/11/2026):
 // último punto = balance de la última sincronización + trades registrados después; hacia atrás, punto anterior = siguiente − resultado.
 // Antes de un reset no hay ancla: ese tramo sigue partiendo del tamaño de la cuenta.
+// Fecha DD/MM siempre con dos dígitos (RF-27: «09/11», no «9/11»).
+const ddmm = t => { const d = diaTz(new Date(t), 'Europe/Madrid'); return d.slice(8, 10) + '/' + d.slice(5, 7); };
 const balApp = c => r2(c.balance + pnlCuenta(c.id, c.syncAt).postSync);
 function serieCuenta(c) {
   const ev = trCuenta(c.id).map(t => ({ f: t.fecha + ' ' + (t.hora || ''), v: num(t.usd) }))
@@ -1848,7 +1850,7 @@ function serieCuenta(c) {
 function pieCurva(cs, syncId) {
   if (!cs.length) return '';
   const ss = cs.map(c => c.syncAt || 0), viejo = Math.min(...ss), ahora = Date.now();
-  const f = viejo ? new Date(viejo).toLocaleDateString('es-ES', { timeZone: 'Europe/Madrid', day: '2-digit', month: '2-digit' }) : '—';
+  const f = viejo ? ddmm(viejo) : '—';
   return '<div class="pie"><span class="chipA">⚓ Anclada al balance real del ' + f + (ss.some(s => s !== viejo) ? ' (la más antigua)' : '') + '</span>'
     + (ss.some(s => !s || (ahora - s) / 86400000 > 7) ? '<span class="chipW">⚠ +7 días sin sincronizar</span>' : '')
     + '<button type="button" data-sync="' + esc(syncId || '') + '">⟳ Sincronizar balance</button></div>';
@@ -1871,7 +1873,7 @@ function abrirSync(id) {
   if (!SYNC_L.length) return;
   const o = $('syOv'); if (o) o.remove();
   const n2 = x => x == null ? '' : Number(x).toLocaleString('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 2 });
-  const fs = s => s ? new Date(s).toLocaleDateString('es-ES', { timeZone: 'Europe/Madrid', day: '2-digit', month: '2-digit' }) : '—';
+  const fs = s => s ? ddmm(s) : '—';
   document.body.insertAdjacentHTML('beforeend', '<div id="syOv"><div class="bx"><div class="row" style="justify-content:space-between"><b>Sincronizar cuentas</b><button class="link" type="button" id="syX">✕</button></div>'
     + '<div class="mut" style="font-size:13px;margin:4px 0 12px">Copiá los dos datos de la web de la firma. Lo que no toques no se guarda.</div>'
     + '<div class="syg syh"><span>Cuenta</span><span>Balance</span><span>Min balance (DD)</span><span style="text-align:right">Dif.</span></div>'
@@ -2024,7 +2026,7 @@ function renderCtaPage() {
   const serF = fund.map(serieCuenta), fechas = [...new Set(serF.flat().map(p => p.x))].sort();
   const tot = fechas.map(f => serF.reduce((a, s) => { const q = s.filter(p => p.x <= f).pop(); return a + (q ? q.y : s[0].y); }, 0));
   dibujar('chCartera', fechas.map(fmtF), [{ data: tot, borderColor: '#2f6fd1', backgroundColor: 'rgba(47,111,209,.12)', fill: true, tension: .25, pointRadius: 0 }]);
-  const sv = fund.map(c => c.syncAt || 0), fa = sv.length && Math.min(...sv) ? new Date(Math.min(...sv)).toLocaleDateString('es-ES', { timeZone: 'Europe/Madrid', day: '2-digit', month: '2-digit' }) : '—';
+  const sv = fund.map(c => c.syncAt || 0), fa = sv.length && Math.min(...sv) ? ddmm(Math.min(...sv)) : '—';
   $('eqKpis').innerHTML = fund.length ? [['Balance', money2(tot[tot.length - 1])], ['Anchor · sync ' + fa, money2(fund.reduce((a, c) => a + c.balance, 0))], ['Start balance (calculado)', money2(tot[0])]]
     .map(k => '<div class="kpi"><div class="l">' + k[0] + '</div><div class="v" style="font-size:18px">' + k[1] + '</div></div>').join('') : '';
   $('eqPie').innerHTML = pieCurva(fund, '');
