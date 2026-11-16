@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Riesgo Futuros</title>
-<!-- Riesgo Futuros · app multiusuario (Firebase) · v21 (14/11/2026) · v21: RF-39 rotación desde la tabla de Cuentas: doble clic en Rotación alterna reserva ↔ rotación (al salir de reserva entra al final de la cola; si estaba en turno, el turno pasa a la siguiente), sin el botón «Activar en rotación / A reserva» de la tarjeta; vincular a un grupo de copia pasa la cuenta a rotación (Pasada/Quemada no se vinculan) · v20 (13/11/2026) · v20: equity con System y Real independientes (dos ejes) y sombreado del drawdown; Monthly P&L con valor por barra y media acumulada suavizada · v19 (13/11/2026) · v19: Cuentas más limpia: Gestión de copias en desplegable cerrado con resumen de grupos; Agregar / Editar / sincronizar cuenta en panel lateral (✏️ o «＋ Agregar cuenta») · v18 (13/11/2026) · v18: cortar al pasar la challenge (target = menor de 1,5R, TP máx. y lo que falta + comisiones), objetivo alcanzado → no operar, fuera de la rotación y botón Pasar a Funded · v17 (13/11/2026) · v17: gestión de copias con arrastrar y soltar, pantalla Hoy minimalista con «Operaste con · hoy», aviso de sincronizar balances, normas de la firma al comprar · v16: copia de cuentas · v15: bloqueo al guardar trade, motor de gestión con trades reales, pantalla Risk engine, tarjeta con selector de modelo y panel Risk · v14: pantallas estilo Tradinverso (barra lateral plegable, filtros globales, Trades, Dashboard, Calendario, Cuentas, Contabilidad con pestañas), noticias (catálogo por usuario, cascada en la checklist, línea y color en la tarjeta, contexto «Operado en noticias» al guardar) y tema claro/oscuro · v13 (13/11/2026) ·v13 · RF-27: curvas de equity (cartera y cuenta) ancladas al balance real de la última sincronización + ventana «Sincronizar cuentas» (balance y min balance por cuenta, Dif. con umbral 0,2 %) · v12 (08/11/2026) ·v12: editar un trade conserva cargadoTradinverso y cargadoEl (antes se borraban y el cierre de día lo volvía a dar como pendiente) · v11 (28/10/2026) · v11: FVG HTF como el POI: en el camino (entrada → 2R), distancia entre 0 y 2R · v10 (28/10/2026) · v10: bloqueo por consistencia si el TP máx. de hoy < 0,4 % de la cuenta (mínimo de riesgo): la cuenta se bloquea hoy, se opera la siguiente de la cola y mañana vuelve; con ≥ 0,4 % sigue igual (cortar en el TP máx.) · v9 (26/10/2026) · v9: consistencia: target recortado a lo que queda del TP máx. (cortar en +$, ≈R), tarjeta amarilla, consistencia alcanzada → hoy se opera la siguiente y mañana vuelve la misma (SL del reemplazo → final de la cola), target con importe en $, fuera "No estoy en reset" de la checklist · v8 (24/10/2026) · v8: alerta de reset del trader (3 días perdedores seguidos → pausa 3 días naturales; 2.º seguido con errores → 1 semana), aviso al registrar en reset (P5), ítem de checklist "No estoy en reset" · v7 (24/10/2026) · v7: P0 "¿Sesión preparada?" automática desde la checklist del día (vigente desde 26/10/2026), checklist guardada por fecha, KPI Sesión preparada · v6 (24/10/2026) · v6: formulario completo de trade (Nasdaq) igual al de la app vieja, editar/completar trades y journal en Trades (sin R plan) · v5 (24/10/2026) · v5: tabla de cuentas: quemadas/pasadas/reserva sin "Poner en turno" · v4 (24/10/2026) · v4: riesgo en rojo si supera el margen; checklist con bots VPS solo para el admin · v3 (23/10/2026) · v3: Cuentas y contabilidad (equity, retiros, compras, resets, reserva, inactividad, caducidad) · v2: consistencia por cuenta
+<!-- Riesgo Futuros · app multiusuario (Firebase) · v22 (16/11/2026) · v22: aviso de sincronizar solo si operó en 7 días y lleva ≥ 7 días sin sincronizar (el alta cuenta como sync); etiqueta «Cortar en XR» en el tile TP máx. si TP máx. ÷ riesgo < target; inactividad ≥ 75 % del plazo → su grupo (o la cuenta) pasa a ser el próximo a operar por encima de la rotación · v21 (14/11/2026) · v21: RF-39 rotación desde la tabla de Cuentas: doble clic en Rotación alterna reserva ↔ rotación (al salir de reserva entra al final de la cola; si estaba en turno, el turno pasa a la siguiente), sin el botón «Activar en rotación / A reserva» de la tarjeta; vincular a un grupo de copia pasa la cuenta a rotación (Pasada/Quemada no se vinculan) · v20 (13/11/2026) · v20: equity con System y Real independientes (dos ejes) y sombreado del drawdown; Monthly P&L con valor por barra y media acumulada suavizada · v19 (13/11/2026) · v19: Cuentas más limpia: Gestión de copias en desplegable cerrado con resumen de grupos; Agregar / Editar / sincronizar cuenta en panel lateral (✏️ o «＋ Agregar cuenta») · v18 (13/11/2026) · v18: cortar al pasar la challenge (target = menor de 1,5R, TP máx. y lo que falta + comisiones), objetivo alcanzado → no operar, fuera de la rotación y botón Pasar a Funded · v17 (13/11/2026) · v17: gestión de copias con arrastrar y soltar, pantalla Hoy minimalista con «Operaste con · hoy», aviso de sincronizar balances, normas de la firma al comprar · v16: copia de cuentas · v15: bloqueo al guardar trade, motor de gestión con trades reales, pantalla Risk engine, tarjeta con selector de modelo y panel Risk · v14: pantallas estilo Tradinverso (barra lateral plegable, filtros globales, Trades, Dashboard, Calendario, Cuentas, Contabilidad con pestañas), noticias (catálogo por usuario, cascada en la checklist, línea y color en la tarjeta, contexto «Operado en noticias» al guardar) y tema claro/oscuro · v13 (13/11/2026) ·v13 · RF-27: curvas de equity (cartera y cuenta) ancladas al balance real de la última sincronización + ventana «Sincronizar cuentas» (balance y min balance por cuenta, Dif. con umbral 0,2 %) · v12 (08/11/2026) ·v12: editar un trade conserva cargadoTradinverso y cargadoEl (antes se borraban y el cierre de día lo volvía a dar como pendiente) · v11 (28/10/2026) · v11: FVG HTF como el POI: en el camino (entrada → 2R), distancia entre 0 y 2R · v10 (28/10/2026) · v10: bloqueo por consistencia si el TP máx. de hoy < 0,4 % de la cuenta (mínimo de riesgo): la cuenta se bloquea hoy, se opera la siguiente de la cola y mañana vuelve; con ≥ 0,4 % sigue igual (cortar en el TP máx.) · v9 (26/10/2026) · v9: consistencia: target recortado a lo que queda del TP máx. (cortar en +$, ≈R), tarjeta amarilla, consistencia alcanzada → hoy se opera la siguiente y mañana vuelve la misma (SL del reemplazo → final de la cola), target con importe en $, fuera "No estoy en reset" de la checklist · v8 (24/10/2026) · v8: alerta de reset del trader (3 días perdedores seguidos → pausa 3 días naturales; 2.º seguido con errores → 1 semana), aviso al registrar en reset (P5), ítem de checklist "No estoy en reset" · v7 (24/10/2026) · v7: P0 "¿Sesión preparada?" automática desde la checklist del día (vigente desde 26/10/2026), checklist guardada por fecha, KPI Sesión preparada · v6 (24/10/2026) · v6: formulario completo de trade (Nasdaq) igual al de la app vieja, editar/completar trades y journal en Trades (sin R plan) · v5 (24/10/2026) · v5: tabla de cuentas: quemadas/pasadas/reserva sin "Poner en turno" · v4 (24/10/2026) · v4: riesgo en rojo si supera el margen; checklist con bots VPS solo para el admin · v3 (23/10/2026) · v3: Cuentas y contabilidad (equity, retiros, compras, resets, reserva, inactividad, caducidad) · v2: consistencia por cuenta
      Misma lógica que la app de Apps Script (Real_Codigo.gs): Tabla maestra para Funded, regla v7 para challenges,
      rotación (SL → siguiente cuenta), plan B y registro rápido. Cada usuario ve solo sus cuentas y trades.
      La Tabla maestra es compartida (config/tablaMaestra) y solo la edita el admin. -->
@@ -168,6 +168,7 @@ td.num,th.num{text-align:right}
 .acc .sub{margin:2px 0 10px;font-size:12px;color:var(--muted)}.acc .tgT{font:11px var(--mono);padding:2px 8px;border-radius:8px;background:var(--info-bg);color:var(--info-tx)}
 .tl3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.tl3 div{background:var(--card);border-radius:8px;padding:8px}.tl3 span{display:block;font-size:11px;color:var(--muted)}.tl3 b{font-size:16px}
 .tl3 .ct{background:var(--warn-bg)}.tl3 .ct span,.tl3 .ct b{color:var(--warn)}
+.tl3 .ctc{display:block;width:fit-content;margin-top:4px;font-style:normal;font-size:12px;background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn-line);border-radius:6px;padding:2px 8px} /* v22 · «Cortar en XR» en TP máx. */
 .acc .lin{margin:8px 0;font-size:12px;color:var(--muted)}
 .acc .qb3{display:flex;gap:6px}.acc .qb3 button{flex:1}.acc .qb3 [data-qr=TP]{color:var(--pos)}.acc .qb3 [data-qr=SL]{color:var(--neg)}
 .acc .qr2{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}.acc .qr2 input{flex:1;min-width:100px}
@@ -603,8 +604,29 @@ function capKv(cap) {
     ['Estado', (ICON[cap.estado] || '') + ' ' + esc(cap.estado)], ['En turno', cap.enTurno ? 'Sí' : 'No · reemplazo']].map(x => '<div>' + x[0] + '<b>' + x[1] + '</b></div>').join('') + '</div>';
 }
 // Cuenta a operar ahora: la en turno, salvo que haya llegado hoy a su consistencia → la siguiente de la rotación (solo por hoy).
+// v22 · inactividad (mockup 2026-11-16_cortar-en-R_inactividad, aprobado 16/11/2026): cuenta activa con ≥ 75 % de su plazo sin operar
+// (una copia 1:1 cuenta como actividad) → su grupo de copia (o ella sola) pasa a ser el próximo a operar, por encima de la rotación.
+// Con varias, manda la de menos días restantes. Al registrar un trade en esa cuenta deja de estar en riesgo y vuelve la rotación normal.
+const INACT_PCT = 0.75;
+function inactRiesgo() {
+  const hoy = hoyES();
+  return CUENTAS.filter(c => c.estado === 'Activa' && c.inactividad > 0).map(c => {
+    const u = ultimaActividad(c); if (!u) return null;
+    const d = diasEntre(u, hoy); return d >= INACT_PCT * c.inactividad ? { c, d, q: c.inactividad - d } : null;
+  }).filter(Boolean).sort((a, b) => (a.q - b.q) || (a.c.activa - b.c.activa)); // empate: primero la de reserva
+}
+// Posición de la cola que opera por inactividad (la de la cuenta o la de su grupo); se salta la que no puede operar hoy.
+function inactTurno(E) {
+  E = cola(E);
+  for (const r of inactRiesgo()) {
+    const e = E.find(x => x.c.id === r.c.id || (x.grupo && x.grupo.filas.some(f => f.c.id === r.c.id)));
+    if (e && !fuera(e)) return Object.assign({ e }, r);
+  }
+  return null;
+}
 function cuentaOperar(E) {
   E = cola(E);
+  const z = inactTurno(E); if (z) { z.e.porInact = true; return z.e; }
   const t = E.find(x => x.c.enTurno); if (!t) return null; if (!fuera(t)) return t;
   const i = E.indexOf(t);
   for (let k = 1; k < E.length; k++) { const x = E[(i + k) % E.length]; if (!fuera(x)) return x; }
@@ -620,8 +642,8 @@ function colaFinal(b, id) {
 function estadoCuentas() {
   const ahora = new Date(), hoyNY = diaTz(ahora, 'America/New_York'), horaNY = parseInt(horaTz(ahora, 'America/New_York'), 10);
   const cerrado = d => d < hoyNY || (d === hoyNY && horaNY >= CIERRE_NY);
-  const RD = TM ? reDecidir(MODELO_SEL) : null;
-  return aplicarGrupos(CUENTAS.filter(c => c.estado === 'Activa' && (c.activa || grupoDeCopia(c.id))).map(c => {
+  const RD = TM ? reDecidir(MODELO_SEL) : null, zIds = new Set(inactRiesgo().map(r => r.c.id)); // v22: la de reserva en riesgo de inactividad entra a la cola
+  return aplicarGrupos(CUENTAS.filter(c => c.estado === 'Activa' && (c.activa || grupoDeCopia(c.id) || zIds.has(c.id))).map(c => {
     const pnl = pnlCuenta(c.id, c.syncAt);
     const syncDia = c.syncAt ? diaTz(new Date(c.syncAt), 'Europe/Madrid') : '';
     const m = (syncDia && c.tipoDD !== 'Estático') ? calcMinimo(c, pnl.dias, syncDia, cerrado) : { minimo: c.minimo, bloqueado: false };
@@ -958,14 +980,14 @@ function renderHoy() {
   renderChk();
   if (!TM) { $('cards').innerHTML = '<div class="empty">Falta la Tabla maestra. Avisale a Javier.</div>'; return; }
   const EA = estadoCuentas(), E = cola(EA), RD = reDecidir(MODELO_SEL);
-  const viejas = EA.filter(e => e.syncDias > 7);
-  const op = cuentaOperar(E), tu = E.find(x => x.c.enTurno);
+  const viejas = cuentasSinSync();
+  const op = cuentaOperar(E), tu = E.find(x => x.c.enTurno), z = inactTurno(E);
   const avCons = tu && tu.consAlcanzada ? '<div class="warn">✓ ' + esc(nomE(tu)) + (tu.grupo ? ' bloqueado' : ' bloqueada') + ' hoy por consistencia (TP máx. hoy ' + money(tu.tpMaxHoy) + ' < mín. ' + money(tu.consMin) + ' = 0,4 %): ' + (op ? 'hoy se opera <b>' + esc(nomE(op)) + '</b>' : '<b>no queda otra cuenta para operar hoy</b>') + '. Mañana vuelve ' + esc(nomE(tu)) + ' como primera opción.</div>' : '';
   const avObj = E.filter(x => x.objAlcanzado).map(x => '<div class="okb">🎯 <b>' + esc(x.c.nombre) + ' · challenge superada.</b> No operar más en esta cuenta: espera la aprobación de la firma y pásala a Funded. ' + (op ? 'Hoy se opera <b>' + esc(nomE(op)) + '</b>.' : '<b>No queda otra cuenta para operar hoy.</b>') + ' <button type="button" class="okbtn" data-act="fondear" data-id="' + esc(x.c.id) + '">✓ Pasar a Funded</button></div>').join('')
     + E.filter(x => x.grupo && x.grupo.pasadas.length).map(x => '<div class="okb">🎯 <b>' + x.grupo.pasadas.map(f => esc(f.c.nombre)).join(', ') + ' · challenge superada.</b> Sácala del grupo de copia (Cuentas → Gestión de copias) y pásala a Funded cuando la apruebe la firma. ' + x.grupo.pasadas.map(f => '<button type="button" class="okbtn" data-act="fondear" data-id="' + esc(f.c.id) + '">✓ Pasar ' + esc(f.c.nombre) + ' a Funded</button>').join(' ') + '</div>').join('');
   $('avisos').innerHTML = avisoSyncHtml() + resetHtml() + avObj + avCons + (E.length && !E.some(e => e.c.enTurno) ? '<div class="warn">Ninguna cuenta está en turno: marcá una en Cuentas.</div>' : '')
-    + (viejas.length ? '<div class="warn">Hace más de 7 días que no sincronizás con la firma: ' + viejas.map(e => esc(e.c.nombre)).join(', ') + '. Actualizá balance y mínimo en Cuentas.</div>' : '')
-    + avisosCuentas().map(a => '<div class="warn' + (a.bad ? ' bad' : '') + '">' + a.t + '</div>').join('');
+    + (viejas.length ? '<div class="warn">Hace más de 7 días que no sincronizás con la firma: ' + viejas.map(c => esc(c.nombre) + (c.activa ? '' : ' (reserva)')).join(', ') + '. Actualizá balance y mínimo en Cuentas.</div>' : '')
+    + avisosCuentas(z && !z.e.c.enTurno ? z : null).map(a => '<div class="warn' + (a.bad ? ' bad' : '') + '">' + a.t + '</div>').join('');
   $('opDia').innerHTML = operasteDiaHtml();
   if (!E.length) { $('cards').className = 'accs'; $('cards').innerHTML = '<div class="empty">Todavía no cargaste cuentas. Andá a <b>Cuentas</b> y agregá la primera.</div>'; return; }
   // v17 · pantalla «Hoy» (mockup 2026-11-13_pantalla-hoy, aprobado 13/11/2026): la cuenta (o grupo) a operar destacada a la izquierda, las demás apagadas.
@@ -990,17 +1012,25 @@ function grupoDesplegable(e) {
     + '</table></div><div class="src">Manda la cuenta más restrictiva' + (G.pctG != null ? ' (consistency del grupo: ' + G.pctG + ' %)' : '') + '. Mínimo para operar = 0,4 % de la cuenta' + (m ? ' (' + money(m.min) + ' en ' + Math.round(m.c.tam / 1000) + 'K)' : '') + '. Para cambiar el grupo: <a data-nav="cuentas" style="cursor:pointer;color:var(--real)">Cuentas → Gestión de copias</a>.</div></details>';
 }
 // v17 · tarjeta en turno minimalista, sin MNQ: Riesgo, Target («Cortar en X R» en ámbar si limita la consistency), TP máx. hoy en $, lo que falta para pasar y TP/SL/BE.
+// v22 · etiqueta «Cortar en XR» en el tile TP máx. (mockup 2026-11-16_cortar-en-R_inactividad): corteR = TP máx. ÷ riesgo, solo si queda por
+// debajo del target en R que se muestra (nunca un corte por encima del target). 1 decimal redondeado hacia abajo (no pasar el TP máx.).
+function corteChip(e) {
+  const tR = targetR(e.target);
+  if (e.tpMaxHoy == null || !(e.riesgo > 0) || tR == null) return '';
+  const cR = e.tpMaxHoy / e.riesgo;
+  return cR < tR - 1e-9 ? '<em class="ctc">Cortar en ' + fmtR(Math.floor(cR * 10 + 1e-9) / 10) + '</em>' : '';
+}
 function tarjetaTurno(e, RD, filas) {
   const c = e.c, G = e.grupo, ef = G ? G.efMin : e, corte = e.consAjuste;
   const nom = G ? esc(G.g.nombre) : esc(c.nombre);
   const sub = (G ? esc(G.nombres.join(' + ')) + ' · copia 1:1' : faseHoy(c)) + (e.estado && e.estado !== 'Challenge' ? ' · ' + esc(e.estado) : '');
   const falta = G ? (G.pasar ? 'Falta ' + money(G.pasar.faltan) + ' para pasar ' + esc(G.pasar.c.nombre) : '') : (e.objetivo ? 'Falta ' + money(e.faltan) + ' para pasar' : '');
   const lin = [corte && e.targetOrig ? '<s>' + esc(tgtCorto(e.targetOrig)) + '</s> limitado por ' + (e.pasarCorte ? 'lo que falta para pasar' + (G ? ' ' + esc(e.pasarCorte.nombre) : '') : 'consistency') : '', e.pasarCorte ? '' : falta].filter(Boolean).join(' · ');
-  return '<div class="acc turno' + (corte ? ' cons' : '') + '" style="grid-row:span ' + filas + '"><div class="top"><span class="nm">' + nom + '</span><span class="tgT">' + (c.enTurno ? 'En turno' : 'Reemplazo de hoy') + '</span></div>'
+  return '<div class="acc turno' + (corte ? ' cons' : '') + '" style="grid-row:span ' + filas + '"><div class="top"><span class="nm">' + nom + '</span><span class="tgT">' + (c.enTurno || e.porInact ? 'En turno' : 'Reemplazo de hoy') + '</span></div>'
     + '<div class="sub">' + sub + '</div>' + (G ? grupoDesplegable(e) : '') + reChipsHtml()
     + '<div class="tl3"><div><span>Riesgo</span><b' + (e.riesgo > ef.efectivo ? ' class="neg"' : '') + '>' + money(e.riesgo) + '</b></div>'
     + (corte ? '<div class="ct"><span>Cortar en</span><b>' + esc(tgtCorto(e.target)) + '</b></div>' : '<div><span>Target</span><b>' + esc(tgtCorto(e.target)) + '</b></div>')
-    + '<div><span>TP máx.</span><b>' + (e.tpMaxHoy != null ? money(e.tpMaxHoy) : '—') + '</b></div></div>'
+    + '<div><span>TP máx.</span><b>' + (e.tpMaxHoy != null ? money(e.tpMaxHoy) : '—') + '</b>' + corteChip(e) + '</div></div>'
     + (lin ? '<div class="lin">' + lin + '</div>' : '<div style="height:8px"></div>')
     + (e.riesgo > ef.efectivo ? '<div class="warn bad">⚠ No se puede arriesgar ' + money(e.riesgo) + ': el margen efectivo' + (G ? ' de ' + esc(ef.c.nombre) : '') + ' es ' + money(ef.efectivo) + '.</div>' : '')
     + (e.resetRec ? '<div class="warn">Reset recomendado.</div>' : '')
@@ -1125,7 +1155,8 @@ async function qrConfirmar(p) {
     const b = writeBatch(db);
     b.set(doc(ucol('trades')), t);
     let rot = 'Turno: sigue la misma cuenta.';
-    if (sal === 'SL' && tu && e !== tu) {
+    if (e.porInact && !e.c.enTurno) rot = 'Trade por inactividad: el turno no se mueve, vuelve la rotación normal.'; // v22
+    else if (sal === 'SL' && tu && e !== tu) {
       colaFinal(b, e.c.id);
       rot = 'Turno: SL en el reemplazo → ' + nomE(e) + ' pasa al final de la cola; mañana vuelve ' + nomE(tu) + '.';
     } else if (sal === 'SL') {
@@ -1567,8 +1598,10 @@ async function guardarTrade(enReset) {
     if (prev) { if (prev.captura) o.captura = prev.captura; else delete o.captura; o.num = prev.num; o.registrado = prev.registrado; if (prev.rapido) o.rapido = true; if (prev.migrado) o.migrado = true; ['cargadoTradinverso', 'cargadoEl'].forEach(k => { if (prev[k] !== undefined) o[k] = prev[k]; }); o.editado = Date.now(); b.set(uref('trades', prev._id), o); }
     else {
       o.num = TRADES.reduce((m, t) => Math.max(m, num(t.num)), 0) + 1; o.registrado = Date.now(); b.set(doc(ucol('trades')), o);
-      const Eh = TM ? estadoCuentas() : [], tuH = Eh.find(x => x.c.enTurno);
-      if (o.salida === 'SL' && tuH && fuera(tuH) && o.cuenta !== tuH.c.id && o.fecha === hoyES()) {
+      const Eh = TM ? estadoCuentas() : [], tuH = Eh.find(x => x.c.enTurno), zH = TM ? inactTurno(Eh) : null;
+      if (zH && !zH.e.c.enTurno && o.cuenta === zH.e.c.id) {
+        rot = ' Trade por inactividad: el turno no se mueve, vuelve la rotación normal.'; // v22
+      } else if (o.salida === 'SL' && tuH && fuera(tuH) && o.cuenta !== tuH.c.id && o.fecha === hoyES()) {
         colaFinal(b, o.cuenta); rot = ' Turno: SL en el reemplazo → pasa al final de la cola; mañana vuelve ' + tuH.c.nombre + '.';
       } else if (o.salida === 'SL') {
         const act = CUENTAS.filter(c => enRot(c) && c.estado === 'Activa'), i = act.findIndex(c => c.id === o.cuenta);
@@ -1811,13 +1844,26 @@ function ultimaActividad(c) {
   const t = trCuenta(c.id).map(x => x.fecha).sort().pop();
   return [t, c.alta].filter(Boolean).sort().pop() || '';
 }
-function avisosCuentas() {
+// v22 · aviso «Hace más de 7 días que no sincronizás» (corrige el aviso en cuentas recién abiertas): solo si la cuenta operó en los últimos
+// 7 días (una copia 1:1 cuenta) y lleva ≥ 7 días sin sincronizar; la fecha de alta cuenta como primera sincronización.
+const SYNC_DIAS = 7;
+function cuentasSinSync() {
+  const hoy = hoyES();
+  return CUENTAS.filter(c => c.estado === 'Activa').filter(c => {
+    const s = [c.syncAt ? diaTz(new Date(c.syncAt), 'Europe/Madrid') : '', c.alta || ''].filter(Boolean).sort().pop();
+    const opero = trCuenta(c.id).some(t => { const d = diasEntre(t.fecha, hoy); return d >= 0 && d < SYNC_DIAS; });
+    return opero && (!s || diasEntre(s, hoy) >= SYNC_DIAS);
+  });
+}
+// z = cuenta que manda por inactividad (v22): su aviso añade quién pasa a ser el próximo a operar.
+function avisosCuentas(z) {
   const out = [], hoy = hoyES();
   CUENTAS.filter(c => c.estado === 'Activa').forEach(c => {
     const u = ultimaActividad(c);
     if (u) {
-      const d = diasEntre(u, hoy), q = c.inactividad - d;
-      if (q <= 7) out.push({ bad: q <= 3, t: '⏳ <b>' + esc(c.nombre) + '</b>: ' + d + ' días sin operar' + (q > 0 ? ' · quedan ' + q + ' para la regla de inactividad (' + c.inactividad + ' días)' : ' · pasó el límite de inactividad (' + c.inactividad + ' días): revisalo en la firma') + (c.activa ? '' : ' · está en reserva') + '.' });
+      const d = diasEntre(u, hoy), q = c.inactividad - d, manda = z && z.c.id === c.id, g = manda && (grupoDeLider(c.id) || grupoDeCopia(c.id));
+      const frase = manda ? ' <b>' + (g ? esc(g.nombre) + ' pasa a ser el próximo' : esc(c.nombre) + ' pasa a ser la próxima') + ' a operar por inactividad.</b>' : '';
+      if (q <= 7 || manda) out.push({ bad: q <= 3, t: '⏳ <b>' + esc(c.nombre) + '</b>: ' + d + ' días sin operar' + (q > 0 ? ' · quedan ' + q + ' para la regla de inactividad (' + c.inactividad + ' días)' : ' · pasó el límite de inactividad (' + c.inactividad + ' días): revisalo en la firma') + (c.activa ? '' : ' · está en reserva') + '.' + frase });
     }
     if (c.caducidad && c.fase === 'Evaluación') {
       const q = diasEntre(hoy, c.caducidad);
