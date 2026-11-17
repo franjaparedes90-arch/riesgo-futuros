@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Riesgo Futuros</title>
-<!-- Riesgo Futuros · app multiusuario (Firebase) · v23 (16/11/2026) · v23: el tile Target muestra siempre el target del plan (sin «Cortar en» en su lugar ni target tachado); el corte (menor de TP máx. ÷ riesgo y lo que falta para pasar ÷ riesgo) va en la etiqueta ámbar «Cortar en XR» del tile TP máx. · v22.1 (16/11/2026) · v22.1: fuera el aviso «Hace … días que no sincronizás con la firma» (basta el banner de sincronizar: 10 trades o una rotación completa) · v22: aviso de sincronizar solo si operó en 7 días y lleva ≥ 7 días sin sincronizar (el alta cuenta como sync); etiqueta «Cortar en XR» en el tile TP máx. si TP máx. ÷ riesgo < target; inactividad ≥ 75 % del plazo → su grupo (o la cuenta) pasa a ser el próximo a operar por encima de la rotación · v21 (14/11/2026) · v21: RF-39 rotación desde la tabla de Cuentas: doble clic en Rotación alterna reserva ↔ rotación (al salir de reserva entra al final de la cola; si estaba en turno, el turno pasa a la siguiente), sin el botón «Activar en rotación / A reserva» de la tarjeta; vincular a un grupo de copia pasa la cuenta a rotación (Pasada/Quemada no se vinculan) · v20 (13/11/2026) · v20: equity con System y Real independientes (dos ejes) y sombreado del drawdown; Monthly P&L con valor por barra y media acumulada suavizada · v19 (13/11/2026) · v19: Cuentas más limpia: Gestión de copias en desplegable cerrado con resumen de grupos; Agregar / Editar / sincronizar cuenta en panel lateral (✏️ o «＋ Agregar cuenta») · v18 (13/11/2026) · v18: cortar al pasar la challenge (target = menor de 1,5R, TP máx. y lo que falta + comisiones), objetivo alcanzado → no operar, fuera de la rotación y botón Pasar a Funded · v17 (13/11/2026) · v17: gestión de copias con arrastrar y soltar, pantalla Hoy minimalista con «Operaste con · hoy», aviso de sincronizar balances, normas de la firma al comprar · v16: copia de cuentas · v15: bloqueo al guardar trade, motor de gestión con trades reales, pantalla Risk engine, tarjeta con selector de modelo y panel Risk · v14: pantallas estilo Tradinverso (barra lateral plegable, filtros globales, Trades, Dashboard, Calendario, Cuentas, Contabilidad con pestañas), noticias (catálogo por usuario, cascada en la checklist, línea y color en la tarjeta, contexto «Operado en noticias» al guardar) y tema claro/oscuro · v13 (13/11/2026) ·v13 · RF-27: curvas de equity (cartera y cuenta) ancladas al balance real de la última sincronización + ventana «Sincronizar cuentas» (balance y min balance por cuenta, Dif. con umbral 0,2 %) · v12 (08/11/2026) ·v12: editar un trade conserva cargadoTradinverso y cargadoEl (antes se borraban y el cierre de día lo volvía a dar como pendiente) · v11 (28/10/2026) · v11: FVG HTF como el POI: en el camino (entrada → 2R), distancia entre 0 y 2R · v10 (28/10/2026) · v10: bloqueo por consistencia si el TP máx. de hoy < 0,4 % de la cuenta (mínimo de riesgo): la cuenta se bloquea hoy, se opera la siguiente de la cola y mañana vuelve; con ≥ 0,4 % sigue igual (cortar en el TP máx.) · v9 (26/10/2026) · v9: consistencia: target recortado a lo que queda del TP máx. (cortar en +$, ≈R), tarjeta amarilla, consistencia alcanzada → hoy se opera la siguiente y mañana vuelve la misma (SL del reemplazo → final de la cola), target con importe en $, fuera "No estoy en reset" de la checklist · v8 (24/10/2026) · v8: alerta de reset del trader (3 días perdedores seguidos → pausa 3 días naturales; 2.º seguido con errores → 1 semana), aviso al registrar en reset (P5), ítem de checklist "No estoy en reset" · v7 (24/10/2026) · v7: P0 "¿Sesión preparada?" automática desde la checklist del día (vigente desde 26/10/2026), checklist guardada por fecha, KPI Sesión preparada · v6 (24/10/2026) · v6: formulario completo de trade (Nasdaq) igual al de la app vieja, editar/completar trades y journal en Trades (sin R plan) · v5 (24/10/2026) · v5: tabla de cuentas: quemadas/pasadas/reserva sin "Poner en turno" · v4 (24/10/2026) · v4: riesgo en rojo si supera el margen; checklist con bots VPS solo para el admin · v3 (23/10/2026) · v3: Cuentas y contabilidad (equity, retiros, compras, resets, reserva, inactividad, caducidad) · v2: consistencia por cuenta
+<!-- Riesgo Futuros · app multiusuario (Firebase) · v24 (17/11/2026) · v24: Vista administrador (solo lectura): en Ajustes · Admin, el admin ve las pantallas de otro participante. · v23: el tile Target muestra siempre el target del plan (sin «Cortar en» en su lugar ni target tachado); el corte (menor de TP máx. ÷ riesgo y lo que falta para pasar ÷ riesgo) va en la etiqueta ámbar «Cortar en XR» del tile TP máx. · v22.1 (16/11/2026) · v22.1: fuera el aviso «Hace … días que no sincronizás con la firma» (basta el banner de sincronizar: 10 trades o una rotación completa) · v22: aviso de sincronizar solo si operó en 7 días y lleva ≥ 7 días sin sincronizar (el alta cuenta como sync); etiqueta «Cortar en XR» en el tile TP máx. si TP máx. ÷ riesgo < target; inactividad ≥ 75 % del plazo → su grupo (o la cuenta) pasa a ser el próximo a operar por encima de la rotación · v21 (14/11/2026) · v21: RF-39 rotación desde la tabla de Cuentas: doble clic en Rotación alterna reserva ↔ rotación (al salir de reserva entra al final de la cola; si estaba en turno, el turno pasa a la siguiente), sin el botón «Activar en rotación / A reserva» de la tarjeta; vincular a un grupo de copia pasa la cuenta a rotación (Pasada/Quemada no se vinculan) · v20 (13/11/2026) · v20: equity con System y Real independientes (dos ejes) y sombreado del drawdown; Monthly P&L con valor por barra y media acumulada suavizada · v19 (13/11/2026) · v19: Cuentas más limpia: Gestión de copias en desplegable cerrado con resumen de grupos; Agregar / Editar / sincronizar cuenta en panel lateral (✏️ o «＋ Agregar cuenta») · v18 (13/11/2026) · v18: cortar al pasar la challenge (target = menor de 1,5R, TP máx. y lo que falta + comisiones), objetivo alcanzado → no operar, fuera de la rotación y botón Pasar a Funded · v17 (13/11/2026) · v17: gestión de copias con arrastrar y soltar, pantalla Hoy minimalista con «Operaste con · hoy», aviso de sincronizar balances, normas de la firma al comprar · v16: copia de cuentas · v15: bloqueo al guardar trade, motor de gestión con trades reales, pantalla Risk engine, tarjeta con selector de modelo y panel Risk · v14: pantallas estilo Tradinverso (barra lateral plegable, filtros globales, Trades, Dashboard, Calendario, Cuentas, Contabilidad con pestañas), noticias (catálogo por usuario, cascada en la checklist, línea y color en la tarjeta, contexto «Operado en noticias» al guardar) y tema claro/oscuro · v13 (13/11/2026) ·v13 · RF-27: curvas de equity (cartera y cuenta) ancladas al balance real de la última sincronización + ventana «Sincronizar cuentas» (balance y min balance por cuenta, Dif. con umbral 0,2 %) · v12 (08/11/2026) ·v12: editar un trade conserva cargadoTradinverso y cargadoEl (antes se borraban y el cierre de día lo volvía a dar como pendiente) · v11 (28/10/2026) · v11: FVG HTF como el POI: en el camino (entrada → 2R), distancia entre 0 y 2R · v10 (28/10/2026) · v10: bloqueo por consistencia si el TP máx. de hoy < 0,4 % de la cuenta (mínimo de riesgo): la cuenta se bloquea hoy, se opera la siguiente de la cola y mañana vuelve; con ≥ 0,4 % sigue igual (cortar en el TP máx.) · v9 (26/10/2026) · v9: consistencia: target recortado a lo que queda del TP máx. (cortar en +$, ≈R), tarjeta amarilla, consistencia alcanzada → hoy se opera la siguiente y mañana vuelve la misma (SL del reemplazo → final de la cola), target con importe en $, fuera "No estoy en reset" de la checklist · v8 (24/10/2026) · v8: alerta de reset del trader (3 días perdedores seguidos → pausa 3 días naturales; 2.º seguido con errores → 1 semana), aviso al registrar en reset (P5), ítem de checklist "No estoy en reset" · v7 (24/10/2026) · v7: P0 "¿Sesión preparada?" automática desde la checklist del día (vigente desde 26/10/2026), checklist guardada por fecha, KPI Sesión preparada · v6 (24/10/2026) · v6: formulario completo de trade (Nasdaq) igual al de la app vieja, editar/completar trades y journal en Trades (sin R plan) · v5 (24/10/2026) · v5: tabla de cuentas: quemadas/pasadas/reserva sin "Poner en turno" · v4 (24/10/2026) · v4: riesgo en rojo si supera el margen; checklist con bots VPS solo para el admin · v3 (23/10/2026) · v3: Cuentas y contabilidad (equity, retiros, compras, resets, reserva, inactividad, caducidad) · v2: consistencia por cuenta
      Misma lógica que la app de Apps Script (Real_Codigo.gs): Tabla maestra para Funded, regla v7 para challenges,
      rotación (SL → siguiente cuenta), plan B y registro rápido. Cada usuario ve solo sus cuentas y trades.
      La Tabla maestra es compartida (config/tablaMaestra) y solo la edita el admin. -->
@@ -106,7 +106,7 @@ td.num,th.num{text-align:right}
 .form{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
 .form label,.form .flab{display:flex;flex-direction:column;gap:4px;font:10px var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
 .empty{padding:30px 10px;text-align:center;color:var(--muted)}
-.msg{margin-top:8px;font-size:13px}.msg.err{color:var(--neg)}.msg.ok{color:var(--pos)}
+.msg{margin-top:8px;font-size:13px}#roBar{position:sticky;top:0;z-index:5}body.ro #main{outline:3px solid var(--warn-line);outline-offset:-3px}.msg.err{color:var(--neg)}.msg.ok{color:var(--pos)}
 .okb{background:rgba(46,180,120,.12);border:1px solid rgba(46,180,120,.45);border-radius:10px;padding:8px 12px;font-size:13px;margin-bottom:10px}.okbtn{margin-left:6px;padding:4px 10px;border-radius:8px;border:0;background:#2eb478;color:#06140d;font-weight:700;cursor:pointer}
 #ctaPanOv{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:60}#ctaPanOv .ctaPan{position:absolute;top:0;right:0;bottom:0;width:min(560px,100%);background:var(--card);border-left:1px solid var(--line);padding:16px;overflow:auto;box-shadow:-8px 0 24px rgba(0,0,0,.35)}
 .cpDet{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin-top:16px}.cpDet>summary{cursor:pointer;list-style:none;display:flex;gap:10px;align-items:center}.cpDet>summary::-webkit-details-marker{display:none}.cpDet>summary::before{content:'▸';color:var(--muted)}.cpDet[open]>summary::before{content:'▾'}.cpDet[open]>summary{margin-bottom:10px}.cpDet #cpBox{border:0;padding:0}
@@ -221,6 +221,7 @@ td.num,th.num{text-align:right}
     </div>
   </aside>
   <div id="main"><div class="wrap">
+    <div id="roBar" class="warn" hidden><div class="row"><b id="roTxt"></b><select id="roSel" title="Cambiar de participante"></select><button type="button" id="roSalir">Volver a mi vista</button><span id="roFlash" class="mut"></span></div></div>
     <div id="gfBox" hidden><div class="gf" id="gf"></div><div class="gfc" id="gfc"></div></div>
     <section id="v-hoy">
       <div id="chkBox"></div>
@@ -336,6 +337,12 @@ td.num,th.num{text-align:right}
     </section>
     <section id="v-nuevo" hidden><div id="frmBox"></div></section>
     <section id="v-admin" hidden>
+      <div class="sec"><h2>Vista administrador</h2><span class="hint">Mira los datos de otro participante como si fueran tuyos. Solo lectura: no se puede editar nada.</span></div>
+      <div class="card">
+        <label class="row"><input type="checkbox" id="vaOn"> <span>Activar vista administrador</span></label>
+        <div class="row" style="margin-top:10px"><select id="vaSel" style="min-width:240px"></select></div>
+        <div class="msg" id="vaMsg"></div>
+      </div>
       <div class="sec"><h2>Usuarios autorizados</h2><span class="hint">Solo estos correos pueden entrar.</span></div>
       <div class="card">
         <div id="allowList"></div>
@@ -350,7 +357,7 @@ td.num,th.num{text-align:right}
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
 import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-import { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, getDocs, writeBatch, query, orderBy } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+import { getFirestore, doc, getDoc, setDoc as _setDoc, deleteDoc as _deleteDoc, collection, getDocs, writeBatch as _writeBatch, query, orderBy } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
 const app = initializeApp({
   apiKey: 'AIzaSyBzJa8A1AEs1L0oxk0wN8JTefOHxpks7nk',
@@ -375,7 +382,8 @@ const SEED_TM = { filas: {
 const UMBRAL_NORMAL = 0.60, ACEL_DD_PEAK = 0.10, CIERRE_NY = 17;
 const CH_R_PCT = 0.01, CH_MIN_PCT = 0.004;
 const CHK_BOTS = ['MT5 del challenge abierto y bot ORB activo', 'MT5 de Pepperstone abierto y bot ORB activo'];
-let CHK_ITEMS = ['Noticias y festivos de EE. UU. revisados', 'Sentado como tarde a las 15:15', 'Riesgo listo y Tradesea abierto en la cuenta en turno', 'Niveles marcados antes de las 15:25'];
+const CHK_BASE = ['Noticias y festivos de EE. UU. revisados', 'Sentado como tarde a las 15:15', 'Riesgo listo y Tradesea abierto en la cuenta en turno', 'Niveles marcados antes de las 15:25'];
+let CHK_ITEMS = CHK_BASE.slice();
 
 let GRUPOS = [], CPW = [], CP_MSG = ''; // v16 · Copia de cuentas: meta/copias.grupos
 let U = null, IS_ADMIN = false, TM = null, CUENTAS = [], TRADES = [], CHK = CHK_ITEMS.map(() => false), CHK_OPEN = true, QR_SAL = null, QR_MSG = '', EDIT_ID = null, MOVS = [], SEL_CTA = null, CHARTS = {};
@@ -389,8 +397,27 @@ const fmtTz = (d, tz, o) => new Intl.DateTimeFormat('en-CA', Object.assign({ tim
 const diaTz = (d, tz) => fmtTz(d, tz, { year: 'numeric', month: '2-digit', day: '2-digit' });
 const horaTz = (d, tz) => fmtTz(d, tz, { hour: '2-digit', minute: '2-digit' });
 const hoyES = () => diaTz(new Date(), 'Europe/Madrid');
-const uref = (...p) => doc(db, 'users', U.uid, ...p);
-const ucol = (...p) => collection(db, 'users', U.uid, ...p);
+// v24 · Vista administrador (solo lectura): el admin mira los datos de otro participante con las mismas pantallas.
+let VU = null, VU_NOM = '', VA_USERS = [], RO_T = null;
+const RO = () => !!U && !!VU && VU !== U.uid;
+const vuid = () => VU || U.uid;
+const uref = (...p) => doc(db, 'users', vuid(), ...p);
+const ucol = (...p) => collection(db, 'users', vuid(), ...p);
+const RO_MSG = 'Vista administrador: solo lectura, no se guardó nada';
+const roBloq = r => RO() && String(r.path).startsWith('users/');
+function roAviso() { const e = $('roFlash'); if (!e) return; e.textContent = RO_MSG; clearTimeout(RO_T); RO_T = setTimeout(() => { e.textContent = ''; }, 4000); }
+const setDoc = (r, ...a) => roBloq(r) ? (roAviso(), Promise.reject(new Error(RO_MSG))) : _setDoc(r, ...a);
+const deleteDoc = (r, ...a) => roBloq(r) ? (roAviso(), Promise.reject(new Error(RO_MSG))) : _deleteDoc(r, ...a);
+const writeBatch = d => {
+  const b = _writeBatch(d); let mal = false;
+  const w = {
+    set(r, ...a) { if (roBloq(r)) mal = true; else b.set(r, ...a); return w; },
+    update(r, ...a) { if (roBloq(r)) mal = true; else b.update(r, ...a); return w; },
+    delete(r) { if (roBloq(r)) mal = true; else b.delete(r); return w; },
+    commit() { if (mal) { roAviso(); return Promise.reject(new Error(RO_MSG)); } return b.commit(); }
+  };
+  return w;
+};
 
 // ---------- v14 · pantallas estilo Tradinverso + noticias (mockup aprobado 13/11/2026) ----------
 let VIEW = 'hoy', NEWS = [], GF = {}, EQ_MODE = { tr: { sys: true, real: false }, dash: { sys: true, real: false } }, CAL_MES = '', CTA_F = { fase: '', est: 'activas' }, CONTA_TAB = 'res', CONTA_SORT = 'net', NW_EDIT = null, NQ = { sel: '', hora: '', nuevo: false };
@@ -927,12 +954,12 @@ async function cargar() {
   // catálogo de noticias por usuario (meta/noticias); la primera vez se carga con las 5 del mockup (Javier, 13/11/2026)
   const nw = await getDoc(uref('meta', 'noticias'));
   if (nw.exists()) NEWS = Array.isArray(nw.data().lista) ? nw.data().lista : [];
-  else { NEWS = SEED_NEWS.slice(); await setDoc(uref('meta', 'noticias'), { lista: NEWS }); }
+  else { NEWS = SEED_NEWS.slice(); if (!RO()) await setDoc(uref('meta', 'noticias'), { lista: NEWS }); }
   try { const cp = await getDoc(uref('meta', 'copias')); GRUPOS = cp.exists() && Array.isArray(cp.data().grupos) ? cp.data().grupos : []; } catch (e) { GRUPOS = []; }
   CPW = JSON.parse(JSON.stringify(GRUPOS));
   try { const re = await getDoc(uref('meta', 'riskEngine')); RE_VIG = re.exists() && re.data().vig ? re.data().vig : {}; } catch (e) { RE_VIG = {}; }
   const ck = await getDoc(uref('meta', 'checklist'));
-  if (IS_ADMIN && CHK_ITEMS.length === 4) CHK_ITEMS = CHK_BOTS.concat(CHK_ITEMS);
+  CHK_ITEMS = (IS_ADMIN && !RO()) ? CHK_BOTS.concat(CHK_BASE) : CHK_BASE.slice(); // los ítems de bots son solo de Javier
   await reGuardar();
   await cargarSync();
   if (!EDIT_ID && $('fVer')) aplicarNormas();
@@ -1181,7 +1208,7 @@ async function qrConfirmar(p) {
 function renderChk() {
   const n = CHK.filter(Boolean).length, ok = n === CHK.length;
   $('chkBox').innerHTML = '<div class="ck' + (ok ? ' ok' : '') + '"><div class="ch" id="chkHead"><span>' + (ok ? '✓ Sesión preparada' : '○ Checklist preoperativa pendiente') + '</span><span>' + n + '/' + CHK.length + ' ' + (CHK_OPEN ? '▾' : '▸') + '</span></div><div class="bar"><i style="width:' + Math.round(n / CHK.length * 100) + '%"></i></div>'
-    + (CHK_OPEN ? CHK_ITEMS.map((t, k) => (IS_ADMIN && k === 0 ? '<div class="g">BOTS NASDAQ (VPS)</div>' : '') + (IS_ADMIN && k === 2 ? '<div class="g">ANTES DE LA SESIÓN</div>' : '') + '<div class="ckr"><label><input type="checkbox" data-chk="' + k + '"' + (CHK[k] ? ' checked' : '') + '>' + esc(t) + '</label>' + (t === CHK_NOTICIAS && CHK[k] ? preguntaNoticias() : '') + '</div>').join('') : '') + '</div>';
+    + (CHK_OPEN ? CHK_ITEMS.map((t, k) => ((IS_ADMIN && !RO()) && k === 0 ? '<div class="g">BOTS NASDAQ (VPS)</div>' : '') + ((IS_ADMIN && !RO()) && k === 2 ? '<div class="g">ANTES DE LA SESIÓN</div>' : '') + '<div class="ckr"><label><input type="checkbox" data-chk="' + k + '"' + (CHK[k] ? ' checked' : '') + '>' + esc(t) + '</label>' + (t === CHK_NOTICIAS && CHK[k] ? preguntaNoticias() : '') + '</div>').join('') : '') + '</div>';
 }
 // Cascada de noticias al lado del ítem de la checklist (mockup 13/11/2026). «No» = día sin noticias; «Sí» = catálogo + hora + Añadir.
 const CHK_NOTICIAS = 'Noticias y festivos de EE. UU. revisados';
@@ -1722,7 +1749,28 @@ function verTrade(id) {
     + '<div class="row" style="justify-content:space-between;margin-top:12px"><button type="button" class="link" data-del="' + esc(t._id) + '">🗑 Borrar</button><span class="row"><button type="button" id="trOvC">Cerrar</button><button type="button" class="pri" data-editr="' + esc(t._id) + '">' + (t.rapido && !t.completo ? '✎ Completar' : '✎ Editar') + '</button></span></div></div>';
 }
 
+async function vaUsuarios() {
+  const us = await getDocs(collection(db, 'users'));
+  VA_USERS = us.docs.filter(d => d.id !== U.uid).map(d => ({ uid: d.id, nombre: d.data().nombre || '', email: d.data().email || '' }))
+    .sort((a, b) => (a.nombre || a.email).localeCompare(b.nombre || b.email));
+  const op = '<option value="">Elige un participante…</option>' + VA_USERS.map(u => '<option value="' + esc(u.uid) + '"' + (u.uid === VU ? ' selected' : '') + '>' + esc((u.nombre || u.email) + (u.nombre && u.email ? ' · ' + u.email : '')) + '</option>').join('');
+  $('vaSel').innerHTML = op; $('roSel').innerHTML = op;
+}
+function vaPintar() {
+  const on = RO();
+  $('vaOn').checked = on; $('roBar').hidden = !on; document.body.classList.toggle('ro', on);
+  $('roTxt').textContent = on ? 'Viendo los datos de ' + (VU_NOM || 'otro participante') + ' · solo lectura' : '';
+  $('vaSel').value = VU || ''; $('roSel').value = VU || '';
+}
+async function vaAplicar(uid) {
+  const u = uid ? VA_USERS.find(x => x.uid === uid) : null;
+  VU = u ? u.uid : null; VU_NOM = u ? (u.nombre || u.email) : '';
+  GF = {}; SEL_CTA = null; EDIT_ID = null;
+  vaPintar();
+  try { await cargar(); } catch (e) { $('cards').innerHTML = '<div class="empty">Error al leer datos: ' + esc(e.message) + '</div>'; }
+}
 async function renderAdmin() {
+  try { await vaUsuarios(); vaPintar(); $('vaMsg').textContent = ''; } catch (e) { $('vaMsg').className = 'msg err'; $('vaMsg').textContent = 'No se pudo leer la lista de participantes: ' + e.message; }
   const al = await getDocs(collection(db, 'allow'));
   $('allowList').innerHTML = al.docs.map(d => '<div class="row" style="justify-content:space-between;border-bottom:1px solid var(--line);padding:6px 0"><span><b>' + esc(d.data().nombre || '') + '</b> · ' + esc(d.id) + '</span>' + (d.id === ADMIN ? '<span class="mut">admin</span>' : '<button class="link" type="button" data-unallow="' + esc(d.id) + '">Quitar</button>') + '</div>').join('') || '<div class="mut">Nadie autorizado.</div>';
   const tm = await getDoc(doc(db, 'config', 'tablaMaestra')), d = tm.exists() ? tm.data() : SEED_TM;
@@ -2370,6 +2418,13 @@ document.addEventListener('change', ev => {
 (() => { let t = 'light', m = 'max'; try { t = localStorage.getItem('rf-tema') || 'light'; m = localStorage.getItem('rf-menu') || 'max'; } catch (e) {} aplicarTema(t); plegarMenu(m === 'min'); })();
 $('btnLogin').onclick =() => signInWithPopup(auth, new GoogleAuthProvider()).catch(e => { $('loginMsg').textContent = e.message; });
 $('btnSalir').onclick = () => signOut(auth);
+$('vaOn').addEventListener('change', async () => {
+  if ($('vaOn').checked) { const u = $('vaSel').value; if (!u) { $('vaOn').checked = false; $('vaMsg').className = 'msg err'; $('vaMsg').textContent = 'Elige primero un participante.'; return; } $('vaMsg').textContent = ''; await vaAplicar(u); }
+  else await vaAplicar(null);
+});
+$('vaSel').addEventListener('change', async () => { if ($('vaOn').checked) await vaAplicar($('vaSel').value || null); });
+$('roSel').addEventListener('change', async () => { await vaAplicar($('roSel').value || null); });
+$('roSalir').addEventListener('click', () => vaAplicar(null));
 
 onAuthStateChanged(auth, async user => {
   $('loginMsg').textContent = '';
