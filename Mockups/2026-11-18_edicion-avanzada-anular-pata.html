@@ -1,0 +1,65 @@
+<!DOCTYPE html><html lang="es"><meta charset="utf-8"><title>Mockup · Edición avanzada: anular pata / No ejecutado (aprobado 18/11/2026)</title>
+<body style="font:14px sans-serif;max-width:760px;margin:20px auto;color:#12223b">
+<style>
+.c{border:1px solid #c5d8f1;border-radius:10px;padding:14px;margin-bottom:18px}
+.r{display:grid;grid-template-columns:1.5fr .7fr .9fr 1fr;gap:8px;align-items:center;padding:9px 0;border-top:1px solid #e3edf9}
+.k{font-size:11px;padding:2px 8px;border-radius:6px;background:#eef3fa}
+.w{font-size:11px;padding:2px 8px;border-radius:6px;background:#fdf0d5;color:#7a4b00}
+button{font:12px sans-serif;padding:5px 12px;border:1px solid #9db6d6;border-radius:6px;background:#fff}
+.p{background:#12223b;color:#fff;border-color:#12223b}
+.bar{display:flex;gap:8px;align-items:center;border-top:1px solid #e3edf9;padding-top:12px;margin-top:12px}
+h3{margin:18px 0 6px}
+small{color:#5b6b82}
+</style>
+
+<h2>Edición avanzada · anular pata / No ejecutado</h2>
+<small>Aprobado el 18/11/2026. Caso real que lo motiva: Trade #28 de Pedro (17/11/2026 16:11, SL −246,50 $), el copiador no abrió la copia en Lucid 25K #5 pero la app la cuenta.</small>
+
+<h3>1 · Editar trade: barra inferior</h3>
+<div class="c">
+  <div style="height:70px;background:#f3f7fc;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#5b6b82">… formulario actual sin cambios …</div>
+  <div class="bar">
+    <button>⚙ Edición avanzada</button>
+    <span style="flex:1"></span>
+    <button>Cancelar</button><button class="p">Guardar cambios</button>
+  </div>
+  <p><small>Botón a la izquierda del todo, estilo secundario, separado de Guardar. Solo aparece si el trade tiene copias (ejecuciones por cuenta). No aparece en la vista de administrador (solo lectura).</small></p>
+  <div style="border:1px solid #e0b24d;background:#fff8e6;border-radius:8px;padding:10px;margin-top:8px">
+    <b>Tienes cambios sin guardar</b> (solo si se tocó algo en el editor)<br>
+    <div style="margin-top:8px;display:flex;gap:8px"><button class="p">Guardar y continuar</button><button>Descartar</button><button>Seguir editando</button></div>
+  </div>
+</div>
+
+<h3>2 · Pantalla Edición avanzada</h3>
+<div class="c">
+  <div style="display:flex;justify-content:space-between;align-items:center">
+    <b>Edición avanzada · trade #28</b><button>← Volver al editor</button>
+  </div>
+  <p style="margin:8px 0 4px"><small>Ejecuciones por cuenta</small></p>
+  <div class="r" style="border-top:none"><span>Lucid 25K #1</span><span><span class="k">Líder</span></span><span style="text-align:right">−246,50 $</span><span></span></div>
+  <div class="r"><span>Lucid 25K #5</span><span><span class="k">Copia</span></span><span style="text-align:right">−246,50 $</span><span style="text-align:right"><button>Anular pata</button></span></div>
+  <div style="border-top:1px solid #e3edf9;padding-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:end">
+    <div><small>Motivo *</small><br><select style="width:100%"><option>Elegí…</option><option selected>El copiador falló</option><option>Rechazada por el broker</option><option>Cuenta bloqueada o sin margen</option><option>Otro</option></select></div>
+    <div><small>Nota (obligatoria con «Otro»)</small><br><input type="text" style="width:100%"></div>
+    <div style="grid-column:1/-1"><small>Se quitan −246,50 $ del equity de Lucid 25K #5. La líder no cambia.</small></div>
+    <div style="grid-column:1/-1;display:flex;gap:8px;justify-content:flex-end"><button>Cancelar</button><button class="p">Confirmar anulación</button></div>
+  </div>
+</div>
+
+<h3>3 · Después de confirmar</h3>
+<div class="c">
+  <div class="r" style="border-top:none"><span>Lucid 25K #1</span><span><span class="k">Líder</span></span><span style="text-align:right">−246,50 $</span><span></span></div>
+  <div class="r" style="color:#8a97ab"><span style="text-decoration:line-through">Lucid 25K #5</span><span><span class="w">No ejecutada</span></span><span style="text-align:right;text-decoration:line-through">−246,50 $</span><span style="text-align:right"><button>Restaurar</button></span></div>
+  <small>Motivo: el copiador falló · anulada por Javier el 18/11/2026 · sin impacto en el equity de Lucid 25K #5</small>
+</div>
+
+<h3>Reglas</h3>
+<ul>
+<li>La líder no se puede anular (si falla la líder, se borra el trade entero).</li>
+<li>Anular una pata: motivo obligatorio (nota obligatoria con «Otro»); guarda quién, cuándo y por qué.</li>
+<li>Pata anulada: no suma en equity, contabilidad ni P&amp;L de esa cuenta. El trade sigue contando una sola vez para estadísticas y motor de gestión.</li>
+<li>«Restaurar» reactiva la pata (con su P&amp;L original) y deja constancia.</li>
+<li>El detalle del trade (el ojo) ya existente no se toca en esta tarea.</li>
+<li>Nombres de métricas en inglés (equity, P&amp;L).</li>
+</ul>
+</body></html>
