@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Riesgo Futuros</title>
-<!-- Riesgo Futuros · app multiusuario (Firebase) · v24 (17/11/2026) · v24: Vista administrador (solo lectura): en Ajustes · Admin, el admin ve las pantallas de otro participante. · v23: el tile Target muestra siempre el target del plan (sin «Cortar en» en su lugar ni target tachado); el corte (menor de TP máx. ÷ riesgo y lo que falta para pasar ÷ riesgo) va en la etiqueta ámbar «Cortar en XR» del tile TP máx. · v22.1 (16/11/2026) · v22.1: fuera el aviso «Hace … días que no sincronizás con la firma» (basta el banner de sincronizar: 10 trades o una rotación completa) · v22: aviso de sincronizar solo si operó en 7 días y lleva ≥ 7 días sin sincronizar (el alta cuenta como sync); etiqueta «Cortar en XR» en el tile TP máx. si TP máx. ÷ riesgo < target; inactividad ≥ 75 % del plazo → su grupo (o la cuenta) pasa a ser el próximo a operar por encima de la rotación · v21 (14/11/2026) · v21: RF-39 rotación desde la tabla de Cuentas: doble clic en Rotación alterna reserva ↔ rotación (al salir de reserva entra al final de la cola; si estaba en turno, el turno pasa a la siguiente), sin el botón «Activar en rotación / A reserva» de la tarjeta; vincular a un grupo de copia pasa la cuenta a rotación (Pasada/Quemada no se vinculan) · v20 (13/11/2026) · v20: equity con System y Real independientes (dos ejes) y sombreado del drawdown; Monthly P&L con valor por barra y media acumulada suavizada · v19 (13/11/2026) · v19: Cuentas más limpia: Gestión de copias en desplegable cerrado con resumen de grupos; Agregar / Editar / sincronizar cuenta en panel lateral (✏️ o «＋ Agregar cuenta») · v18 (13/11/2026) · v18: cortar al pasar la challenge (target = menor de 1,5R, TP máx. y lo que falta + comisiones), objetivo alcanzado → no operar, fuera de la rotación y botón Pasar a Funded · v17 (13/11/2026) · v17: gestión de copias con arrastrar y soltar, pantalla Hoy minimalista con «Operaste con · hoy», aviso de sincronizar balances, normas de la firma al comprar · v16: copia de cuentas · v15: bloqueo al guardar trade, motor de gestión con trades reales, pantalla Risk engine, tarjeta con selector de modelo y panel Risk · v14: pantallas estilo Tradinverso (barra lateral plegable, filtros globales, Trades, Dashboard, Calendario, Cuentas, Contabilidad con pestañas), noticias (catálogo por usuario, cascada en la checklist, línea y color en la tarjeta, contexto «Operado en noticias» al guardar) y tema claro/oscuro · v13 (13/11/2026) ·v13 · RF-27: curvas de equity (cartera y cuenta) ancladas al balance real de la última sincronización + ventana «Sincronizar cuentas» (balance y min balance por cuenta, Dif. con umbral 0,2 %) · v12 (08/11/2026) ·v12: editar un trade conserva cargadoTradinverso y cargadoEl (antes se borraban y el cierre de día lo volvía a dar como pendiente) · v11 (28/10/2026) · v11: FVG HTF como el POI: en el camino (entrada → 2R), distancia entre 0 y 2R · v10 (28/10/2026) · v10: bloqueo por consistencia si el TP máx. de hoy < 0,4 % de la cuenta (mínimo de riesgo): la cuenta se bloquea hoy, se opera la siguiente de la cola y mañana vuelve; con ≥ 0,4 % sigue igual (cortar en el TP máx.) · v9 (26/10/2026) · v9: consistencia: target recortado a lo que queda del TP máx. (cortar en +$, ≈R), tarjeta amarilla, consistencia alcanzada → hoy se opera la siguiente y mañana vuelve la misma (SL del reemplazo → final de la cola), target con importe en $, fuera "No estoy en reset" de la checklist · v8 (24/10/2026) · v8: alerta de reset del trader (3 días perdedores seguidos → pausa 3 días naturales; 2.º seguido con errores → 1 semana), aviso al registrar en reset (P5), ítem de checklist "No estoy en reset" · v7 (24/10/2026) · v7: P0 "¿Sesión preparada?" automática desde la checklist del día (vigente desde 26/10/2026), checklist guardada por fecha, KPI Sesión preparada · v6 (24/10/2026) · v6: formulario completo de trade (Nasdaq) igual al de la app vieja, editar/completar trades y journal en Trades (sin R plan) · v5 (24/10/2026) · v5: tabla de cuentas: quemadas/pasadas/reserva sin "Poner en turno" · v4 (24/10/2026) · v4: riesgo en rojo si supera el margen; checklist con bots VPS solo para el admin · v3 (23/10/2026) · v3: Cuentas y contabilidad (equity, retiros, compras, resets, reserva, inactividad, caducidad) · v2: consistencia por cuenta
+<!-- Riesgo Futuros · app multiusuario (Firebase) · v25 (18/11/2026) · v25: Edición avanzada en Editar trade: anular pata de una copia («No ejecutada», con motivo, quién y cuándo) y Restaurar; la pata anulada no suma en equity, contabilidad ni P&L de su cuenta · v24 (17/11/2026) · v24: Vista administrador (solo lectura): en Ajustes · Admin, el admin ve las pantallas de otro participante. · v23: el tile Target muestra siempre el target del plan (sin «Cortar en» en su lugar ni target tachado); el corte (menor de TP máx. ÷ riesgo y lo que falta para pasar ÷ riesgo) va en la etiqueta ámbar «Cortar en XR» del tile TP máx. · v22.1 (16/11/2026) · v22.1: fuera el aviso «Hace … días que no sincronizás con la firma» (basta el banner de sincronizar: 10 trades o una rotación completa) · v22: aviso de sincronizar solo si operó en 7 días y lleva ≥ 7 días sin sincronizar (el alta cuenta como sync); etiqueta «Cortar en XR» en el tile TP máx. si TP máx. ÷ riesgo < target; inactividad ≥ 75 % del plazo → su grupo (o la cuenta) pasa a ser el próximo a operar por encima de la rotación · v21 (14/11/2026) · v21: RF-39 rotación desde la tabla de Cuentas: doble clic en Rotación alterna reserva ↔ rotación (al salir de reserva entra al final de la cola; si estaba en turno, el turno pasa a la siguiente), sin el botón «Activar en rotación / A reserva» de la tarjeta; vincular a un grupo de copia pasa la cuenta a rotación (Pasada/Quemada no se vinculan) · v20 (13/11/2026) · v20: equity con System y Real independientes (dos ejes) y sombreado del drawdown; Monthly P&L con valor por barra y media acumulada suavizada · v19 (13/11/2026) · v19: Cuentas más limpia: Gestión de copias en desplegable cerrado con resumen de grupos; Agregar / Editar / sincronizar cuenta en panel lateral (✏️ o «＋ Agregar cuenta») · v18 (13/11/2026) · v18: cortar al pasar la challenge (target = menor de 1,5R, TP máx. y lo que falta + comisiones), objetivo alcanzado → no operar, fuera de la rotación y botón Pasar a Funded · v17 (13/11/2026) · v17: gestión de copias con arrastrar y soltar, pantalla Hoy minimalista con «Operaste con · hoy», aviso de sincronizar balances, normas de la firma al comprar · v16: copia de cuentas · v15: bloqueo al guardar trade, motor de gestión con trades reales, pantalla Risk engine, tarjeta con selector de modelo y panel Risk · v14: pantallas estilo Tradinverso (barra lateral plegable, filtros globales, Trades, Dashboard, Calendario, Cuentas, Contabilidad con pestañas), noticias (catálogo por usuario, cascada en la checklist, línea y color en la tarjeta, contexto «Operado en noticias» al guardar) y tema claro/oscuro · v13 (13/11/2026) ·v13 · RF-27: curvas de equity (cartera y cuenta) ancladas al balance real de la última sincronización + ventana «Sincronizar cuentas» (balance y min balance por cuenta, Dif. con umbral 0,2 %) · v12 (08/11/2026) ·v12: editar un trade conserva cargadoTradinverso y cargadoEl (antes se borraban y el cierre de día lo volvía a dar como pendiente) · v11 (28/10/2026) · v11: FVG HTF como el POI: en el camino (entrada → 2R), distancia entre 0 y 2R · v10 (28/10/2026) · v10: bloqueo por consistencia si el TP máx. de hoy < 0,4 % de la cuenta (mínimo de riesgo): la cuenta se bloquea hoy, se opera la siguiente de la cola y mañana vuelve; con ≥ 0,4 % sigue igual (cortar en el TP máx.) · v9 (26/10/2026) · v9: consistencia: target recortado a lo que queda del TP máx. (cortar en +$, ≈R), tarjeta amarilla, consistencia alcanzada → hoy se opera la siguiente y mañana vuelve la misma (SL del reemplazo → final de la cola), target con importe en $, fuera "No estoy en reset" de la checklist · v8 (24/10/2026) · v8: alerta de reset del trader (3 días perdedores seguidos → pausa 3 días naturales; 2.º seguido con errores → 1 semana), aviso al registrar en reset (P5), ítem de checklist "No estoy en reset" · v7 (24/10/2026) · v7: P0 "¿Sesión preparada?" automática desde la checklist del día (vigente desde 26/10/2026), checklist guardada por fecha, KPI Sesión preparada · v6 (24/10/2026) · v6: formulario completo de trade (Nasdaq) igual al de la app vieja, editar/completar trades y journal en Trades (sin R plan) · v5 (24/10/2026) · v5: tabla de cuentas: quemadas/pasadas/reserva sin "Poner en turno" · v4 (24/10/2026) · v4: riesgo en rojo si supera el margen; checklist con bots VPS solo para el admin · v3 (23/10/2026) · v3: Cuentas y contabilidad (equity, retiros, compras, resets, reserva, inactividad, caducidad) · v2: consistencia por cuenta
      Misma lógica que la app de Apps Script (Real_Codigo.gs): Tabla maestra para Funded, regla v7 para challenges,
      rotación (SL → siguiente cuenta), plan B y registro rápido. Cada usuario ve solo sus cuentas y trades.
      La Tabla maestra es compartida (config/tablaMaestra) y solo la edita el admin. -->
@@ -141,6 +141,7 @@ td.num,th.num{text-align:right}
 #trOv .bx{background:var(--card-2);border-radius:12px;max-width:720px;width:100%;max-height:88vh;overflow:auto;padding:16px 18px}
 .kv2{display:grid;grid-template-columns:minmax(120px,200px) 1fr;gap:5px 12px;font-size:13px}.kv2 span{font:11px var(--mono);color:var(--muted)}.kv2 div{word-break:break-word}
 @media(max-width:700px){.fg{grid-template-columns:1fr 1fr}.fc.w2,.fc.w3{grid-column:1/-1}}
+.advl{margin-top:8px}.advr{display:grid;grid-template-columns:1.5fr .7fr .9fr 1fr;gap:8px;align-items:center;padding:9px 0;border-top:1px solid var(--line-2)}.advl>.advr:first-child{border-top:none}.advr.anu{color:var(--muted)}.advn{font-size:12px;margin:-4px 0 6px}.advf{border-top:1px solid var(--line-2);padding-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:end}
 .warn.bad{background:var(--bad-bg);border-color:var(--bad-line);color:var(--bad-tx)}
 .pie{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px;font-size:13px}.pie button{margin-left:auto}
 .chipA,.chipW{padding:4px 10px;border-radius:8px}.chipA{background:var(--info-bg);color:var(--info-tx)}.chipW{background:var(--warn-bg);color:var(--warn)}
@@ -706,15 +707,17 @@ const enRot = c => c.activa && !grupoDeCopia(c.id);        // cuentas que ocupan
 const cola = E => E.filter(e => !e.copiaDe);
 const consTxt = c => c.sinCons ? '— (sin)' : c.consistencia + ' %';
 // Trades de una cuenta: los suyos + su ejecución dentro de un trade copiado (resultado $ de esa cuenta).
+// v25 · pata anulada («No ejecutada»): no suma en equity, contabilidad ni P&L de esa cuenta; el trade sigue contando una vez (líder).
+const ejVivas = t => (t.ejecuciones || []).filter(j => !j.anulada);
 function trCuenta(id) {
   const out = [];
   TRADES.forEach(t => {
-    if (Array.isArray(t.ejecuciones) && t.ejecuciones.length) { const x = t.ejecuciones.find(j => j.cuenta === id); if (x) out.push(Object.assign({}, t, { cuenta: id, usd: num(x.usd), ejec: x })); }
+    if (Array.isArray(t.ejecuciones) && t.ejecuciones.length) { const x = ejVivas(t).find(j => j.cuenta === id); if (x) out.push(Object.assign({}, t, { cuenta: id, usd: num(x.usd), ejec: x })); }
     else if (t.cuenta === id) out.push(t);
   });
   return out;
 }
-const tocaCuenta = (t, id) => t.cuenta === id || (Array.isArray(t.ejecuciones) && t.ejecuciones.some(j => j.cuenta === id));
+const tocaCuenta = (t, id) => t.cuenta === id || (Array.isArray(t.ejecuciones) && ejVivas(t).some(j => j.cuenta === id));
 function aplicarGrupos(E) {
   GRUPOS.forEach(g => {
     const L = E.find(e => e.c.id === g.lider); if (!L) return;
@@ -1387,6 +1390,9 @@ const NOTA_RESET = 'Reset (operó durante la pausa, falla P5). ';
 const PREG_TXT = { P0: '¿Sesión preparada? (checklist)', P1: '¿Setup válido de la estrategia?', P2: '¿Entrada, SL y TP según la estrategia?', P3: '¿Riesgo correcto según escalera?', P4: '¿Operación sin tocar?', P5: '¿Sin filtros de NO OPERAR? (horario, noticias, 3 SL)', P6: '¿Registrada con capturas y comentario?' };
 const VENTANA_NY = ['09:30', '12:00'];
 let F = null, F_EDIT = null, F_MSG = '', F_ERR = '', CHKS = {}, RESET_OV = {};
+// v25 · Edición avanzada (mockup 2026-11-18_edicion-avanzada-anular-pata, aprobado 18/11/2026)
+let F_SNAP = '', F_PREG = false, F_ADV = null;
+const MOT_ANULA = ['El copiador falló', 'Rechazada por el broker', 'Cuenta bloqueada o sin margen', 'Otro'];
 const P0_DESDE = '2026-10-26';
 function autoP0() {
   if (!F || F.p0Manual) return;
@@ -1434,14 +1440,59 @@ function formDeTrade(t) {
     fvg: g('fvg', 'FVG HTF Presente'), fvgTf: lista('fvgTf', 'FVG HTF Temporalidad', '|'), fvgUb: g('fvgUb', 'FVG HTF Ubicación'), fvgDir: g('fvgDir', 'FVG HTF Dirección'), fvgRe: g('fvgRe', 'FVG HTF Reacciona'), fvgDist: n(g('fvgDist', 'FVG HTF Distancia (R)')),
     p0: t.p0 || '', p0Falta: t.p0Falta || [], captura: t.captura || null,
     grupo: t.grupo ? t.grupo.id : '', grupoNombre: t.grupo ? t.grupo.nombre : '', motivo: t.motivoCorte ? t.motivoCorte.tipo : '', motivoTxt: t.motivoCorte && t.motivoCorte.tipo === 'otro' ? t.motivoCorte.texto : '',
-    ejL: Array.isArray(t.ejecuciones) ? t.ejecuciones.map(j => ({ cuenta: j.cuenta, rol: j.rol })) : [],
+    ejL: Array.isArray(t.ejecuciones) ? t.ejecuciones.map(j => Object.assign({ cuenta: j.cuenta, rol: j.rol }, j.anulada ? { anulada: j.anulada } : {}, j.historial ? { historial: j.historial } : {})) : [],
     linkHtf: g('linkHtf', 'Link HTF'), linkLtf: g('linkLtf', 'Link LTF'), reflexion: t.completo || t.migrado ? (t.nota || '') : String(t.nota || '').replace(/^Registro rápido: /, '') };
 }
 function abrirForm(id) {
   const t = id ? TRADES.find(x => x._id === id) : null;
-  F_EDIT = t ? t._id : null; F_MSG = ''; F_ERR = '';
+  F_EDIT = t ? t._id : null; F_MSG = ''; F_ERR = ''; F_PREG = false; F_ADV = null;
   if (t) { nuevoForm(formDeTrade(t)); } else nuevoForm();
   ir('nuevo');
+  F_SNAP = JSON.stringify(F);
+}
+const hayCopias = t => !!t && Array.isArray(t.ejecuciones) && t.ejecuciones.some(j => j.rol === 'Copia');
+function irAvanzada() { F_PREG = false; F_ADV = { anular: null, motivo: '', nota: '', msg: '' }; renderForm(); window.scrollTo(0, 0); }
+function renderAvanzada(t) {
+  const nomC = id => { const c = CUENTAS.find(x => x.id === id); return c ? c.nombre : id; }, A = F_ADV;
+  const fch = ms => ms ? fmtF(diaTz(new Date(ms), 'Europe/Madrid')) : '';
+  const fila = (j, i) => {
+    const an = j.anulada, usd = num(j.usd), lider = j.rol === 'Líder';
+    const acc = lider ? '' : an ? '<button type="button" data-advres="' + i + '">Restaurar</button>' : (A.anular === i ? '' : '<button type="button" data-advan="' + i + '">Anular pata</button>');
+    let h = '<div class="advr' + (an ? ' anu' : '') + '"><span' + (an ? ' style="text-decoration:line-through"' : '') + '>' + esc(nomC(j.cuenta)) + '</span><span>' + (an ? '<span class="tag c">No ejecutada</span>' : '<span class="tag ' + (lider ? 'ld' : 'cp') + '">' + esc(j.rol) + '</span>') + '</span>'
+      + '<span class="num ' + (an ? '' : cls(usd)) + '" style="text-align:right' + (an ? ';text-decoration:line-through' : '') + '">' + money2(usd) + '</span><span style="text-align:right">' + acc + '</span></div>';
+    if (an) h += '<div class="mut advn">Motivo: ' + esc(String(an.motivo).toLowerCase()) + (an.nota ? ' (' + esc(an.nota) + ')' : '') + ' · anulada por ' + esc(an.por || '') + ' el ' + fch(an.cuando) + ' · sin impacto en el equity de ' + esc(nomC(j.cuenta)) + '</div>';
+    else { const r = (j.historial || []).filter(x => x.accion === 'Restaurada').pop(); if (r) h += '<div class="mut advn">Restaurada por ' + esc(r.por || '') + ' el ' + fch(r.cuando) + ' (había sido anulada: ' + esc(String(r.motivo || '').toLowerCase()) + ')</div>'; }
+    if (A.anular === i && !an) h += '<div class="advf"><label class="fc"><span>Motivo *</span><select id="advMot"><option value="">Elegí…</option>' + MOT_ANULA.map(m => '<option' + (A.motivo === m ? ' selected' : '') + '>' + esc(m) + '</option>').join('') + '</select></label>'
+      + '<label class="fc"><span>Nota (obligatoria con «Otro»)</span><input type="text" id="advNota" value="' + esc(A.nota) + '"></label>'
+      + '<div class="mut" style="grid-column:1/-1;font-size:12px">Se quitan ' + money2(usd) + ' del equity de ' + esc(nomC(j.cuenta)) + '. La líder no cambia.</div>'
+      + '<div class="row" style="grid-column:1/-1;justify-content:flex-end"><button type="button" id="advCan">Cancelar</button><button type="button" class="pri" id="advOk">Confirmar anulación</button></div></div>';
+    return h;
+  };
+  return '<div class="sec"><h2>Edición avanzada · trade #' + esc(t.num) + '</h2></div><div class="card fsec"><div class="row" style="justify-content:space-between;align-items:center"><div class="ft" style="margin:0">Ejecuciones por cuenta</div><button type="button" id="advVolver">← Volver al editor</button></div>'
+    + '<div class="advl">' + t.ejecuciones.map(fila).join('') + '</div>'
+    + '<div class="msg' + (A.msg.startsWith('✓') ? ' ok' : ' err') + '">' + esc(A.msg) + '</div></div>';
+}
+async function guardarPata(i, anular) {
+  const t = TRADES.find(x => x._id === F_EDIT); if (!t || !Array.isArray(t.ejecuciones) || !t.ejecuciones[i] || t.ejecuciones[i].rol === 'Líder') return;
+  const A = F_ADV, quien = (U && (U.displayName || U.email)) || '', ahora = Date.now();
+  if (anular) {
+    if (!MOT_ANULA.includes(A.motivo)) { A.msg = 'Elegí el motivo.'; return renderForm(); }
+    if (A.motivo === 'Otro' && !A.nota.trim()) { A.msg = 'Con «Otro» la nota es obligatoria.'; return renderForm(); }
+  }
+  const ej = t.ejecuciones.map((j, k) => {
+    if (k !== i) return j;
+    const x = Object.assign({}, j), hist = (j.historial || []).slice();
+    if (anular) { x.anulada = { motivo: A.motivo, nota: A.nota.trim(), por: quien, email: (U && U.email) || '', cuando: ahora }; hist.push(Object.assign({ accion: 'Anulada' }, x.anulada)); }
+    else { const prev = j.anulada || {}; delete x.anulada; hist.push({ accion: 'Restaurada', motivo: prev.motivo || '', nota: prev.nota || '', por: quien, email: (U && U.email) || '', cuando: ahora }); }
+    x.historial = hist; return x;
+  });
+  try {
+    await setDoc(uref('trades', t._id), { ejecuciones: ej }, { merge: true });
+    await cargar();
+    const t2 = TRADES.find(x => x._id === F_EDIT); if (t2) { nuevoForm(formDeTrade(t2)); F_SNAP = JSON.stringify(F); }
+    F_ADV = { anular: null, motivo: '', nota: '', msg: anular ? '✓ Pata anulada · equity y contabilidad de la cuenta recalculados.' : '✓ Pata restaurada con su P&L original.' };
+    renderForm();
+  } catch (e) { A.msg = 'Error: ' + e.message; renderForm(); }
 }
 function chips(k, list, multi, lab) {
   const v = F[k];
@@ -1457,6 +1508,8 @@ function renderForm() {
   const c = CUENTAS.find(x => x.id === F.cuenta), usd = num(F.usd), cap = F.captura, rrCap = cap ? rrCaptura(cap, F.salida) : null;
   const riesgo = cap ? cap.riesgo : rr === 0 ? num(F.riesgoManual) : (isNaN(usd) || isNaN(rr) || !rr ? NaN : Math.abs(usd / rr));
   const t = F_EDIT ? TRADES.find(x => x._id === F_EDIT) : null;
+  if (F_ADV && t && hayCopias(t) && !RO()) { $('frmBox').innerHTML = renderAvanzada(t); return; }
+  F_ADV = null;
   let h = '<div class="sec"><h2>' + (t ? (t.rapido && !t.completo ? 'Completar registro rápido #' : 'Editar trade #') + esc(t.num) : 'Nuevo trade real') + '</h2><span class="hint">Estrategia</span>' + '<div class="chips"><button type="button" class="chip on">Nasdaq</button><button type="button" class="chip" disabled>Zonas · pronto</button><button type="button" class="chip" disabled>Liquidez · pronto</button></div></div>';
   h += '<div class="card fsec"><div class="ft">1 · Cuenta y resultado</div>'
     + (cap ? '<div class="opc" style="margin-bottom:10px"><div class="oph"><span>🔒 Plan al abrir (solo lectura)</span></div>' + capLinea(cap) + '</div>' : '') + '<div class="fg">'
@@ -1491,7 +1544,8 @@ function renderForm() {
   if (F.fvg === 'Sí') h += campo('Temporalidad * (una o más)', chips('fvgTf', CAT.fvgTf, true)) + campo('¿Dónde está? *', chips('fvgUb', CAT.fvgUb)) + (F.fvgUb === 'En el camino' ? campo('¿A cuántos R de la entrada? (0–2) *', inp('fvgDist', 'number')) : '') + campo('¿A favor o en contra? *', chips('fvgDir', CAT.fvgDir)) + campo('¿Reacciona? * (sea TP o SL)', chips('fvgRe', CAT.fvgRe));
   h += '</div></div><div class="card fsec"><div class="ft">6 · Links y reflexión · P6</div><div class="fg">' + campo('Link HTF (M15)', inp('linkHtf', 'url', 'https://www.tradingview.com/x/…')) + campo('Link LTF (M1)', inp('linkLtf', 'url', 'https://www.tradingview.com/x/…'))
     + campo('Reflexión', '<textarea data-fin="reflexion" rows="3">' + esc(F.reflexion) + '</textarea>', 'w3') + '</div>'
-    + '<div class="row" style="margin-top:12px;justify-content:space-between"><span class="mut" style="font-size:12px">' + (t ? 'Editar no cambia el turno.' : 'Si es SL, el turno pasa a la siguiente cuenta en rotación.') + '</span><span class="row"><button type="button" id="frmCancel">Cancelar</button><button type="button" class="pri" id="frmSave">' + (t ? 'Guardar cambios' : 'Guardar trade') + '</button></span></div>'
+    + '<div class="row" style="margin-top:12px;justify-content:space-between"><span class="row">' + (t && hayCopias(t) && !RO() ? '<button type="button" id="frmAdv">⚙ Edición avanzada</button>' : '') + '<span class="mut" style="font-size:12px">' + (t ? 'Editar no cambia el turno.' : 'Si es SL, el turno pasa a la siguiente cuenta en rotación.') + '</span></span><span class="row"><button type="button" id="frmCancel">Cancelar</button><button type="button" class="pri" id="frmSave">' + (t ? 'Guardar cambios' : 'Guardar trade') + '</button></span></div>'
+    + (F_PREG ? '<div class="warn" style="margin-top:10px"><b>Tienes cambios sin guardar</b><div class="row" style="margin-top:8px"><button type="button" class="pri" id="advGuardar">Guardar y continuar</button><button type="button" id="advDescartar">Descartar</button><button type="button" id="advSeguir">Seguir editando</button></div></div>' : '')
     + '<div class="msg' + (F_MSG.startsWith('✓') ? ' ok' : ' err') + '" id="frmMsg">' + esc(F_MSG) + '</div></div>';
   $('frmBox').innerHTML = h;
   marcarErr();
@@ -1523,7 +1577,7 @@ function validarTrade(f) {
   if (f.plan === 'No' && !fallidas.length) return falta('¿Qué pregunta falló? (al menos una, P0–P6)', 'preguntas');
   // v16 · trade copiado: el P&L se vincula a la líder y las copias llevan el mismo resultado (1:1)
   let motivo = null;
-  const ejec = f.ejL && f.ejL.length ? f.ejL.map(j => ({ cuenta: j.cuenta, rol: j.rol, usd })) : null;
+  const ejec = f.ejL && f.ejL.length ? f.ejL.map(j => Object.assign({ cuenta: j.cuenta, rol: j.rol, usd }, j.anulada ? { anulada: j.anulada } : {}, j.historial ? { historial: j.historial } : {})) : null;
   if (pasaCorte(cap, f.salida, usd)) {
     if (!MOTIVOS.some(m => m[0] === f.motivo)) return falta('¿Por qué se pasó del corte?', 'motivo');
     if (f.motivo === 'otro' && !String(f.motivoTxt || '').trim()) return falta('el motivo (texto)', 'motivoTxt');
@@ -1617,12 +1671,12 @@ function validarTrade(f) {
   Object.keys(o.detalle).forEach(k => { if (o.detalle[k] === '' || o.detalle[k] === 'undefined') delete o.detalle[k]; });
   return { o, c };
 }
-async function guardarTrade(enReset) {
+async function guardarTrade(enReset, sigueAdv) {
   const v = validarTrade(F);
-  if (v.err) { F_MSG = v.err; F_ERR = v.campo || ''; renderForm(); return; }
+  if (v.err) { F_MSG = v.err; F_ERR = v.campo || ''; F_PREG = false; renderForm(); return; }
   F_ERR = '';
   if (enReset === undefined && !F_EDIT) return avisoReset(F.fecha, x => guardarTrade(x));
-  $('frmSave').disabled = true;
+  if ($('frmSave')) $('frmSave').disabled = true;
   try {
     const o = v.o, prev = F_EDIT ? TRADES.find(x => x._id === F_EDIT) : null, b = writeBatch(db);
     if (enReset) { o.plan = 'No'; o.preguntas = Array.from(new Set((o.preguntas || []).concat(['P5']))); o.cuentaStats = 'No'; o.enReset = true; o.nota = NOTA_RESET + (o.nota || ''); if (o.detalle) { o.detalle['¿Siguió el Plan?'] = 'No'; o.detalle['Preguntas Fallidas'] = o.preguntas.join(', '); o.detalle['Cuenta para Estadística'] = 'No'; o.detalle['Reflexión'] = o.nota; } }
@@ -1642,9 +1696,10 @@ async function guardarTrade(enReset) {
     }
     await b.commit();
     F_MSG = '✓ Guardado #' + o.num + ' · ' + v.c.nombre + ' · ' + o.salida + ' ' + o.usd + ' $.' + rot;
+    if (sigueAdv && prev) { const id = prev._id; F_MSG = ''; await cargar(); abrirForm(id); return irAvanzada(); }
     F_EDIT = null; nuevoForm(); await cargar();
     ir('trades'); $('trMsg').textContent = F_MSG; F_MSG = '';
-  } catch (e) { $('frmMsg').textContent = 'Error: ' + e.message; $('frmSave').disabled = false; }
+  } catch (e) { F_PREG = false; if ($('frmMsg')) $('frmMsg').textContent = 'Error: ' + e.message; if ($('frmSave')) $('frmSave').disabled = false; }
 }
 function renderTrades() {
   if (!$('trKpis')) return;
@@ -1955,7 +2010,7 @@ function valoresApp(c) {
 // registrados, aunque esté en reserva (se opera por inactividad). Con id (icono ⟳ de la tarjeta): solo esa. Regla de Javier, 13/11/2026.
 const SYNC_ULT_TRADES = 10;
 function abrirSync(id) {
-  const ult = new Set(TRADES.slice().sort((a, b) => num(b.registrado) - num(a.registrado)).slice(0, SYNC_ULT_TRADES).flatMap(t => Array.isArray(t.ejecuciones) && t.ejecuciones.length ? t.ejecuciones.map(j => j.cuenta) : [t.cuenta]));
+  const ult = new Set(TRADES.slice().sort((a, b) => num(b.registrado) - num(a.registrado)).slice(0, SYNC_ULT_TRADES).flatMap(t => Array.isArray(t.ejecuciones) && t.ejecuciones.length ? ejVivas(t).map(j => j.cuenta) : [t.cuenta]));
   SYNC_L = CUENTAS.filter(c => c.estado === 'Activa' && (id ? c.id === id : (c.activa || ult.has(c.id))))
     .sort((a, b) => (b.enTurno - a.enTurno) || (b.activa - a.activa) || (a.orden - b.orden)).map(c => Object.assign({ c }, valoresApp(c)));
   if (!SYNC_L.length) return;
@@ -2003,7 +2058,7 @@ async function guardarSync() {
 // meta/sync = { at }: momento de la última sincronización completa.
 const SYNC_TRADES = 10;
 let SYNC_META = null, SB_ID = null, SB_DIF = {};
-const ejecIds = t => Array.isArray(t.ejecuciones) && t.ejecuciones.length ? t.ejecuciones.map(j => j.cuenta) : [t.cuenta];
+const ejecIds = t => Array.isArray(t.ejecuciones) && t.ejecuciones.length ? ejVivas(t).map(j => j.cuenta) : [t.cuenta];
 const ordCola = c => { const g = grupoDeCopia(c.id), l = g && CUENTAS.find(x => x.id === g.lider); return l ? l.orden + 0.001 : c.orden; };
 function syncEstado() {
   const at = SYNC_META && SYNC_META.at ? SYNC_META.at : 0;
@@ -2351,8 +2406,17 @@ document.addEventListener('click', async ev => {
     if (k === 'salida') { const u = parseFloat(String(F.usd).replace(',', '.')); if (!isNaN(u)) F.usd = String(v === 'SL' ? -Math.abs(u) : v === 'TP' ? Math.abs(u) : u); if (v === 'SL') F.rr = '-1'; else if (v === 'BE') F.rr = '0'; else if (v === 'TP' && parseFloat(F.rr) < 0) F.rr = ''; }
     renderForm(); return; }
   if (el.id === 'frmSave') return guardarTrade();
+  if (el.id === 'frmAdv') { if (JSON.stringify(F) !== F_SNAP) { F_PREG = true; return renderForm(); } return irAvanzada(); }
+  if (el.id === 'advSeguir') { F_PREG = false; return renderForm(); }
+  if (el.id === 'advDescartar') { const t = TRADES.find(x => x._id === F_EDIT); if (t) { nuevoForm(formDeTrade(t)); F_SNAP = JSON.stringify(F); } F_MSG = ''; F_ERR = ''; return irAvanzada(); }
+  if (el.id === 'advGuardar') { F_PREG = false; return guardarTrade(undefined, true); }
+  if (el.id === 'advVolver') { F_ADV = null; renderForm(); F_SNAP = JSON.stringify(F); return; }
+  if (el.dataset.advan) { F_ADV = { anular: +el.dataset.advan, motivo: '', nota: '', msg: '' }; return renderForm(); }
+  if (el.id === 'advCan') { F_ADV.anular = null; F_ADV.msg = ''; return renderForm(); }
+  if (el.id === 'advOk') return guardarPata(F_ADV.anular, true);
+  if (el.dataset.advres) return guardarPata(+el.dataset.advres, false);
   if (el.id === 'rsGuardar') { const v = $('rsVuelta').value; if (!/^\d{4}-\d{2}-\d{2}$/.test(v) || v <= el.dataset.disparo) return; RESET_OV[el.dataset.disparo] = Object.assign({}, RESET_OV[el.dataset.disparo], { vuelta: v }); await setDoc(uref('meta', 'reset'), RESET_OV); return renderHoy(); }
-  if (el.id === 'frmCancel') { F_EDIT = null; nuevoForm(); ir('trades'); return; }
+  if (el.id === 'frmCancel') { F_EDIT = null; F_PREG = false; F_ADV = null; nuevoForm(); ir('trades'); return; }
   if (el.id === 'btnNuevoTr') return abrirForm(null);
   if (el.dataset.ver) return verTrade(el.dataset.ver);
   if (el.dataset.editr) { const o = $('trOv'); if (o) o.remove(); return abrirForm(el.dataset.editr); }
@@ -2383,6 +2447,7 @@ document.addEventListener('input', ev => {
   if (ev.target.closest && ev.target.closest('#syOv')) return syncDif();
   if (ev.target.closest && ev.target.closest('#sbOv')) return sbDif();
   if (ev.target.id === 'nqHora') { NQ.hora = ev.target.value; return; }
+  if (F_ADV && (ev.target.id === 'advMot' || ev.target.id === 'advNota')) { F_ADV[ev.target.id === 'advMot' ? 'motivo' : 'nota'] = ev.target.value; return; }
   if (ev.target.id === 'fFirma' || ev.target.id === 'fTam') return aplicarNormas();
   if (ev.target.closest && ev.target.closest('[data-nf]')) return nfMarcar();
   const k = ev.target.dataset && ev.target.dataset.fin; if (!k || !F) return;
