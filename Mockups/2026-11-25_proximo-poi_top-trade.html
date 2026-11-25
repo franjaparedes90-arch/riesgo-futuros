@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><title>Próximo POI + Top trade %</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;padding:28px;background:#070d18;color:#c7d4e8;font:14px/1.5 -apple-system,Segoe UI,Roboto,sans-serif}
+h1{font-size:15px;margin:0 0 4px;color:#e8f0fb;font-weight:600}
+.sub{font-size:12px;color:#6b7c96;margin:0 0 24px}
+.lbl{font:11px/1 ui-monospace,Menlo,monospace;letter-spacing:.12em;color:#5d6e88;text-transform:uppercase;margin:22px 0 10px}
+.panel{background:#0d1626;border:1px solid #1b2942;border-radius:10px;padding:16px 18px}
+.fl{font-size:13px;margin:0 0 4px}
+.ip{border:1px solid #2b3c56;border-radius:6px;padding:7px 9px;font-size:13px;background:#0a1220}
+.ro{border:1px dashed #2b3c56;border-radius:6px;padding:7px 9px;font-size:12px;color:#6f7f99}
+.row{margin-bottom:11px}
+.del{text-decoration:line-through;color:#5a6a82}
+.warn{background:rgba(242,180,55,.12);border-radius:6px;padding:9px 11px;font-size:12px;color:#f2b437;margin-top:6px}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+table{width:100%;border-collapse:collapse}
+th{font:10px/1 ui-monospace,Menlo,monospace;letter-spacing:.1em;color:#5d6e88;text-transform:uppercase;text-align:right;padding:0 4px 9px;font-weight:400}
+th:first-child{text-align:left}
+td{padding:6px 4px;text-align:right;border-top:1px solid #16233a;font-variant-numeric:tabular-nums}
+td:first-child{text-align:left}
+tr.win td{background:rgba(14,138,92,.14);color:#3ddc97}
+tr.est td{opacity:.6}
+.star{color:#f2c14e;margin-left:3px}
+.tw{color:#f2b437}
+.tag{font-size:10px;color:#6f7f99;border:1px solid #28384f;border-radius:4px;padding:1px 5px;margin-left:6px}
+.note{background:#0b1322;border-left:2px solid #2f6fed;padding:11px 14px;font-size:12px;color:#8fa0bb;border-radius:0 6px 6px 0;margin-top:22px}
+.note b{color:#c7d4e8}
+@media(max-width:900px){.cols{grid-template-columns:1fr}}
+</style></head><body>
+
+<h1>Riesgo Futuros · Próximo POI + Top trade %</h1>
+<p class="sub">Aprobado por Javier el 25/11/2026. Dos cambios: una sola pregunta de POI en el formulario, y una métrica nueva en el ranking del Risk engine.</p>
+
+<p class="lbl">1 · Formulario de trade · sección 4</p>
+<div class="cols">
+<div><p class="lbl" style="margin-top:0">Ahora</p>
+<div class="panel">
+<div class="row"><p class="fl">POI en el camino (entrada → 2R)</p><div class="ip">Ninguno</div></div>
+<div class="row"><p class="fl del">¿A cuántos R está? (0 a 2R)</p></div>
+<div class="row"><p class="fl del">¿Qué pasó en el POI?</p></div>
+<div class="row"><p class="fl del">Punto de liquidez objetivo</p></div>
+<div class="row"><p class="fl del">¿A cuántos R está? (≥ 2)</p></div>
+<div class="ro">«Punto de liquidez: solo si no hay POI y llegó a 2R»</div>
+</div></div>
+<div><p class="lbl" style="margin-top:0">Propuesta</p>
+<div class="panel">
+<div class="row"><p class="fl">Próximo POI en la dirección del trade</p><div class="ip">IRL</div></div>
+<div class="row"><p class="fl">¿A cuántos R está?</p><div class="ip">3,4</div></div>
+<div class="row"><div class="ro">No llegó · deducido (MFE 1,2 &lt; POI 3,4)</div></div>
+<div class="row"><div class="ro">Lo frenó · deducido (MFE 3,5 ≤ POI + 0,2R)</div></div>
+<div class="row"><div class="ro">Lo atravesó y siguió · deducido (MFE 6,1 · no volvió a BE)</div></div>
+<div class="row" style="margin:0"><p class="fl">Si la distancia es menor que 1R</p><div class="ip" style="border-color:#6b5a1f">0,85</div>
+<div class="warn">POI por debajo de 1R: la entrada no cumple criterios. Marca P1 en «¿Siguió el plan?». Avisa, no bloquea.</div></div>
+</div></div>
+</div>
+
+<p class="lbl">2 · Risk engine · ranking completo</p>
+<div class="panel">
+<table>
+<tr><th>Management</th><th>Expectancy</th><th>Win rate</th><th>Profit factor</th><th>Max DD</th><th>Top trade %</th></tr>
+<tr class="win"><td>2R fijo</td><td>+0,20R<span class="star">★</span></td><td>40 %</td><td>1,33<span class="star">★</span></td><td>−11,2R</td><td>6 %</td></tr>
+<tr><td>1,5R fijo</td><td>+0,09R</td><td>44 %</td><td>1,16</td><td>−11,1R</td><td>5 %</td></tr>
+<tr><td>1,5R + BE 1R</td><td>+0,08R</td><td>37 %</td><td>1,17</td><td>−9,1R</td><td>6 %</td></tr>
+<tr><td>1R fijo</td><td>+0,06R</td><td>53 %<span class="star">★</span></td><td>1,12</td><td>−7,2R<span class="star">★</span></td><td>4 %<span class="star">★</span></td></tr>
+<tr><td>2R + BE 1R</td><td>−0,01R</td><td>23 %</td><td>0,97</td><td>−9,1R</td><td>10 %</td></tr>
+<tr class="est"><td>Target liq. + BE 1R <span class="tag">en estudio · 0/50</span></td><td>+0,44R</td><td>19 %</td><td>1,92</td><td>−9,1R</td><td class="tw">52 %</td></tr>
+</table>
+</div>
+
+<div class="note">
+<b>Acordado el 25/11/2026:</b><br>
+1 · Sección 4 pasa a una sola pregunta: próximo POI en la dirección del trade y su distancia en R, siempre, llegue o no el precio. Desaparecen «Punto de liquidez objetivo», su distancia y la frontera de los 2R.<br>
+2 · Se deduce del MFE: llegó o no (MFE ≥ distancia), lo frenó o lo atravesó (margen 0,2R, el mismo del BE), y BE en el POI (de «Volvió a BE tras 1R» y «MFE antes de BE»).<br>
+3 · «Ninguno» se mantiene para casos reales, como máximos históricos.<br>
+4 · Distancia &lt; 1R: la entrada no cumple criterios, se avisa y se marca P1. No bloquea el guardado.<br>
+5 · Columna Top trade % = mejor trade ganador ÷ suma de todos los ganadores. La ★ va al valor más bajo. Por encima del 50 % el valor sale en ámbar y el motor no puede recomendar esa gestión, aunque gane en Expectancy.<br>
+6 · «Target liq. + BE 1R» pasa a calcularse solo con el campo nuevo, contador desde 0/50. Los 12 registros viejos quedan como histórico, fuera del cálculo: se registraron solo cuando el precio llegó a 2R, así que están sesgados.<br>
+7 · Aplazado: la ventana del estudio por tipo de POI. Hasta tener datos, la fila solo muestra el general.<br>
+<br>
+Datos del 25/11/2026 (43 trades): Top trade % de las gestiones fijas entre 4 % y 10 %; «Target liq. + BE 1R» 52 %, con +20,68R de un solo trade sobre +19,40R netos (sin él, −1,28R).
+</div>
+
+</body></html>
