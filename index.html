@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Riesgo Futuros</title>
-<!-- Riesgo Futuros · app multiusuario (Firebase) · v31 (25/11/2026) · v31: corrige el Max DD del selector «Excluir top»: los trades excluidos se quitan sin alterar el orden cronológico del resto (antes la serie quedaba ordenada por R y el DD salía disparado) · v30 (25/11/2026) · v30: Risk engine · fuera la columna Top trade % (en target fijo era el inverso del win rate); la regla pasa a «la gestión recomendada debe seguir en positivo sin su 5 % de mejores trades» y se añade el selector «Excluir top» (no / 5 / 10 / 20 %), que recalcula la tabla sin cambiar lo que decide el motor · v29 (25/11/2026) · v29: Risk engine · columna Top trade % (peso del mejor trade sobre el beneficio bruto de cada gestión) y condición: por encima del 50 % la gestión no puede ser la recomendada, aunque gane en Expectancy · v28 (25/11/2026) · v28: Risk engine · ★ en el mejor valor de cada columna del ranking (Expectancy, Win rate, Profit factor, Max DD; solo entre gestiones elegibles; fila en verde = la que elige el motor); solo visual, el motor no cambia (mockup 2026-11-25_estrella-por-columna, aprobado 25/11/2026) · v27 (25/11/2026) · v27: RF-41 · Risk engine sin sesgo de selección en las gestiones de liquidez · v26 (24/11/2026) · v26: botón «⬇ CSV» en Risk engine (trades del motor, filtro por modelo) y en Trades (trades filtrados): una fila por trade con todo el registro + R de cada gestión · v25 (18/11/2026) · v25: Edición avanzada en Editar trade: anular pata de una copia («No ejecutada», con motivo, quién y cuándo) y Restaurar; la pata anulada no suma en equity, contabilidad ni P&L de su cuenta · v24 (17/11/2026) · v24: Vista administrador (solo lectura): en Ajustes · Admin, el admin ve las pantallas de otro participante. · v23: el tile Target muestra siempre el target del plan (sin «Cortar en» en su lugar ni target tachado); el corte (menor de TP máx. ÷ riesgo y lo que falta para pasar ÷ riesgo) va en la etiqueta ámbar «Cortar en XR» del tile TP máx. · v22.1 (16/11/2026) · v22.1: fuera el aviso «Hace … días que no sincronizás con la firma» (basta el banner de sincronizar: 10 trades o una rotación completa) · v22: aviso de sincronizar solo si operó en 7 días y lleva ≥ 7 días sin sincronizar (el alta cuenta como sync); etiqueta «Cortar en XR» en el tile TP máx. si TP máx. ÷ riesgo < target; inactividad ≥ 75 % del plazo → su grupo (o la cuenta) pasa a ser el próximo a operar por encima de la rotación · v21 (14/11/2026) · v21: RF-39 rotación desde la tabla de Cuentas: doble clic en Rotación alterna reserva ↔ rotación (al salir de reserva entra al final de la cola; si estaba en turno, el turno pasa a la siguiente), sin el botón «Activar en rotación / A reserva» de la tarjeta; vincular a un grupo de copia pasa la cuenta a rotación (Pasada/Quemada no se vinculan) · v20 (13/11/2026) · v20: equity con System y Real independientes (dos ejes) y sombreado del drawdown; Monthly P&L con valor por barra y media acumulada suavizada · v19 (13/11/2026) · v19: Cuentas más limpia: Gestión de copias en desplegable cerrado con resumen de grupos; Agregar / Editar / sincronizar cuenta en panel lateral (✏️ o «＋ Agregar cuenta») · v18 (13/11/2026) · v18: cortar al pasar la challenge (target = menor de 1,5R, TP máx. y lo que falta + comisiones), objetivo alcanzado → no operar, fuera de la rotación y botón Pasar a Funded · v17 (13/11/2026) · v17: gestión de copias con arrastrar y soltar, pantalla Hoy minimalista con «Operaste con · hoy», aviso de sincronizar balances, normas de la firma al comprar · v16: copia de cuentas · v15: bloqueo al guardar trade, motor de gestión con trades reales, pantalla Risk engine, tarjeta con selector de modelo y panel Risk · v14: pantallas estilo Tradinverso (barra lateral plegable, filtros globales, Trades, Dashboard, Calendario, Cuentas, Contabilidad con pestañas), noticias (catálogo por usuario, cascada en la checklist, línea y color en la tarjeta, contexto «Operado en noticias» al guardar) y tema claro/oscuro · v13 (13/11/2026) ·v13 · RF-27: curvas de equity (cartera y cuenta) ancladas al balance real de la última sincronización + ventana «Sincronizar cuentas» (balance y min balance por cuenta, Dif. con umbral 0,2 %) · v12 (08/11/2026) ·v12: editar un trade conserva cargadoTradinverso y cargadoEl (antes se borraban y el cierre de día lo volvía a dar como pendiente) · v11 (28/10/2026) · v11: FVG HTF como el POI: en el camino (entrada → 2R), distancia entre 0 y 2R · v10 (28/10/2026) · v10: bloqueo por consistencia si el TP máx. de hoy < 0,4 % de la cuenta (mínimo de riesgo): la cuenta se bloquea hoy, se opera la siguiente de la cola y mañana vuelve; con ≥ 0,4 % sigue igual (cortar en el TP máx.) · v9 (26/10/2026) · v9: consistencia: target recortado a lo que queda del TP máx. (cortar en +$, ≈R), tarjeta amarilla, consistencia alcanzada → hoy se opera la siguiente y mañana vuelve la misma (SL del reemplazo → final de la cola), target con importe en $, fuera "No estoy en reset" de la checklist · v8 (24/10/2026) · v8: alerta de reset del trader (3 días perdedores seguidos → pausa 3 días naturales; 2.º seguido con errores → 1 semana), aviso al registrar en reset (P5), ítem de checklist "No estoy en reset" · v7 (24/10/2026) · v7: P0 "¿Sesión preparada?" automática desde la checklist del día (vigente desde 26/10/2026), checklist guardada por fecha, KPI Sesión preparada · v6 (24/10/2026) · v6: formulario completo de trade (Nasdaq) igual al de la app vieja, editar/completar trades y journal en Trades (sin R plan) · v5 (24/10/2026) · v5: tabla de cuentas: quemadas/pasadas/reserva sin "Poner en turno" · v4 (24/10/2026) · v4: riesgo en rojo si supera el margen; checklist con bots VPS solo para el admin · v3 (23/10/2026) · v3: Cuentas y contabilidad (equity, retiros, compras, resets, reserva, inactividad, caducidad) · v2: consistencia por cuenta
+<!-- Riesgo Futuros · app multiusuario (Firebase) · v32 (25/11/2026) · v32: «Próximo POI» (mockup 2026-11-25_proximo-poi_robustez): la sección 4 pregunta solo el próximo POI en la dirección del trade y su distancia (sin tope de 2R; «Ninguno» disponible); fuera «Punto de liquidez» y su distancia; «Qué pasó en el POI» (No llegó / Lo frenó hasta POI + 0,2R / Lo atravesó) y «BE en el POI» se deducen del MFE; POI a menos de 1R avisa y marca P1 (no bloquea); «Target liq. + BE 1R» se calcula con el próximo POI y solo con trades nuevos (poiV2), contador desde 0/50; los trades viejos quedan como histórico · v31 (25/11/2026) · v31: corrige el Max DD del selector «Excluir top»: los trades excluidos se quitan sin alterar el orden cronológico del resto (antes la serie quedaba ordenada por R y el DD salía disparado) · v30 (25/11/2026) · v30: Risk engine · fuera la columna Top trade % (en target fijo era el inverso del win rate); la regla pasa a «la gestión recomendada debe seguir en positivo sin su 5 % de mejores trades» y se añade el selector «Excluir top» (no / 5 / 10 / 20 %), que recalcula la tabla sin cambiar lo que decide el motor · v29 (25/11/2026) · v29: Risk engine · columna Top trade % (peso del mejor trade sobre el beneficio bruto de cada gestión) y condición: por encima del 50 % la gestión no puede ser la recomendada, aunque gane en Expectancy · v28 (25/11/2026) · v28: Risk engine · ★ en el mejor valor de cada columna del ranking (Expectancy, Win rate, Profit factor, Max DD; solo entre gestiones elegibles; fila en verde = la que elige el motor); solo visual, el motor no cambia (mockup 2026-11-25_estrella-por-columna, aprobado 25/11/2026) · v27 (25/11/2026) · v27: RF-41 · Risk engine sin sesgo de selección en las gestiones de liquidez · v26 (24/11/2026) · v26: botón «⬇ CSV» en Risk engine (trades del motor, filtro por modelo) y en Trades (trades filtrados): una fila por trade con todo el registro + R de cada gestión · v25 (18/11/2026) · v25: Edición avanzada en Editar trade: anular pata de una copia («No ejecutada», con motivo, quién y cuándo) y Restaurar; la pata anulada no suma en equity, contabilidad ni P&L de su cuenta · v24 (17/11/2026) · v24: Vista administrador (solo lectura): en Ajustes · Admin, el admin ve las pantallas de otro participante. · v23: el tile Target muestra siempre el target del plan (sin «Cortar en» en su lugar ni target tachado); el corte (menor de TP máx. ÷ riesgo y lo que falta para pasar ÷ riesgo) va en la etiqueta ámbar «Cortar en XR» del tile TP máx. · v22.1 (16/11/2026) · v22.1: fuera el aviso «Hace … días que no sincronizás con la firma» (basta el banner de sincronizar: 10 trades o una rotación completa) · v22: aviso de sincronizar solo si operó en 7 días y lleva ≥ 7 días sin sincronizar (el alta cuenta como sync); etiqueta «Cortar en XR» en el tile TP máx. si TP máx. ÷ riesgo < target; inactividad ≥ 75 % del plazo → su grupo (o la cuenta) pasa a ser el próximo a operar por encima de la rotación · v21 (14/11/2026) · v21: RF-39 rotación desde la tabla de Cuentas: doble clic en Rotación alterna reserva ↔ rotación (al salir de reserva entra al final de la cola; si estaba en turno, el turno pasa a la siguiente), sin el botón «Activar en rotación / A reserva» de la tarjeta; vincular a un grupo de copia pasa la cuenta a rotación (Pasada/Quemada no se vinculan) · v20 (13/11/2026) · v20: equity con System y Real independientes (dos ejes) y sombreado del drawdown; Monthly P&L con valor por barra y media acumulada suavizada · v19 (13/11/2026) · v19: Cuentas más limpia: Gestión de copias en desplegable cerrado con resumen de grupos; Agregar / Editar / sincronizar cuenta en panel lateral (✏️ o «＋ Agregar cuenta») · v18 (13/11/2026) · v18: cortar al pasar la challenge (target = menor de 1,5R, TP máx. y lo que falta + comisiones), objetivo alcanzado → no operar, fuera de la rotación y botón Pasar a Funded · v17 (13/11/2026) · v17: gestión de copias con arrastrar y soltar, pantalla Hoy minimalista con «Operaste con · hoy», aviso de sincronizar balances, normas de la firma al comprar · v16: copia de cuentas · v15: bloqueo al guardar trade, motor de gestión con trades reales, pantalla Risk engine, tarjeta con selector de modelo y panel Risk · v14: pantallas estilo Tradinverso (barra lateral plegable, filtros globales, Trades, Dashboard, Calendario, Cuentas, Contabilidad con pestañas), noticias (catálogo por usuario, cascada en la checklist, línea y color en la tarjeta, contexto «Operado en noticias» al guardar) y tema claro/oscuro · v13 (13/11/2026) ·v13 · RF-27: curvas de equity (cartera y cuenta) ancladas al balance real de la última sincronización + ventana «Sincronizar cuentas» (balance y min balance por cuenta, Dif. con umbral 0,2 %) · v12 (08/11/2026) ·v12: editar un trade conserva cargadoTradinverso y cargadoEl (antes se borraban y el cierre de día lo volvía a dar como pendiente) · v11 (28/10/2026) · v11: FVG HTF como el POI: en el camino (entrada → 2R), distancia entre 0 y 2R · v10 (28/10/2026) · v10: bloqueo por consistencia si el TP máx. de hoy < 0,4 % de la cuenta (mínimo de riesgo): la cuenta se bloquea hoy, se opera la siguiente de la cola y mañana vuelve; con ≥ 0,4 % sigue igual (cortar en el TP máx.) · v9 (26/10/2026) · v9: consistencia: target recortado a lo que queda del TP máx. (cortar en +$, ≈R), tarjeta amarilla, consistencia alcanzada → hoy se opera la siguiente y mañana vuelve la misma (SL del reemplazo → final de la cola), target con importe en $, fuera "No estoy en reset" de la checklist · v8 (24/10/2026) · v8: alerta de reset del trader (3 días perdedores seguidos → pausa 3 días naturales; 2.º seguido con errores → 1 semana), aviso al registrar en reset (P5), ítem de checklist "No estoy en reset" · v7 (24/10/2026) · v7: P0 "¿Sesión preparada?" automática desde la checklist del día (vigente desde 26/10/2026), checklist guardada por fecha, KPI Sesión preparada · v6 (24/10/2026) · v6: formulario completo de trade (Nasdaq) igual al de la app vieja, editar/completar trades y journal en Trades (sin R plan) · v5 (24/10/2026) · v5: tabla de cuentas: quemadas/pasadas/reserva sin "Poner en turno" · v4 (24/10/2026) · v4: riesgo en rojo si supera el margen; checklist con bots VPS solo para el admin · v3 (23/10/2026) · v3: Cuentas y contabilidad (equity, retiros, compras, resets, reserva, inactividad, caducidad) · v2: consistencia por cuenta
      Misma lógica que la app de Apps Script (Real_Codigo.gs): Tabla maestra para Funded, regla v7 para challenges,
      rotación (SL → siguiente cuenta), plan B y registro rápido. Cada usuario ve solo sus cuentas y trades.
      La Tabla maestra es compartida (config/tablaMaestra) y solo la edita el admin. -->
@@ -783,9 +783,10 @@ function reTrade(t) {
   const rCierre = n(f.rCierre), abierto = volvio !== 'No' && f.abierto && !isNaN(rCierre);
   const noAlc = volvio === 'No' ? 0 : (abierto ? rCierre : -1), fijo = T => mfe >= T ? T : noAlc;
   const be1 = T => mfe < 1 ? noAlc : (volvio === 'Sí' ? (mfeAntes >= T ? T : 0) : (mfe >= T ? T : 0));
-  // RF-41: objetivo = POI si lo hay; si no, el punto de liquidez (≥ 2R); sin ninguno de los dos, 2R (el trade no llegó a 2R: mismo resultado).
-  const hayPoi = f.poi && f.poi !== 'Ninguno', distPoi = n(f.distPoi), distLiq = n(f.distLiq);
-  const objLiq = hayPoi ? distPoi : (distLiq >= 2 ? distLiq : 2);
+  // v32 · «Próximo POI»: objetivo = próximo POI en la dirección del trade (sin tope); «Ninguno» → 2R, como en RF-41.
+  // Solo trades con el campo nuevo (poiV2): los viejos (punto de liquidez, pedido solo si el MFE llegó a 2R) están sesgados y quedan fuera.
+  const hayPoi = f.poi && f.poi !== 'Ninguno', distPoi = n(f.distPoi);
+  const objLiq = !f.poiV2 ? NaN : hayPoi ? distPoi : 2;
   return { t, fecha: f.fecha || '', hora: f.horaAp || '', num: num(t.num), modelo: f.modelo || '',
     g: { g1: fijo(1), g15: fijo(1.5), g2: fijo(2), be15: be1(1.5), be2: be1(2), liqBe1: isNaN(objLiq) ? null : be1(objLiq) } };
 }
@@ -854,8 +855,8 @@ function reDecidir(modelo, B) {
   const elegible = s => s.n > 0 && !(gestK(s.k) || {}).est && (s.n >= total || s.n >= RE_MIN) && s.sin5 > 0;
   const enEstudio = k => !!(gestK(k) || {}).est;
   const ord = (p, q) => (enEstudio(p.k) ? 1 : 0) - (enEstudio(q.k) ? 1 : 0) || q.exp - p.exp;
-  const ranking = GESTIONES.map(g => reStats(L, g.k, B.com)).filter(s => s.n > 0).sort(ord);
-  const vista = RE_EX ? GESTIONES.map(g => reStats(L, g.k, B.com, RE_EX)).filter(s => s.n > 0).sort(ord) : ranking;
+  const ranking = GESTIONES.map(g => reStats(L, g.k, B.com)).filter(s => s.n > 0 || enEstudio(s.k)).sort(ord);
+  const vista = RE_EX ? GESTIONES.map(g => reStats(L, g.k, B.com, RE_EX)).filter(s => s.n > 0 || enEstudio(s.k)).sort(ord) : ranking;
   const ch = GESTIONES.map(g => reSimChallenge(L, g.k, B.com)).filter(s => s.n > 0).sort(reOrdCh);
   const guard = real ? (RE_VIG[F0.scope] || {}) : {};
   // Challenge: vigente 1,5R fijo (regla v7) salvo decisión real guardada; cambia si la ganadora supera por ≥ 5 pp.
@@ -972,7 +973,7 @@ function renderRisk() {
       + (() => { const elK = (d.rkElig || []).map(x => x.k), base = d.vista || d.ranking, el = base.filter(x => elK.indexOf(x.k) >= 0), mejor = f => { const v = el.map(f).filter(x => x != null && !isNaN(x)); return el.length > 1 && v.length ? { hi: Math.max(...v), lo: Math.min(...v) } : null; };
         const fE = s => s.exp, fW = s => s.wr, fP = s => s.pf, fD = s => s.dd, bE = mejor(fE), bW = mejor(fW), bP = mejor(fP), bD = mejor(fD);
         const st = (s, f, b, hi) => el.includes(s) && b && f(s) === (hi ? b.hi : b.lo) ? '<span class="st">★</span>' : '';
-        return (d.vista || d.ranking).map(s => { const es = !!(gestK(s.k) || {}).est, w = d.rkWin && s.k === d.rkWin.k; return '<tr' + (w ? ' class="win"' : es ? ' class="est"' : '') + '><td>' + esc(nom(s.k)) + nTxt(s) + (es ? ' <span class="tag">en estudio</span>' : '') + '</td><td>' + fmtRs(s.exp) + st(s, fE, bE, 1) + '</td><td>' + fmtPc(s.wr) + st(s, fW, bW, 1) + '</td><td>' + (s.pf == null ? '—' : s.pf === Infinity ? '∞' : s.pf.toFixed(2).replace('.', ',')) + st(s, fP, bP, 1) + '</td><td>' + fmtRs(s.dd, 1) + st(s, fD, bD, 1) + '</td></tr>'; }).join(''); })() + '</table>'
+        return (d.vista || d.ranking).map(s => { const es = !!(gestK(s.k) || {}).est, w = d.rkWin && s.k === d.rkWin.k; return '<tr' + (w ? ' class="win"' : es ? ' class="est"' : '') + '><td>' + esc(nom(s.k)) + (es ? ' <span class="tag">en estudio · ' + s.n + '/' + RE_MIN + '</span>' : nTxt(s)) + '</td><td>' + fmtRs(s.exp) + st(s, fE, bE, 1) + '</td><td>' + fmtPc(s.wr) + st(s, fW, bW, 1) + '</td><td>' + (s.pf == null ? '—' : s.pf === Infinity ? '∞' : s.pf.toFixed(2).replace('.', ',')) + st(s, fP, bP, 1) + '</td><td>' + fmtRs(s.dd, 1) + st(s, fD, bD, 1) + '</td></tr>'; }).join(''); })() + '</table>'
       + '<div class="mut" style="font-size:11px;margin-top:8px">' + pie + '</div></div>';
   }
   $('reBox').innerHTML = h;
@@ -1442,6 +1443,19 @@ let F = null, F_EDIT = null, F_MSG = '', F_ERR = '', CHKS = {}, RESET_OV = {};
 let F_SNAP = '', F_PREG = false, F_ADV = null;
 const MOT_ANULA = ['El copiador falló', 'Rechazada por el broker', 'Cuenta bloqueada o sin margen', 'Otro'];
 const P0_DESDE = '2026-10-26';
+// v32 · «Próximo POI»: qué pasó y el BE se deducen del MFE (margen 0,2R, el mismo del BE). null si falta un dato.
+const POI_MARGEN = 0.2;
+function poiDeducido(mfe, dist, volvio, mfeAntes) {
+  if (isNaN(mfe) || isNaN(dist) || dist <= 0) return null;
+  const quePaso = mfe < dist ? 'No llegó' : mfe <= dist + POI_MARGEN + 1e-9 ? 'Lo frenó' : 'Lo atravesó';
+  return { quePaso, bePoi: volvio === 'Sí' && mfeAntes < dist ? 'Me sacó en BE' : 'Siguió' };
+}
+// v32 · POI a menos de 1R → la entrada no cumple criterios: marca P1 (avisa, no bloquea). Si se corrige la distancia, quita la P1 que puso.
+function autoP1() {
+  const d = parseFloat(String(F.distPoi).replace(',', '.')), bajo = F.poi && F.poi !== 'Ninguno' && d > 0 && d < 1;
+  if (bajo && !F.preguntas.includes('P1')) { F.preguntas = F.preguntas.concat(['P1']); F.plan = 'No'; F.p1Auto = true; }
+  else if (!bajo && F.p1Auto) { F.preguntas = F.preguntas.filter(x => x !== 'P1'); F.p1Auto = false; if (!F.preguntas.length && F.p0 !== 'No') F.plan = ''; }
+}
 function autoP0() {
   if (!F || F.p0Manual) return;
   if (!F.fecha || F.fecha < P0_DESDE) { F.p0 = ''; F.p0Falta = []; F.preguntas = F.preguntas.filter(x => x !== 'P0'); return; }
@@ -1463,7 +1477,7 @@ function nuevoForm(base) {
   const E = TM ? estadoCuentas() : [], turno = cuentaOperar(E), now = new Date();
   F = Object.assign({ estrategia: 'Nasdaq', cuenta: turno ? turno.c.id : '', estado: turno ? turno.estado : '', salida: '', usd: '', rr: '', riesgoManual: '', plan: '', preguntas: [], sensacion: '',
     fecha: hoyES(), horaAp: horaTz(now, 'Europe/Madrid'), horaCi: horaTz(now, 'Europe/Madrid'), setup: '', modelo: '', zona: '', tipos: [], mfe: '', volvioBE: '', mfeAntesBE: '', abierto: false, rCierre: '',
-    poi: 'Ninguno', distPoi: '', quePaso: '', bePoi: '', puntoLiq: '', distLiq: '', fvg: '', fvgTf: [], fvgUb: '', fvgDir: '', fvgRe: '', fvgDist: '', linkHtf: '', linkLtf: '', reflexion: '', captura: null, grupo: '', grupoNombre: '', ejL: [], motivo: '', motivoTxt: '' }, base || {});
+    poi: 'Ninguno', distPoi: '', quePaso: '', bePoi: '', puntoLiq: '', distLiq: '', llegoLiq: '', poiV2: true, p1Auto: false, fvg: '', fvgTf: [], fvgUb: '', fvgDir: '', fvgRe: '', fvgDist: '', linkHtf: '', linkLtf: '', reflexion: '', captura: null, grupo: '', grupoNombre: '', ejL: [], motivo: '', motivoTxt: '' }, base || {});
   if (!base && turno && turno.grupo) ponerGrupoForm(turno.grupo.g);
   F.p0Manual = !!(base && base.p0); if (!F.p0Manual) autoP0();
 }
@@ -1484,7 +1498,7 @@ function formDeTrade(t) {
     setup: g('setup', 'Setup'), modelo: g('modelo', 'Modelo'), zona: g('zona', 'Zona'), tipos: lista('tipos', 'Tipo de Entrada', '|'),
     mfe: n(g('mfe', 'MFE (R)')), volvioBE: g('volvioBE', 'Volvió a BE tras 1R'), mfeAntesBE: n(g('mfeAntesBE', 'MFE antes de BE (R)')), abierto: t.abierto === true || d['Seguía Abierto 19:00'] === 'Sí', rCierre: n(g('rCierre', 'R al Cierre')),
     poi: g('poi', 'POI en el Camino') || 'Ninguno', distPoi: n(g('distPoi', 'Distancia POI (R)')), quePaso: g('quePaso', 'Qué Pasó en el POI'), bePoi: g('bePoi', 'BE en el POI'),
-    puntoLiq: g('puntoLiq', 'Punto de Liquidez'), distLiq: n(g('distLiq', 'Distancia Liquidez (R)')),
+    puntoLiq: g('puntoLiq', 'Punto de Liquidez'), distLiq: n(g('distLiq', 'Distancia Liquidez (R)')), llegoLiq: g('llegoLiq', 'Llegó a Liquidez'), poiV2: t.poiV2 === true || (!!t.rapido && !t.completo), p1Auto: false,
     fvg: g('fvg', 'FVG HTF Presente'), fvgTf: lista('fvgTf', 'FVG HTF Temporalidad', '|'), fvgUb: g('fvgUb', 'FVG HTF Ubicación'), fvgDir: g('fvgDir', 'FVG HTF Dirección'), fvgRe: g('fvgRe', 'FVG HTF Reacciona'), fvgDist: n(g('fvgDist', 'FVG HTF Distancia (R)')),
     p0: t.p0 || '', p0Falta: t.p0Falta || [], captura: t.captura || null,
     grupo: t.grupo ? t.grupo.id : '', grupoNombre: t.grupo ? t.grupo.nombre : '', motivo: t.motivoCorte ? t.motivoCorte.tipo : '', motivoTxt: t.motivoCorte && t.motivoCorte.tipo === 'otro' ? t.motivoCorte.texto : '',
@@ -1582,12 +1596,15 @@ function renderForm() {
   if (mfe >= 1 && F.volvioBE === 'Sí') h += campo('MFE antes de volver a BE *', inp('mfeAntesBE', 'number'));
   if (F.volvioBE !== 'No') h += campo('¿Seguía abierto a las 19:00? (caso raro)', '<label class="chk"><input type="checkbox" data-fin="abierto"' + (F.abierto ? ' checked' : '') + '> Sí</label>');
   if (F.volvioBE !== 'No' && F.abierto) h += campo('R al cierre de las 19:00 *', inp('rCierre', 'number'));
-  h += '</div></div><div class="card fsec"><div class="ft">4 · POI y liquidez</div><div class="fg">' + campo('POI en el camino (entrada → 2R) *', sel('poi', ['Ninguno'].concat(CAT.poi), 'Ninguno'));
-  const poiPasado = hayPoi && mfe > num(F.distPoi);
-  if (poiPasado) F.quePaso = 'Lo atravesó';
-  if (hayPoi) h += campo('¿A cuántos R está? *', inp('distPoi', 'number')) + campo('¿Qué pasó en el POI? *', poiPasado ? '<div class="ro">Lo atravesó · deducido (MFE &gt; POI)</div>' : chips('quePaso', CAT.quePaso)) + (F.quePaso === 'Lo atravesó' ? campo('BE en el POI *', chips('bePoi', CAT.bePoi)) : '');
-  if (!hayPoi && mfe >= 2) h += campo('Punto de liquidez objetivo *', sel('puntoLiq', CAT.poi)) + campo('¿A cuántos R está? (≥ 2) *', inp('distLiq', 'number'));
-  if (!hayPoi && !(mfe >= 2)) h += '<div class="mut" style="font-size:12px;align-self:center">Punto de liquidez: solo si no hay POI y llegó a 2R.</div>';
+  // v32 · «Próximo POI» (mockup 2026-11-25_proximo-poi_robustez): una sola pregunta; qué pasó y el BE se deducen del MFE.
+  h += '</div></div><div class="card fsec"><div class="ft">4 · POI</div><div class="fg">' + campo('Próximo POI en la dirección del trade *', sel('poi', ['Ninguno'].concat(CAT.poi), 'Ninguno'));
+  if (hayPoi) {
+    const dP = num(F.distPoi), mA = num(F.mfeAntesBE), dz = poiDeducido(mfe, dP, mfe >= 1 ? F.volvioBE : '', mA), f1 = x => String(x).replace('.', ',');
+    h += campo('¿A cuántos R está? *', inp('distPoi', 'number') + (dP > 0 && dP < 1 ? '<div class="warn" style="margin:4px 0 0;padding:5px 8px;font-size:12px">POI por debajo de 1R: la entrada no cumple criterios. Se marca P1 en «¿Siguió el plan?».</div>' : ''));
+    if (dz && F.poiV2) h += campo('Qué pasó en el POI · deducido', '<div class="ro">' + esc(dz.quePaso === 'Lo atravesó' ? 'Lo atravesó' + (dz.bePoi === 'Siguió' ? ' y siguió' : ' · el BE lo sacó antes') : dz.quePaso)
+      + ' (MFE ' + f1(mfe) + (dz.quePaso === 'No llegó' ? ' &lt; POI ' : dz.quePaso === 'Lo frenó' ? ' ≤ POI + 0,2R · ' : ' &gt; POI + 0,2R · ') + (dz.quePaso === 'No llegó' ? f1(dP) : f1(Math.round((dP + POI_MARGEN) * 100) / 100)) + ')</div>');
+  }
+  if (!F.poiV2 && (F.quePaso || F.puntoLiq)) h += '<div class="mut" style="font-size:12px;align-self:center">Registro anterior a v32 (histórico, no se recalcula)' + (F.quePaso ? ' · ' + esc(F.quePaso) + (F.bePoi ? ' · ' + esc(F.bePoi) : '') : '') + (F.puntoLiq ? ' · liquidez ' + esc(F.puntoLiq) + ' a ' + esc(String(F.distLiq).replace('.', ',')) + 'R' : '') + '.</div>';
   h += '</div></div><div class="card fsec"><div class="ft">5 · FVG HTF</div><div class="fg">' + campo('FVG HTF en el camino (entrada → 2R) *', chips('fvg', ['Sí', 'No']));
   if (F.fvg === 'Sí') h += campo('Temporalidad * (una o más)', chips('fvgTf', CAT.fvgTf, true)) + campo('¿Dónde está? *', chips('fvgUb', CAT.fvgUb)) + (F.fvgUb === 'En el camino' ? campo('¿A cuántos R de la entrada? (0–2) *', inp('fvgDist', 'number')) : '') + campo('¿A favor o en contra? *', chips('fvgDir', CAT.fvgDir)) + campo('¿Reacciona? * (sea TP o SL)', chips('fvgRe', CAT.fvgRe));
   h += '</div></div><div class="card fsec"><div class="ft">6 · Links y reflexión · P6</div><div class="fg">' + campo('Link HTF (M15)', inp('linkHtf', 'url', 'https://www.tradingview.com/x/…')) + campo('Link LTF (M1)', inp('linkLtf', 'url', 'https://www.tradingview.com/x/…'))
@@ -1659,23 +1676,14 @@ function validarTrade(f) {
   let distPoi = '', fuera = '', quePaso = '', bePoi = '';
   if (hayPoi) {
     if (!en(CAT.poi, f.poi)) return falta('POI en el camino', 'poi');
-    distPoi = n(f.distPoi); if (isNaN(distPoi)) return falta('Distancia del POI (R)', 'distPoi'); if (distPoi <= 0 || distPoi > 2) return err('Distancia del POI: entre 0 y 2R', 'distPoi');
+    distPoi = n(f.distPoi); if (isNaN(distPoi)) return falta('Distancia del POI (R)', 'distPoi'); if (distPoi <= 0) return err('Distancia del POI: mayor que 0', 'distPoi');
     fuera = distPoi < 1 ? 'Sí' : 'No';
-    // Si el MFE ya supera el POI, llegó y lo atravesó: se deduce, no se pregunta (Javier, 13/11/2026)
-    if (mfe > distPoi) quePaso = 'Lo atravesó';
-    else { if (!en(CAT.quePaso, f.quePaso)) return falta('¿Qué pasó en el POI?', 'quePaso'); quePaso = f.quePaso; }
-    if (mfe >= 2 && quePaso !== 'Lo atravesó') return err('¿Qué pasó en el POI?: si llegó al 2R, lo atravesó', 'quePaso');
-    if (quePaso === 'Lo atravesó') { if (!en(CAT.bePoi, f.bePoi)) return falta('BE en el POI', 'bePoi'); bePoi = f.bePoi; }
-    else if (quePaso === 'Lo frenó') bePoi = 'Me sacó en BE';
+    // v32 · qué pasó y el BE en el POI se deducen del MFE (margen 0,2R). Trades anteriores a v32: se conservan sus valores (histórico).
+    if (f.poiV2) { const dz = poiDeducido(mfe, distPoi, volvio, mfeAntes === '' ? NaN : mfeAntes); quePaso = dz.quePaso; bePoi = dz.bePoi; }
+    else { quePaso = f.quePaso || ''; bePoi = f.bePoi || ''; }
   }
-  const hayLiq = !hayPoi && mfe >= 2;
-  let puntoLiq = '', distLiq = '', llegoLiq = '';
-  if (hayLiq) {
-    if (!en(CAT.poi, f.puntoLiq)) return falta('Punto de liquidez objetivo', 'puntoLiq');
-    puntoLiq = f.puntoLiq; distLiq = n(f.distLiq);
-    if (isNaN(distLiq)) return falta('Distancia al punto de liquidez (R)', 'distLiq'); if (distLiq < 2) return err('Distancia al punto de liquidez: 2R o más', 'distLiq');
-    llegoLiq = mfe >= distLiq ? 'Sí' : 'No';
-  }
+  // v32 · el punto de liquidez desaparece; los trades viejos lo conservan tal cual (histórico, fuera del Risk engine).
+  const puntoLiq = f.poiV2 ? '' : (f.puntoLiq || ''), distLiq = f.poiV2 || f.distLiq === '' || isNaN(n(f.distLiq)) ? '' : n(f.distLiq), llegoLiq = f.poiV2 ? '' : (f.llegoLiq || ''), hayLiq = !f.poiV2 && !!puntoLiq && !isNaN(n(distLiq));
   if (f.fvg !== 'Sí' && f.fvg !== 'No') return falta('FVG HTF en el camino', 'fvg');
   let fvgTf = [], fvgUb = '', fvgDir = '', fvgRe = '', fvgDist = '';
   if (f.fvg === 'Sí') {
@@ -1693,7 +1701,9 @@ function validarTrade(f) {
   // gestiones (igual que el BT v9)
   const noAlc = volvio === 'No' ? 0 : (abierto ? rCierre : -1), fijo = T => mfe >= T ? T : noAlc;
   const be1 = T => mfe < 1 ? noAlc : (volvio === 'Sí' ? (mfeAntes >= T ? T : 0) : (mfe >= T ? T : 0));
-  const gest = { g1: fijo(1), g15: fijo(1.5), g2: fijo(2), be15: be1(1.5), be2: be1(2), poi: hayPoi ? (bePoi === 'Me sacó en BE' ? 0 : fijo(2)) : '', liq: hayLiq ? (mfe >= distLiq ? distLiq : 0) : '' };
+  const gest = { g1: fijo(1), g15: fijo(1.5), g2: fijo(2), be15: be1(1.5), be2: be1(2), poi: hayPoi ? (bePoi === 'Me sacó en BE' ? 0 : fijo(2)) : '',
+    // v32 · «Target liq. + BE 1R» con el próximo POI: llega → distPoi; no llega → BE como en el resto (be1). Viejos: fórmula de antes.
+    liq: f.poiV2 ? (hayPoi ? be1(distPoi) : '') : (hayLiq ? (mfe >= distLiq ? distLiq : 0) : '') };
   let reflexion = String(f.reflexion || '').trim();
   if (f.plan === 'No' && !fallidas.every(x => reflexion.includes(x))) reflexion = fallidas.map(x => x === 'P0' && f.p0Falta && f.p0Falta.length ? 'P0 (faltó: ' + f.p0Falta.join(', ') + ')' : x).join(', ') + (reflexion ? ' · ' + reflexion : '');
   const p6 = (!reflexion || !f.linkHtf || !f.linkLtf) ? 'Sí' : 'No';
@@ -1703,7 +1713,7 @@ function validarTrade(f) {
   const target = cap ? cap.target : f.estado === 'Challenge' ? (E && E.target || '1,5R fijo') : (TM && TM[f.estado] ? TM[f.estado].target : '');
   const o = { estrategia: 'Nasdaq', cuenta: c.id, estado: f.estado, salida: f.salida, usd, rr, riesgo: riesgo === '' ? 0 : riesgo, riesgoPct, pnlPct, plan: f.plan, preguntas: fallidas, p0: f.fecha >= P0_DESDE ? f.p0 : '', p0Falta: f.p0 === 'No' ? (f.p0Falta || []) : [], sensacion: f.sensacion,
     fecha: f.fecha, hora: f.horaAp, horaCi: f.horaCi, setup: f.setup, modelo: f.modelo, zona: f.zona, tipos, mfe, volvioBE: volvio, mfeAntesBE: mfeAntes, abierto, rCierre,
-    poi: hayPoi ? f.poi : 'Ninguno', distPoi, fueraPlan: fuera, quePaso, bePoi, puntoLiq, distLiq, llegoLiq, fvg: f.fvg, fvgTf, fvgUb, fvgDir, fvgRe, fvgDist,
+    poi: hayPoi ? f.poi : 'Ninguno', distPoi, fueraPlan: fuera, quePaso, bePoi, puntoLiq, distLiq, llegoLiq, poiV2: !!f.poiV2, fvg: f.fvg, fvgTf, fvgUb, fvgDir, fvgRe, fvgDist,
     linkHtf: f.linkHtf || '', linkLtf: f.linkLtf || '', nota: reflexion, p6, cuentaStats, gestiones: gest, target, completo: true, contexto: ctxCalc(f.fecha, f.horaAp) };
   if (cap) o.captura = cap;
   if (ejec) { o.ejecuciones = ejec; o.grupo = { id: f.grupo || '', nombre: f.grupoNombre || '' }; }
@@ -2452,6 +2462,7 @@ document.addEventListener('click', async ev => {
     if (k === 'p0') { F.p0Manual = true; aplicarP0(); }
     if (k === 'plan' && F.p0 === 'No') F.plan = 'No';
     if (k === 'preguntas' && v === 'P0') { F.p0Manual = true; F.p0 = F.preguntas.includes('P0') ? 'No' : (F.fecha >= P0_DESDE ? 'Sí' : ''); if (F.p0 === 'No') F.plan = 'No'; }
+    if (k === 'preguntas' && v === 'P1') F.p1Auto = false;
     if (k === 'motivo' && F.motivo === 'target') { F.plan = 'No'; if (!F.preguntas.includes('P2')) F.preguntas = F.preguntas.concat(['P2']); }
     if (k === 'salida') { const u = parseFloat(String(F.usd).replace(',', '.')); if (!isNaN(u)) F.usd = String(v === 'SL' ? -Math.abs(u) : v === 'TP' ? Math.abs(u) : u); if (v === 'SL') F.rr = '-1'; else if (v === 'BE') F.rr = '0'; else if (v === 'TP' && parseFloat(F.rr) < 0) F.rr = ''; }
     renderForm(); return; }
@@ -2509,10 +2520,11 @@ document.addEventListener('change', ev => {
     F[fk] = ev.target.type === 'checkbox' ? ev.target.checked : ev.target.value;
     if (fk === 'usd' && (F.salida === 'SL' || F.salida === 'TP')) { const u = parseFloat(String(F.usd).replace(',', '.')); if (!isNaN(u)) F.usd = String(F.salida === 'SL' ? -Math.abs(u) : Math.abs(u)); }
     if (fk === 'fecha') autoP0();
+    if (fk === 'poi' || fk === 'distPoi') autoP1();
     if (fk === 'cuenta' && TM) { const e = estadoCuentas().find(x => x.c.id === F.cuenta); if (e) F.estado = e.estado; }
     if (fk === 'cuenta' && !F_EDIT) ponerGrupoForm(grupoDeLider(F.cuenta));
     if (fk === F_ERR) { F_ERR = ''; const x = ev.target.closest('.fc'); if (x) x.classList.remove('err'); }
-    if (['cuenta', 'usd', 'rr', 'mfe', 'poi', 'distPoi', 'abierto', 'fvgUb', 'fecha'].includes(fk)) setTimeout(() => { const a = document.activeElement && document.activeElement.dataset ? document.activeElement.dataset.fin : null; renderForm(); if (a) { const e = document.querySelector('[data-fin="' + a + '"]'); if (e) e.focus(); } }, 0);
+    if (['cuenta', 'usd', 'rr', 'mfe', 'mfeAntesBE', 'poi', 'distPoi', 'abierto', 'fvgUb', 'fecha'].includes(fk)) setTimeout(() => { const a = document.activeElement && document.activeElement.dataset ? document.activeElement.dataset.fin : null; renderForm(); if (a) { const e = document.querySelector('[data-fin="' + a + '"]'); if (e) e.focus(); } }, 0);
     return;
   }
   const tg = ev.target;
