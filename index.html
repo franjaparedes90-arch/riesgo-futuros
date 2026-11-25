@@ -71,7 +71,9 @@ input,select{background:var(--card-2);color:var(--text);border:1px solid var(--l
 .rpb{height:4px;background:var(--line);border-radius:2px}.rpb i{display:block;height:4px;background:var(--real);border-radius:2px}.rpn{font:11px var(--mono);color:var(--muted);margin-top:2px}
 .rechip{margin:8px 0;padding:8px;border:1px dashed var(--line-2);border-radius:8px}.rechip .ql{font:700 10px var(--mono);letter-spacing:.06em;color:var(--muted);margin-bottom:4px}.rechip .chip{padding:3px 9px;font-size:12px}
 .acc .hero .src{flex-basis:100%;font-size:11px;color:var(--muted)}
-table.re{width:100%;border-collapse:collapse;font-size:13px}table.re th,table.re td{text-align:right;padding:6px 4px;border-bottom:1px solid var(--line)}table.re th{font-weight:500;color:var(--muted)}table.re th:first-child,table.re td:first-child{text-align:left}table.re tr.win td{background:rgba(14,138,92,.14);color:var(--pos);font-weight:600}
+table.re{width:100%;border-collapse:collapse;font-size:13px}table.re th,table.re td{text-align:right;padding:6px 4px;border-bottom:1px solid var(--line)}table.re th{font-weight:500;color:var(--muted)}table.re th:first-child,table.re td:first-child{text-align:left}table.re tr.win td{background:rgba(14,138,92,.14);color:var(--pos);font-weight:600}table.re tr.est td{opacity:.55}
+.hlp{width:17px;height:17px;padding:0;border:1px solid var(--line-2);border-radius:50%;background:var(--card-2);color:var(--text-2);font-size:11px;line-height:1;cursor:pointer}
+.hlpTx{font-size:11px;margin:0 0 8px;padding:7px 10px;border-left:2px solid var(--line-2);background:var(--card-2);border-radius:0 6px 6px 0}
 .accs{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:10px}
 .acc{background:var(--card-2);border:1px solid var(--line-2);border-left:4px solid var(--pos);border-radius:10px;padding:10px 12px}
 .acc.turno{border:2px solid var(--real);border-left-width:6px;box-shadow:0 2px 10px rgba(0,0,0,.12)}
@@ -757,7 +759,7 @@ const RE_CORTO = { '1 · ORB': 'ORB', '2 · AMD + IFVG': 'AMD + IFVG', '3 · Liq
 const GESTIONES = [
   { k: 'g1', n: '1R fijo', tm: '1R fijo', r: 1 }, { k: 'g15', n: '1,5R fijo', tm: '1,5R fijo', r: 1.5 }, { k: 'g2', n: '2R fijo', tm: '2R fijo', r: 2 },
   { k: 'be15', n: '1,5R + BE 1R', tm: '1,5R + BE en 1R', r: 1.5 }, { k: 'be2', n: '2R + BE 1R', tm: '2R + BE en 1R', r: 2 },
-  { k: 'liqBe1', n: 'Target liq. + BE 1R', tm: 'Target liquidez + BE en 1R', r: null }, { k: 'liq', n: 'Liquidez + BE 2R', tm: 'Liquidez + BE en 2R', r: null }];
+  { k: 'liqBe1', n: 'Target liq. + BE 1R', tm: 'Target liquidez + BE en 1R', r: null, est: 1 }];
 const RE_MIN = 50, RE_FUND_MEJORA = 0.1, RE_CH_MEJORA = 5;
 const RE_CH = { tam: 25000, objetivo: 1250, dd: 1000, cons: 0.5, maxDia: 600, lockMin: 25100, lockCierre: 26100 };
 const RE_CRIT = { 'Aceleración': 'Expectancy', 'Normal': 'Expectancy', 'Defensa': 'Win rate', 'Crítica': 'Win rate' };
@@ -779,9 +781,11 @@ function reTrade(t) {
   const rCierre = n(f.rCierre), abierto = volvio !== 'No' && f.abierto && !isNaN(rCierre);
   const noAlc = volvio === 'No' ? 0 : (abierto ? rCierre : -1), fijo = T => mfe >= T ? T : noAlc;
   const be1 = T => mfe < 1 ? noAlc : (volvio === 'Sí' ? (mfeAntes >= T ? T : 0) : (mfe >= T ? T : 0));
-  const hayPoi = f.poi && f.poi !== 'Ninguno', distLiq = n(f.distLiq), hayLiq = !hayPoi && mfe >= 2 && distLiq >= 2;
+  // RF-41: objetivo = POI si lo hay; si no, el punto de liquidez (≥ 2R); sin ninguno de los dos, 2R (el trade no llegó a 2R: mismo resultado).
+  const hayPoi = f.poi && f.poi !== 'Ninguno', distPoi = n(f.distPoi), distLiq = n(f.distLiq);
+  const objLiq = hayPoi ? distPoi : (distLiq >= 2 ? distLiq : 2);
   return { t, fecha: f.fecha || '', hora: f.horaAp || '', num: num(t.num), modelo: f.modelo || '',
-    g: { g1: fijo(1), g15: fijo(1.5), g2: fijo(2), be15: be1(1.5), be2: be1(2), liqBe1: hayLiq ? be1(distLiq) : null, liq: hayLiq ? (mfe >= distLiq ? distLiq : 0) : null } };
+    g: { g1: fijo(1), g15: fijo(1.5), g2: fijo(2), be15: be1(1.5), be2: be1(2), liqBe1: isNaN(objLiq) ? null : be1(objLiq) } };
 }
 // Comisión media por trade en R (estimación, mínimo 0): media de (R sistema − Resultado $ / Riesgo) en los trades con riesgo > 0.
 function reComision() {
@@ -839,8 +843,9 @@ function reDecidir(modelo, B) {
   B = B || reBase();
   const F0 = reFuente(B, modelo), real = F0.tipo !== 'tm', L = F0.lista, total = L.length;
   // una gestión que excluye trades (liquidez) solo compite con ≥ 50 trades propios (en el resto, todos los trades)
-  const elegible = s => s.n > 0 && (s.n >= total || s.n >= RE_MIN);
-  const ranking = GESTIONES.map(g => reStats(L, g.k, B.com)).filter(s => s.n > 0).sort((p, q) => q.exp - p.exp);
+  const elegible = s => s.n > 0 && !(gestK(s.k) || {}).est && (s.n >= total || s.n >= RE_MIN);
+  const enEstudio = k => !!(gestK(k) || {}).est;
+  const ranking = GESTIONES.map(g => reStats(L, g.k, B.com)).filter(s => s.n > 0).sort((p, q) => (enEstudio(p.k) ? 1 : 0) - (enEstudio(q.k) ? 1 : 0) || q.exp - p.exp);
   const ch = GESTIONES.map(g => reSimChallenge(L, g.k, B.com)).filter(s => s.n > 0).sort(reOrdCh);
   const guard = real ? (RE_VIG[F0.scope] || {}) : {};
   // Challenge: vigente 1,5R fijo (regla v7) salvo decisión real guardada; cambia si la ganadora supera por ≥ 5 pp.
@@ -859,7 +864,8 @@ function reDecidir(modelo, B) {
     if (real && win && win.k !== k && (!vig || win.exp - vig.exp >= RE_FUND_MEJORA)) k = win.k;
     funded[est] = { crit, win, k, tmTxt: TM && TM[est] ? TM[est].target : '' };
   });
-  return { fuente: F0, real, total, ranking, ch, chWin, chK, chVig, chDif, funded, com: B.com };
+  const rkWin = ranking.filter(elegible)[0] || null;
+  return { fuente: F0, real, total, ranking, rkWin, ch, chWin, chK, chVig, chDif, funded, com: B.com };
 }
 // Guarda la gestión vigente (meta/riskEngine, por usuario) cuando una fuente real decide un cambio.
 async function reGuardar() {
@@ -950,9 +956,10 @@ function renderRisk() {
       + '<table class="re"><tr><th>State</th><th>Criterion</th><th>Management</th><th>Expectancy</th><th>Win rate</th></tr>'
       + ESTADOS.map(est => { const z = d.funded[est], s = z.win; return '<tr><td>' + ICON[est] + ' ' + est + '</td><td>' + z.crit + '</td><td>' + (s ? esc(nom(s.k)) : '—') + '</td><td>' + (s ? fmtRs(s.exp) : '—') + '</td><td>' + (s ? fmtPc(s.wr) : '—') + '</td></tr>'; }).join('') + '</table>'
       + '<div class="mut" style="font-size:12px;margin-top:8px">Vigente: ' + ESTADOS.map(est => est + ' ' + esc(d.real ? nom(d.funded[est].k) : (d.funded[est].tmTxt || '—'))).join(' · ') + (d.real ? '' : ' (Tabla maestra)') + '</div>'
-      + '<div class="mut" style="font-size:12px;margin:14px 0 6px">Ranking completo</div>'
+      + '<div class="mut row" style="font-size:12px;margin:14px 0 6px;gap:6px">Ranking completo<button type="button" class="hlp" data-hlp="hlpRk">?</button></div>'
+      + '<div class="mut hlpTx" id="hlpRk" hidden>★ = la gestión que elige el motor. «En estudio» = se calcula y se muestra, pero no entra en la recomendación hasta validarla.</div>'
       + '<table class="re"><tr><th>Management</th><th>Expectancy</th><th>Win rate</th><th>Profit factor</th><th>Max DD</th></tr>'
-      + d.ranking.map(s => '<tr><td>' + esc(nom(s.k)) + nTxt(s) + '</td><td>' + fmtRs(s.exp) + '</td><td>' + fmtPc(s.wr) + '</td><td>' + (s.pf == null ? '—' : s.pf === Infinity ? '∞' : s.pf.toFixed(2).replace('.', ',')) + '</td><td>' + fmtRs(s.dd, 1) + '</td></tr>').join('') + '</table>'
+      + d.ranking.map(s => { const es = !!(gestK(s.k) || {}).est, w = d.rkWin && s.k === d.rkWin.k; return '<tr' + (w ? ' class="win"' : es ? ' class="est"' : '') + '><td>' + (w ? '★ ' : '') + esc(nom(s.k)) + nTxt(s) + (es ? ' <span class="tag">en estudio</span>' : '') + '</td><td>' + fmtRs(s.exp) + '</td><td>' + fmtPc(s.wr) + '</td><td>' + (s.pf == null ? '—' : s.pf === Infinity ? '∞' : s.pf.toFixed(2).replace('.', ',')) + '</td><td>' + fmtRs(s.dd, 1) + '</td></tr>'; }).join('') + '</table>'
       + '<div class="mut" style="font-size:11px;margin-top:8px">' + pie + '</div></div>';
   }
   $('reBox').innerHTML = h;
@@ -1328,6 +1335,11 @@ document.addEventListener('dragover', ev => { const z = ev.target.closest && ev.
 document.addEventListener('dragleave', ev => { const z = ev.target.closest && ev.target.closest('[data-cpz]'); if (z) z.classList.remove('over'); });
 document.addEventListener('drop', ev => { const z = ev.target.closest && ev.target.closest('[data-cpz]'); if (!z || !CP_DRAG) return; ev.preventDefault(); const id = CP_DRAG; CP_DRAG = null; cpMover(id, z.dataset.cpz); });
 document.addEventListener('dragend', () => { CP_DRAG = null; document.querySelectorAll('.cpz.over').forEach(z => z.classList.remove('over')); });
+// Botón «?»: abre/cierra la explicación que lleva al lado (norma minimalista)
+document.addEventListener('click', ev => {
+  const b = ev.target.closest && ev.target.closest('[data-hlp]');
+  if (b) { const t = $(b.dataset.hlp); if (t) t.hidden = !t.hidden; }
+});
 document.addEventListener('click', ev => {
   if (!ev.target.closest || !ev.target.closest('#cpBox')) return;
   const a = ev.target.closest('[data-cpacc]');

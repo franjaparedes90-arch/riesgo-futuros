@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><title>RF-41 · Risk engine</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;padding:28px;background:#070d18;color:#c7d4e8;font:14px/1.5 -apple-system,Segoe UI,Roboto,sans-serif}
+h1{font-size:15px;margin:0 0 4px;color:#e8f0fb;font-weight:600}
+.sub{font-size:12px;color:#6b7c96;margin:0 0 26px}
+.lbl{font:11px/1 ui-monospace,Menlo,monospace;letter-spacing:.12em;color:#5d6e88;text-transform:uppercase;margin:0 0 10px}
+.panel{background:#0d1626;border:1px solid #1b2942;border-radius:10px;padding:16px 18px;margin-bottom:12px}
+.panel.ko{opacity:.55}
+table{width:100%;border-collapse:collapse}
+th{font:10px/1 ui-monospace,Menlo,monospace;letter-spacing:.11em;color:#5d6e88;text-transform:uppercase;text-align:right;padding:0 0 9px;font-weight:400}
+th:first-child{text-align:left}
+td{padding:7px 0;text-align:right;border-top:1px solid #16233a;font-variant-numeric:tabular-nums}
+td:first-child{text-align:left}
+tr.est td{color:#5a6a82}
+.n{color:#55657e;font-size:12px}
+.star{color:#f2c14e}
+.tag{font-size:10px;color:#6f7f99;border:1px solid #28384f;border-radius:4px;padding:1px 6px;margin-left:8px;vertical-align:1px}
+.q{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border:1px solid #2b3c56;border-radius:50%;font-size:10px;color:#6f7f99;margin-left:7px;vertical-align:1px}
+.foot{font-size:11px;color:#55657e;margin-top:12px}
+.del{color:#8a5560;text-decoration:line-through}
+.gone{font-size:11px;color:#8a5560;margin-top:10px}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.note{background:#0b1322;border-left:2px solid #2f6fed;padding:11px 14px;font-size:12px;color:#8fa0bb;border-radius:0 6px 6px 0;margin-top:22px}
+.note b{color:#c7d4e8;font-weight:600}
+@media(max-width:900px){.cols{grid-template-columns:1fr}}
+</style></head><body>
+
+<h1>RF-41 · Risk engine → Ranking completo</h1>
+<p class="sub">Dónde: la misma tabla que ya existe. Sin filas nuevas, sin pantallas nuevas, sin textos añadidos.</p>
+
+<div class="cols">
+<div>
+<p class="lbl">Ahora</p>
+<div class="panel ko">
+<table>
+<tr><th>Management</th><th>Expectancy</th><th>Win rate</th><th>Profit factor</th><th>Max DD</th></tr>
+<tr><td class="del">Liquidez + BE 2R <span class="n">· n 12</span></td><td>+3,27R</td><td>50 %</td><td>513,76</td><td>−0,0R</td></tr>
+<tr><td>Target liq. + BE 1R <span class="n">· n 12</span></td><td>+2,82R</td><td>33 %</td><td>332,39</td><td>−0,1R</td></tr>
+<tr><td>2R fijo</td><td>+0,20R</td><td>40 %</td><td>1,33</td><td>−11,2R</td></tr>
+<tr><td>1,5R fijo</td><td>+0,09R</td><td>44 %</td><td>1,16</td><td>−11,1R</td></tr>
+<tr><td>1,5R + BE 1R</td><td>+0,08R</td><td>37 %</td><td>1,17</td><td>−9,1R</td></tr>
+<tr><td>1R fijo</td><td>+0,06R</td><td>53 %</td><td>1,12</td><td>−7,2R</td></tr>
+<tr><td>2R + BE 1R</td><td>−0,01R</td><td>23 %</td><td>0,97</td><td>−9,1R</td></tr>
+</table>
+<p class="foot">43 trades reales con resultados paralelos completos · comisión media −0,01R/trade descontada</p>
+</div>
+<p class="gone">Las dos de arriba mandan visualmente aunque el motor ya las descarta: salen de 12 trades sin un solo SL.</p>
+</div>
+
+<div>
+<p class="lbl">Propuesta</p>
+<div class="panel">
+<table>
+<tr><th>Management</th><th>Expectancy</th><th>Win rate</th><th>Profit factor</th><th>Max DD</th></tr>
+<tr><td><span class="star">★</span> 2R fijo</td><td>+0,20R</td><td>40 %</td><td>1,33</td><td>−11,2R</td></tr>
+<tr><td>1,5R fijo</td><td>+0,09R</td><td>44 %</td><td>1,16</td><td>−11,1R</td></tr>
+<tr><td>1,5R + BE 1R</td><td>+0,08R</td><td>37 %</td><td>1,17</td><td>−9,1R</td></tr>
+<tr><td>1R fijo</td><td>+0,06R</td><td>53 %</td><td>1,12</td><td>−7,2R</td></tr>
+<tr><td>2R + BE 1R</td><td>−0,01R</td><td>23 %</td><td>0,97</td><td>−9,1R</td></tr>
+<tr class="est"><td>Target liq. + BE 1R <span class="tag">en estudio</span><span class="q">?</span></td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+</table>
+<p class="foot">43 trades reales con resultados paralelos completos · comisión media −0,01R/trade descontada</p>
+</div>
+<p class="gone" style="color:#5d7a5f">★ = la que elige el motor. La de estudio va al final, atenuada, y no compite.</p>
+</div>
+</div>
+
+<div class="note">
+<b>Tres cosas cambian, ninguna añade sitio nuevo:</b><br>
+1 · «Liquidez + BE 2R» desaparece de la lista de gestiones (una fila menos).<br>
+2 · «Target liq. + BE 1R» pasa a calcularse con los 43 trades, así que se le cae el «· n 12». Objetivo = POI si lo hay, si no el punto de liquidez, y sin ninguno de los dos se usa 2R. No llega a 1R = −1R (o R al cierre); llega a 1R y vuelve = 0; llega = la distancia en R. Sus cuatro valores salen del recálculo: quedan así hasta que corra con datos reales.<br>
+3 · La ★ marca la gestión que el motor ya elige hoy, y la fila atenuada marca la que no compite. Ese «no compite» ya existe en el código (<i>elegible</i>); hasta ahora no se veía.<br>
+<br>
+El «?» abre una línea: «En estudio: no entra en la recomendación hasta validar el objetivo de liquidez.»
+</div>
+
+</body></html>
