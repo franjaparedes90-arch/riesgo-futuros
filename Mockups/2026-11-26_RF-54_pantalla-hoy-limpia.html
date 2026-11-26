@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><title>RF-54 · Pantalla Hoy más limpia (APROBADO 26/11/2026)</title>
+<style>
+:root{--bg:#d4e5fa;--card:#eaf3ff;--card-2:#fff;--line:#c5d8f1;--line-2:#a8c3e8;--text:#12223b;--muted:#5a6f90;--pos:#0e8a5c;--neg:#c23b3b;--real:#2f6fd1;--warn:#7a5200;--warn-bg:#fdf1d6;--warn-line:#e6c272;--mono:ui-monospace,Menlo,Consolas,monospace}
+body{font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--text);margin:0;padding:22px;font-size:14px}
+.wrap{max-width:980px;margin:0 auto}
+h2{margin:0 0 4px;font-size:18px}.note{font-size:12px;color:var(--muted);margin-bottom:14px}
+.lab{font:700 11px var(--mono);letter-spacing:.06em;color:var(--real);margin:22px 0 8px}
+.ck{border:1px solid #EF9F27;border-radius:10px;padding:10px 12px;margin:0 0 10px;background:var(--card-2)}
+.ck.ok{border-color:#1D9E75}.ck .ch{display:flex;justify-content:space-between;font-weight:700}
+.ck .bar{height:4px;background:var(--line-2);border-radius:2px;margin-top:8px}.ck .bar i{display:block;height:4px;border-radius:2px;background:#EF9F27}.ck.ok .bar i{background:#1D9E75}
+.ck label{display:flex;gap:8px;align-items:center;padding:3px 0;font-size:13px}
+.accs{display:grid;grid-template-columns:minmax(0,1.9fr) minmax(0,1fr);gap:10px;align-items:start}
+.acc{background:var(--card-2);border:1px solid var(--line-2);border-radius:10px;padding:10px 12px}
+.acc.turno{border:2px solid var(--real);border-left-width:6px;box-shadow:0 2px 10px rgba(0,0,0,.12);padding:14px 16px}
+.top{display:flex;justify-content:space-between;align-items:baseline}.nm{font-weight:700;font-size:17px}
+.tgT{font:11px var(--mono);padding:2px 8px;border-radius:8px;background:#e1ecfb;color:#1d4f9a}
+.sub{font-size:12px;color:var(--muted);margin:2px 0 10px}
+details{font-size:12px;color:var(--muted);margin:0 0 8px}summary{cursor:pointer}
+.rechip{margin:8px 0 12px}.rechip .row{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.chip{padding:3px 10px;font-size:12px;border-radius:99px;border:1px solid var(--line-2);background:var(--card-2)}.chip.on{background:#185FA5;color:#fff;border-color:#185FA5}
+.gest{font:11px var(--mono);color:var(--muted);margin-top:6px;display:flex;gap:6px;align-items:center}
+.hlp{width:16px;height:16px;border:1px solid var(--line-2);border-radius:50%;font-size:10px;display:inline-flex;align-items:center;justify-content:center;color:var(--muted)}
+.big{display:grid;grid-template-columns:1fr 1fr;gap:8px}.big div{background:var(--card);border-radius:8px;padding:10px 12px}
+.big span{display:block;font-size:11px;color:var(--muted)}.big b{font-size:26px}
+.tpm{display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding:6px 12px;background:var(--card);border-radius:8px;font-size:13px;color:var(--muted)}
+.tpm b{color:var(--text);font-weight:600}.ctc{font-style:normal;font-size:12px;background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn-line);border-radius:6px;padding:2px 8px;margin-left:8px}
+.warn{font-size:12px;background:var(--warn-bg);border:1px solid var(--warn-line);color:var(--warn);border-radius:8px;padding:6px 10px;margin-top:8px}
+.qb3{display:flex;gap:6px;margin-top:12px}.qb3 button{flex:1;padding:8px;border-radius:8px;border:1px solid var(--line-2);background:var(--card-2);font-weight:600}
+.side{display:flex;flex-direction:column;gap:8px}
+.acc.o .nm{font-size:13px}.acc.o .v{font-size:13px;margin-top:4px}.acc.o .sub{margin-bottom:0}
+.pill{font:11px var(--mono);padding:1px 7px;border-radius:99px;border:1px solid var(--real);color:var(--real)}
+.new{outline:2px dashed #378ADD;outline-offset:3px;border-radius:8px}
+.del{text-decoration:line-through;color:var(--neg)}
+ul{line-height:1.6;font-size:13px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+</style></head><body><div class="wrap">
+<h2>RF-54 · Pantalla Hoy más limpia</h2>
+<div class="note">Mockup 26/11/2026 sobre el código v34. Valores de ejemplo. Solo cambia la presentación: reglas, cálculos, rotación, avisos y registro TP/SL/BE no se tocan. Lo marcado con línea azul discontinua es lo que cambia de sitio o de forma.</div>
+
+<div class="lab">1 · CHECKLIST: ABIERTA MIENTRAS FALTA ALGO, SE PLIEGA SOLA AL COMPLETARLA</div>
+<div class="two">
+<div class="ck"><div class="ch"><span>○ Checklist preoperativa pendiente</span><span>4/6 ▾</span></div><div class="bar"><i style="width:66%"></i></div>
+<label><input type="checkbox" checked> Noticias y festivos de EE. UU. revisados</label>
+<label><input type="checkbox" checked> Sentado como tarde a las 15:15</label>
+<label><input type="checkbox"> Riesgo listo y broker abierto en la cuenta en turno</label>
+<label><input type="checkbox"> Niveles marcados antes de las 15:25</label>
+<div class="note" style="margin:4px 0 0">(+ los 2 ítems de bots del admin, igual que ahora)</div></div>
+<div><div class="ck ok new"><div class="ch"><span>✓ Sesión preparada</span><span>6/6 ▸</span></div><div class="bar"><i style="width:100%"></i></div></div>
+<div class="note">Al marcar el último ítem se pliega sola y queda en una línea. Se puede volver a abrir con un clic, como ahora.</div></div>
+</div>
+
+<div class="lab">2 · TARJETA EN TURNO MÁS ANCHA · SIN EL PANEL «RISK» DE LA DERECHA</div>
+<div class="accs">
+<div class="acc turno new">
+<div class="top"><span class="nm">Grupo A</span><span class="tgT">En turno</span></div>
+<div class="sub">PRO001 + PRO002 · copia 1:1 · Normal</div>
+<details><summary>Ver cuentas del grupo · manda PRO002 (TP máx. hoy 420 $)</summary>(la misma tabla desplegable de hoy)</details>
+<div class="rechip"><div class="row"><span class="chip on">Cualquiera</span><span class="chip">ORB</span><span class="chip">Continuación</span><span class="chip">Liquidez</span><span class="chip">Reversión</span></div>
+<div class="gest new">Gestión: Tabla maestra · 43/50 reales <span class="hlp">?</span> <span style="color:var(--real);cursor:pointer">Risk engine →</span></div></div>
+<div class="big"><div><span>Riesgo</span><b>250 $</b></div><div><span>Target</span><b>1,5R</b></div></div>
+<div class="tpm new"><span>Consistency margin <b>420 $</b> <span class="hlp">?</span></span></div>
+<div class="qb3"><button style="color:var(--pos)">TP</button><button style="color:var(--neg)">SL</button><button>BE</button></div>
+<div style="display:flex;gap:6px;margin-top:8px"><input placeholder="Monto $" style="flex:1;border:1px solid var(--line-2);border-radius:7px;padding:6px"><input placeholder="Nota rápida (opcional)" style="flex:2;border:1px solid var(--line-2);border-radius:7px;padding:6px"><button style="border-radius:8px;border:0;background:#185FA5;color:#fff;padding:6px 12px">Guardar</button></div>
+</div>
+<div class="side">
+<div class="acc o new"><div class="top"><span class="nm">Cuenta 003</span><span class="pill">siguiente</span></div><div class="sub">Eval</div><div class="v">250 $ · 1,5R</div></div>
+<div class="acc o new"><div class="nm">Cuenta 004</div><div class="sub">Eval</div><div class="v">250 $ · 1,5R</div></div>
+<div class="acc o new"><div class="nm">Grupo B</div><div class="sub">PRO003 + Cuenta 005</div><div class="v">250 $ · 1,5R</div></div>
+</div>
+</div>
+<div class="acc" style="margin-top:10px;font-size:13px"><b>Operaste con · hoy</b> <span class="note">(sin cambios, debajo de las tarjetas, se sigue viendo al registrar)</span><div style="margin-top:6px">Grupo A · <span class="chip" style="color:var(--neg)">#1 SL −248 $</span> <span class="chip" style="color:var(--pos)">#2 TP +372 $</span> · total +124 $</div></div>
+
+<div class="lab">3 · «FALTA X $ PARA PASAR»: SOLO CUANDO EL PRÓXIMO TP PUEDE PASAR LA CUENTA</div>
+<div class="acc turno" style="max-width:600px">
+<div class="big"><div><span>Riesgo</span><b>250 $</b></div><div><span>Target</span><b>1,5R</b></div></div>
+<div class="tpm"><span>Consistency margin <b>600 $</b> <span class="hlp">?</span></span><em class="ctc">Cortar en 1,2R</em></div>
+<div class="warn">🎯 Con <b>+290 $</b> pasas la challenge (incluye comisiones). Cortar ahí, no buscar más.</div>
+</div>
+<div class="note">«Cortar en» solo aparece si el corte es MENOR que el target (aquí 290 $ ÷ 250 $ = 1,2R &lt; 1,5R); si TP máx. o lo que falta dan 1,5R o más, no sale nada y se busca el target del plan. Es el aviso que ya existe (v18). Lo que se quita es la línea gris fija «Falta 914 $ para pasar», que se veía todos los días aunque no influyera en el trade.</div>
+
+<div class="lab">QUÉ CAMBIA Y DÓNDE</div>
+<ul>
+<li><b>Checklist</b> (#chkBox): mismo bloque. Abierta por defecto mientras falte algún ítem; al llegar a 6/6 se pliega sola. Clic en la cabecera la abre o cierra, como hoy.</li>
+<li><b>Panel «Risk» de la derecha</b> (aside #riskBox): <span class="del">se quita</span>. Queda una sola línea debajo de «¿Qué entrada buscas?», con la fuente de la gestión del modelo elegido y n/50, el «?» y el enlace a Risk engine. Así la tarjeta en turno ocupa todo el ancho que dejaba el panel. El selector de modelo se queda (aprobado el 13/11), sin el rótulo «¿QUÉ ENTRADA BUSCAS?» ni el marco discontinuo.</li>
+<li><b>Riesgo y Target</b>: dos tiles grandes (26 px). <b>«TP máx.» pasa a llamarse «Consistency margin»</b>: lo que todavía se puede ganar hoy sin romper la regla de consistencia (no es lo que falta para pasar). Va en una línea más fina debajo, con su «?» y la etiqueta ámbar «Cortar en XR» solo cuando el corte es menor que el target.</li>
+<li><b>«Falta X $ para pasar»</b>: <span class="del">fuera la línea fija</span>. Solo aparece el aviso 🎯 de cortar para pasar, que ya existe y sale cuando el próximo TP puede pasar la cuenta.</li>
+<li><b>Grupo de copia</b>: subtítulo corto («PRO001 + PRO002 · copia 1:1»). La tabla del grupo sigue en su desplegable cerrado.</li>
+<li><b>Cuentas que no están en turno</b>: <span class="del">fuera la opacidad del 45 %</span>, que las hacía parecer desactivadas. Se quedan en la columna derecha, más pequeñas, con texto normal y la etiqueta «siguiente» en la que va después.</li>
+<li><b>Nombres</b>: en la tarjeta solo el nombre corto. El ID completo sigue en Cuentas.</li>
+<li><b>Sin cambios</b>: avisos de noticias e inactividad, colores de la tarjeta por noticias, consistencia, bloqueo, «Pasar a Funded», «Operaste con · hoy», registro rápido TP / SL / BE con monto y nota.</li>
+<li><b>Sin MNQ en la tarjeta</b>: se mantiene la decisión de la v17, porque depende del SL en puntos, que solo se conoce al entrar.</li>
+</ul>
+</div></body></html>
