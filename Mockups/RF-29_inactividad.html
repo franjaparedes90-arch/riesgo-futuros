@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RF-29 inactividad</title>
+<!-- Mockup RF-29 aprobado por Javier el 26/11/2026: aviso de inactividad 75 % o ≤5 días de sesión, límite obligatorio en el alta y confirmación al pasar a Funded. Reutiliza Hoy, el panel lateral de cuenta y «★ Pasar a funded». -->
+<style>
+:root{color-scheme:light;--bg:#d4e5fa;--card:#eaf3ff;--card-2:#fff;--line:#c5d8f1;--line-2:#a8c3e8;--text:#12223b;--muted:#5a6f90;--real:#2f6fd1;--sel:#185FA5;--warn:#7a5200;--warn-bg:#fdf1d6;--warn-line:#e6c272;--bad-bg:#fde6e6;--bad-line:#eba3a3;--bad-tx:#9b2222;--info-bg:#dbe9fc;--info-tx:#185FA5;--info-line:#9cbbe8;--new:#0e8a5c;--new-bg:#dff3e8}
+@media (prefers-color-scheme:dark){:root{color-scheme:dark;--bg:#0b1220;--card:#111a2e;--card-2:#0d1528;--line:#1f2b45;--line-2:#2c3d61;--text:#dbe4f3;--muted:#7d8aa5;--real:#3b82f6;--sel:#2563eb;--warn:#fcd34d;--warn-bg:#3a2a10;--warn-line:#8a6418;--bad-bg:#3a1515;--bad-line:#7f1d1d;--bad-tx:#fca5a5;--info-bg:#1e2a4a;--info-tx:#93c5fd;--info-line:#2c4170;--new:#22c55e;--new-bg:#0f2a1c}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 Inter,system-ui,'Segoe UI',sans-serif}
+.wrap{max-width:980px;margin:0 auto;padding:16px}
+h1{font-size:18px;margin:0 0 4px}.sub{color:var(--muted);font-size:13px;margin-bottom:18px}
+section{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:16px}
+section>h2{font-size:15px;margin:0 0 2px}.where{color:var(--muted);font-size:12px;margin-bottom:12px}
+.warn{background:var(--warn-bg);border:1px solid var(--warn-line);color:var(--warn);border-radius:10px;padding:8px 12px;font-size:13px;margin-bottom:6px}
+.warn.bad{background:var(--bad-bg);border-color:var(--bad-line);color:var(--bad-tx)}
+.ghost{border:1px dashed var(--line-2);color:var(--muted);border-radius:10px;padding:8px 12px;font-size:13px;margin-bottom:6px;text-decoration:line-through}
+.new{outline:2px solid var(--new);outline-offset:2px;border-radius:8px}
+.tag{display:inline-block;font:600 10px ui-monospace,Consolas,monospace;background:var(--new-bg);color:var(--new);border-radius:6px;padding:1px 6px;margin-left:6px;vertical-align:middle;text-decoration:none}
+.pan{background:var(--card-2);border:1px solid var(--line);border-radius:12px;padding:14px;max-width:520px}
+.pan .hd{display:flex;align-items:center;margin-bottom:10px}.pan .hd b{font-size:15px}.pan .hd span{margin-left:auto;color:var(--muted)}
+.form{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+label{display:flex;flex-direction:column;gap:3px;font:600 11px ui-monospace,Consolas,monospace;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+input{font:14px Inter,system-ui,sans-serif;padding:6px 8px;border:1px solid var(--line-2);border-radius:8px;background:var(--card-2);color:var(--text);width:100%}
+input.err{border-color:var(--bad-tx);box-shadow:0 0 0 1px var(--bad-tx)}
+small{font:12px Inter,system-ui,sans-serif;text-transform:none;letter-spacing:0;color:var(--muted)}small.e{color:var(--bad-tx)}
+.nfsep{grid-column:1/-1;font:600 11px ui-monospace,Consolas,monospace;color:var(--muted);border-top:1px solid var(--line);padding-top:8px}
+.dim{opacity:.45}
+.chk{grid-column:1/-1;display:flex;gap:8px;align-items:center;font:13px Inter,system-ui,sans-serif;text-transform:none;letter-spacing:0;color:var(--text)}.chk input{width:auto}
+.box{grid-column:1/-1;background:var(--info-bg);border:1px solid var(--info-line);color:var(--info-tx);border-radius:10px;padding:10px 12px;font-size:13px}
+.box .r{display:flex;gap:10px;align-items:center;margin-top:8px;flex-wrap:wrap}.box input[type=number]{width:90px}
+button{font:13px Inter,system-ui,sans-serif;padding:6px 12px;border:1px solid var(--line-2);border-radius:8px;background:var(--card);color:var(--text);cursor:default}
+button.pri{background:var(--sel);border-color:var(--sel);color:#fff}button[disabled]{opacity:.45}
+.row{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.cc{background:var(--card-2);border:1px solid var(--line);border-radius:10px;padding:10px;max-width:520px;margin-bottom:10px;font-size:13px}
+.cc .acts{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.q{display:inline-flex;width:18px;height:18px;border-radius:50%;border:1px solid var(--line-2);align-items:center;justify-content:center;font-size:11px;color:var(--muted);margin-left:6px;cursor:pointer}
+details.help{font-size:12px;color:var(--muted);margin-top:6px}details.help summary{cursor:pointer;list-style:none}details.help summary::-webkit-details-marker{display:none}
+.arrow{color:var(--muted);font-size:12px;margin:6px 0}
+.notes{font-size:13px}.notes li{margin-bottom:4px}
+@media(max-width:600px){.form{grid-template-columns:1fr}}
+</style></head><body><div class="wrap">
+<h1>RF-29 · Inactividad</h1>
+<div class="sub">Sin pantallas nuevas. Lo nuevo va marcado en verde <span class="tag">NUEVO</span>.</div>
+
+<section>
+<h2>1 · Aviso en Hoy</h2>
+<div class="where">Hoy → misma lista de avisos ⏳ de siempre (sale debajo de la tarjeta en turno). Solo cambia cuándo salta y la frase.</div>
+<div class="warn new">⏳ <b>Lucid 25K #2</b>: 23 días sin operar · quedan 7 de 30 · <b>5 días de sesión</b> (hasta el 03/12).</div>
+<div class="warn new">⏳ <b>Lucid 50K #2</b>: 9 días sin operar · quedan 5 de 14 · <b>3 días de sesión</b> (hasta el 01/12) · está en reserva. <b>Lucid 50K #2 pasa a ser la próxima a operar por inactividad.</b></div>
+<div class="warn bad new">⏳ <b>Lucid 25K #4</b>: 29 días sin operar · quedan 1 de 30 · <b>1 día de sesión</b> (hasta el 27/11).</div>
+<div class="ghost">⏳ Lucid 25K #3: 8 días sin operar · quedan 22 para la regla de inactividad (30 días). <span class="tag">YA NO SALE</span></div>
+<details class="help"><summary><span class="q">?</span> Cuándo salta</summary>
+Al <b>75 %</b> del límite de la cuenta o cuando queden <b>≤ 5 días de sesión</b> (sin sábados, domingos ni festivos de EE. UU.), lo que llegue antes. Rojo con ≤ 1 día de sesión. La misma regla decide la cuenta que pasa a operar por inactividad (hoy usa solo el 75 %).</details>
+</section>
+
+<section>
+<h2>2 · Alta de cuenta: límite obligatorio</h2>
+<div class="where">Cuentas → «＋ Agregar cuenta» → panel lateral de siempre, bloque «Normas de la firma». Mismo campo, sin el 30 por defecto.</div>
+<div class="pan">
+<div class="hd"><b>Agregar cuenta</b><span>✕</span></div>
+<div class="form">
+<div class="nfsep">Normas de la firma</div>
+<label class="dim">Drawdown ($)<input value="1000"></label>
+<label class="dim">Profit target ($)<input value="1250"></label>
+<label class="dim">Plataforma<input value="Tradovate"></label>
+<label class="new">Inactivity (días naturales) <span class="tag">OBLIGATORIO</span><input class="err" type="number" placeholder="—"><small class="e">Pon el límite de inactividad de la firma.</small></label><label class="dim">Expiry (opcional)<input type="date"></label>
+</div>
+<div class="row"><button class="pri">Guardar cuenta</button><button>Cancelar</button></div>
+</div>
+<details class="help"><summary><span class="q">?</span> Precarga</summary>Con una compra de la misma firma + monto, el campo se rellena con sus normas guardadas (como hoy); solo queda vacío si no hay ninguna. En «Editar / sincronizar» tampoco se puede dejar vacío.</details>
+</section>
+
+<section>
+<h2>3 · Pasar a Funded: confirmar el límite</h2>
+<div class="where">Cuentas → tarjeta de la cuenta → «★ Pasar a funded» (el botón de siempre). Hoy pide un «¿Seguro?» y abre el panel; ahora abre directamente el panel con este bloque arriba.</div>
+<div class="cc"><b>Lucid 25K #3</b> · Evaluación<div class="acts"><button>✏️</button><button class="new">★ Pasar a funded</button><button>↺ Reset</button><button>✗ Quemada</button></div></div>
+<div class="arrow">↓ abre el panel lateral</div>
+<div class="pan">
+<div class="hd"><b>Pasar a Funded · Lucid 25K #3</b><span>✕</span></div>
+<div class="form">
+<div class="box new"><b>Inactividad en Funded</b> <span class="tag">NUEVO</span>
+<div class="r"><input type="number" value="30"> días naturales</div>
+<div style="margin-top:6px">De <b>Lucid 50K #1</b> (última de Lucid que pasó a Funded, 12/11).</div>
+<label class="chk" style="margin-top:8px"><input type="checkbox"> He comprobado el límite de inactividad de la cuenta funded</label>
+</div>
+<div class="nfsep">Otros datos (como hoy al sincronizar)</div>
+<label class="dim">Balance actual ($)<input placeholder="copiar de la firma"></label>
+<label class="dim">Min balance ($)<input placeholder="copiar de la firma"></label>
+</div>
+<div class="row"><button class="pri" disabled>Pasar a Funded y guardar</button><button>Cancelar</button></div>
+<small>El botón se activa al marcar la casilla. Cancelar = sigue en Evaluación.</small>
+</div>
+<details class="help"><summary><span class="q">?</span> Sin Funded anterior de esa firma</summary>Se precarga el límite que tiene ahora la cuenta y la frase dice «Primera de Lucid que pasa a Funded: revisa el límite».</details>
+</section>
+
+<section class="notes">
+<h2>Decisiones para tu OK</h2>
+<ul>
+<li><b>Umbrales fijos:</b> 75 % estricto o ≤ 5 días de sesión, en el código; no se editan (Javier, 26/11).</li>
+<li><b>Paso a Funded:</b> la fase cambia al guardar el panel, no al pulsar el botón (hoy se cambia antes de abrirlo).</li>
+<li><b>Rotación:</b> la cuenta que pasa a operar por inactividad usa la misma regla nueva (75 % o ≤ 5 días de sesión).</li>
+<li><b>Festivos de EE. UU.:</b> lista fija en el código (días de cierre de la CME 2026–2027), no los de la checklist de noticias.</li>
+<li>Formato CM-32 y botón descartar: fuera de este cambio (revisión trimestral, como dice la fila).</li>
+</ul>
+</section>
+</div></body></html>
