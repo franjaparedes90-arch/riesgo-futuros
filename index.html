@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Riesgo Futuros</title>
-<!-- Riesgo Futuros · app multiusuario (Firebase) · v33.1 (26/11/2026) · v33.1: RF-02 · checklist preoperativa, ítem 3: «Tradesea» → «broker» (solo texto) · v33 (26/11/2026) · v33: Risk engine · RF-46: la regla del 5 % sin los mejores trades sale del filtro de Challenge (queda solo en Funded); RF-50: Challenge ya no manda con 50 trades reales, queda informativa (manda la regla v7) hasta el Monte Carlo (RF-48) con intervalos de confianza sin solaparse; Funded igual · v32 (25/11/2026) · v32: «Próximo POI» (mockup 2026-11-25_proximo-poi_robustez): la sección 4 pregunta solo el próximo POI en la dirección del trade y su distancia (sin tope de 2R; «Ninguno» disponible); fuera «Punto de liquidez» y su distancia; «Qué pasó en el POI» (No llegó / Lo frenó hasta POI + 0,2R / Lo atravesó) y «BE en el POI» se deducen del MFE; POI a menos de 1R avisa y marca P1 (no bloquea); «Target liq. + BE 1R» se calcula con el próximo POI y solo con trades nuevos (poiV2), contador desde 0/50; los trades viejos quedan como histórico · v31 (25/11/2026) · v31: corrige el Max DD del selector «Excluir top»: los trades excluidos se quitan sin alterar el orden cronológico del resto (antes la serie quedaba ordenada por R y el DD salía disparado) · v30 (25/11/2026) · v30: Risk engine · fuera la columna Top trade % (en target fijo era el inverso del win rate); la regla pasa a «la gestión recomendada debe seguir en positivo sin su 5 % de mejores trades» y se añade el selector «Excluir top» (no / 5 / 10 / 20 %), que recalcula la tabla sin cambiar lo que decide el motor · v29 (25/11/2026) · v29: Risk engine · columna Top trade % (peso del mejor trade sobre el beneficio bruto de cada gestión) y condición: por encima del 50 % la gestión no puede ser la recomendada, aunque gane en Expectancy · v28 (25/11/2026) · v28: Risk engine · ★ en el mejor valor de cada columna del ranking (Expectancy, Win rate, Profit factor, Max DD; solo entre gestiones elegibles; fila en verde = la que elige el motor); solo visual, el motor no cambia (mockup 2026-11-25_estrella-por-columna, aprobado 25/11/2026) · v27 (25/11/2026) · v27: RF-41 · Risk engine sin sesgo de selección en las gestiones de liquidez · v26 (24/11/2026) · v26: botón «⬇ CSV» en Risk engine (trades del motor, filtro por modelo) y en Trades (trades filtrados): una fila por trade con todo el registro + R de cada gestión · v25 (18/11/2026) · v25: Edición avanzada en Editar trade: anular pata de una copia («No ejecutada», con motivo, quién y cuándo) y Restaurar; la pata anulada no suma en equity, contabilidad ni P&L de su cuenta · v24 (17/11/2026) · v24: Vista administrador (solo lectura): en Ajustes · Admin, el admin ve las pantallas de otro participante. · v23: el tile Target muestra siempre el target del plan (sin «Cortar en» en su lugar ni target tachado); el corte (menor de TP máx. ÷ riesgo y lo que falta para pasar ÷ riesgo) va en la etiqueta ámbar «Cortar en XR» del tile TP máx. · v22.1 (16/11/2026) · v22.1: fuera el aviso «Hace … días que no sincronizás con la firma» (basta el banner de sincronizar: 10 trades o una rotación completa) · v22: aviso de sincronizar solo si operó en 7 días y lleva ≥ 7 días sin sincronizar (el alta cuenta como sync); etiqueta «Cortar en XR» en el tile TP máx. si TP máx. ÷ riesgo < target; inactividad ≥ 75 % del plazo → su grupo (o la cuenta) pasa a ser el próximo a operar por encima de la rotación · v21 (14/11/2026) · v21: RF-39 rotación desde la tabla de Cuentas: doble clic en Rotación alterna reserva ↔ rotación (al salir de reserva entra al final de la cola; si estaba en turno, el turno pasa a la siguiente), sin el botón «Activar en rotación / A reserva» de la tarjeta; vincular a un grupo de copia pasa la cuenta a rotación (Pasada/Quemada no se vinculan) · v20 (13/11/2026) · v20: equity con System y Real independientes (dos ejes) y sombreado del drawdown; Monthly P&L con valor por barra y media acumulada suavizada · v19 (13/11/2026) · v19: Cuentas más limpia: Gestión de copias en desplegable cerrado con resumen de grupos; Agregar / Editar / sincronizar cuenta en panel lateral (✏️ o «＋ Agregar cuenta») · v18 (13/11/2026) · v18: cortar al pasar la challenge (target = menor de 1,5R, TP máx. y lo que falta + comisiones), objetivo alcanzado → no operar, fuera de la rotación y botón Pasar a Funded · v17 (13/11/2026) · v17: gestión de copias con arrastrar y soltar, pantalla Hoy minimalista con «Operaste con · hoy», aviso de sincronizar balances, normas de la firma al comprar · v16: copia de cuentas · v15: bloqueo al guardar trade, motor de gestión con trades reales, pantalla Risk engine, tarjeta con selector de modelo y panel Risk · v14: pantallas estilo Tradinverso (barra lateral plegable, filtros globales, Trades, Dashboard, Calendario, Cuentas, Contabilidad con pestañas), noticias (catálogo por usuario, cascada en la checklist, línea y color en la tarjeta, contexto «Operado en noticias» al guardar) y tema claro/oscuro · v13 (13/11/2026) ·v13 · RF-27: curvas de equity (cartera y cuenta) ancladas al balance real de la última sincronización + ventana «Sincronizar cuentas» (balance y min balance por cuenta, Dif. con umbral 0,2 %) · v12 (08/11/2026) ·v12: editar un trade conserva cargadoTradinverso y cargadoEl (antes se borraban y el cierre de día lo volvía a dar como pendiente) · v11 (28/10/2026) · v11: FVG HTF como el POI: en el camino (entrada → 2R), distancia entre 0 y 2R · v10 (28/10/2026) · v10: bloqueo por consistencia si el TP máx. de hoy < 0,4 % de la cuenta (mínimo de riesgo): la cuenta se bloquea hoy, se opera la siguiente de la cola y mañana vuelve; con ≥ 0,4 % sigue igual (cortar en el TP máx.) · v9 (26/10/2026) · v9: consistencia: target recortado a lo que queda del TP máx. (cortar en +$, ≈R), tarjeta amarilla, consistencia alcanzada → hoy se opera la siguiente y mañana vuelve la misma (SL del reemplazo → final de la cola), target con importe en $, fuera "No estoy en reset" de la checklist · v8 (24/10/2026) · v8: alerta de reset del trader (3 días perdedores seguidos → pausa 3 días naturales; 2.º seguido con errores → 1 semana), aviso al registrar en reset (P5), ítem de checklist "No estoy en reset" · v7 (24/10/2026) · v7: P0 "¿Sesión preparada?" automática desde la checklist del día (vigente desde 26/10/2026), checklist guardada por fecha, KPI Sesión preparada · v6 (24/10/2026) · v6: formulario completo de trade (Nasdaq) igual al de la app vieja, editar/completar trades y journal en Trades (sin R plan) · v5 (24/10/2026) · v5: tabla de cuentas: quemadas/pasadas/reserva sin "Poner en turno" · v4 (24/10/2026) · v4: riesgo en rojo si supera el margen; checklist con bots VPS solo para el admin · v3 (23/10/2026) · v3: Cuentas y contabilidad (equity, retiros, compras, resets, reserva, inactividad, caducidad) · v2: consistencia por cuenta
+<!-- Riesgo Futuros · app multiusuario (Firebase) · v34 (26/11/2026) · v34: RF-29 · inactividad: aviso al 75 % del límite o con ≤ 5 días de sesión (sin fines de semana ni festivos de EE. UU.); límite obligatorio en el alta (días naturales); «Pasar a Funded» obliga a confirmarlo, precargado de la última funded de la firma · v33.1 (26/11/2026) · v33.1: RF-02 · checklist preoperativa, ítem 3: «Tradesea» → «broker» (solo texto) · v33 (26/11/2026) · v33: Risk engine · RF-46: la regla del 5 % sin los mejores trades sale del filtro de Challenge (queda solo en Funded); RF-50: Challenge ya no manda con 50 trades reales, queda informativa (manda la regla v7) hasta el Monte Carlo (RF-48) con intervalos de confianza sin solaparse; Funded igual · v32 (25/11/2026) · v32: «Próximo POI» (mockup 2026-11-25_proximo-poi_robustez): la sección 4 pregunta solo el próximo POI en la dirección del trade y su distancia (sin tope de 2R; «Ninguno» disponible); fuera «Punto de liquidez» y su distancia; «Qué pasó en el POI» (No llegó / Lo frenó hasta POI + 0,2R / Lo atravesó) y «BE en el POI» se deducen del MFE; POI a menos de 1R avisa y marca P1 (no bloquea); «Target liq. + BE 1R» se calcula con el próximo POI y solo con trades nuevos (poiV2), contador desde 0/50; los trades viejos quedan como histórico · v31 (25/11/2026) · v31: corrige el Max DD del selector «Excluir top»: los trades excluidos se quitan sin alterar el orden cronológico del resto (antes la serie quedaba ordenada por R y el DD salía disparado) · v30 (25/11/2026) · v30: Risk engine · fuera la columna Top trade % (en target fijo era el inverso del win rate); la regla pasa a «la gestión recomendada debe seguir en positivo sin su 5 % de mejores trades» y se añade el selector «Excluir top» (no / 5 / 10 / 20 %), que recalcula la tabla sin cambiar lo que decide el motor · v29 (25/11/2026) · v29: Risk engine · columna Top trade % (peso del mejor trade sobre el beneficio bruto de cada gestión) y condición: por encima del 50 % la gestión no puede ser la recomendada, aunque gane en Expectancy · v28 (25/11/2026) · v28: Risk engine · ★ en el mejor valor de cada columna del ranking (Expectancy, Win rate, Profit factor, Max DD; solo entre gestiones elegibles; fila en verde = la que elige el motor); solo visual, el motor no cambia (mockup 2026-11-25_estrella-por-columna, aprobado 25/11/2026) · v27 (25/11/2026) · v27: RF-41 · Risk engine sin sesgo de selección en las gestiones de liquidez · v26 (24/11/2026) · v26: botón «⬇ CSV» en Risk engine (trades del motor, filtro por modelo) y en Trades (trades filtrados): una fila por trade con todo el registro + R de cada gestión · v25 (18/11/2026) · v25: Edición avanzada en Editar trade: anular pata de una copia («No ejecutada», con motivo, quién y cuándo) y Restaurar; la pata anulada no suma en equity, contabilidad ni P&L de su cuenta · v24 (17/11/2026) · v24: Vista administrador (solo lectura): en Ajustes · Admin, el admin ve las pantallas de otro participante. · v23: el tile Target muestra siempre el target del plan (sin «Cortar en» en su lugar ni target tachado); el corte (menor de TP máx. ÷ riesgo y lo que falta para pasar ÷ riesgo) va en la etiqueta ámbar «Cortar en XR» del tile TP máx. · v22.1 (16/11/2026) · v22.1: fuera el aviso «Hace … días que no sincronizás con la firma» (basta el banner de sincronizar: 10 trades o una rotación completa) · v22: aviso de sincronizar solo si operó en 7 días y lleva ≥ 7 días sin sincronizar (el alta cuenta como sync); etiqueta «Cortar en XR» en el tile TP máx. si TP máx. ÷ riesgo < target; inactividad ≥ 75 % del plazo → su grupo (o la cuenta) pasa a ser el próximo a operar por encima de la rotación · v21 (14/11/2026) · v21: RF-39 rotación desde la tabla de Cuentas: doble clic en Rotación alterna reserva ↔ rotación (al salir de reserva entra al final de la cola; si estaba en turno, el turno pasa a la siguiente), sin el botón «Activar en rotación / A reserva» de la tarjeta; vincular a un grupo de copia pasa la cuenta a rotación (Pasada/Quemada no se vinculan) · v20 (13/11/2026) · v20: equity con System y Real independientes (dos ejes) y sombreado del drawdown; Monthly P&L con valor por barra y media acumulada suavizada · v19 (13/11/2026) · v19: Cuentas más limpia: Gestión de copias en desplegable cerrado con resumen de grupos; Agregar / Editar / sincronizar cuenta en panel lateral (✏️ o «＋ Agregar cuenta») · v18 (13/11/2026) · v18: cortar al pasar la challenge (target = menor de 1,5R, TP máx. y lo que falta + comisiones), objetivo alcanzado → no operar, fuera de la rotación y botón Pasar a Funded · v17 (13/11/2026) · v17: gestión de copias con arrastrar y soltar, pantalla Hoy minimalista con «Operaste con · hoy», aviso de sincronizar balances, normas de la firma al comprar · v16: copia de cuentas · v15: bloqueo al guardar trade, motor de gestión con trades reales, pantalla Risk engine, tarjeta con selector de modelo y panel Risk · v14: pantallas estilo Tradinverso (barra lateral plegable, filtros globales, Trades, Dashboard, Calendario, Cuentas, Contabilidad con pestañas), noticias (catálogo por usuario, cascada en la checklist, línea y color en la tarjeta, contexto «Operado en noticias» al guardar) y tema claro/oscuro · v13 (13/11/2026) ·v13 · RF-27: curvas de equity (cartera y cuenta) ancladas al balance real de la última sincronización + ventana «Sincronizar cuentas» (balance y min balance por cuenta, Dif. con umbral 0,2 %) · v12 (08/11/2026) ·v12: editar un trade conserva cargadoTradinverso y cargadoEl (antes se borraban y el cierre de día lo volvía a dar como pendiente) · v11 (28/10/2026) · v11: FVG HTF como el POI: en el camino (entrada → 2R), distancia entre 0 y 2R · v10 (28/10/2026) · v10: bloqueo por consistencia si el TP máx. de hoy < 0,4 % de la cuenta (mínimo de riesgo): la cuenta se bloquea hoy, se opera la siguiente de la cola y mañana vuelve; con ≥ 0,4 % sigue igual (cortar en el TP máx.) · v9 (26/10/2026) · v9: consistencia: target recortado a lo que queda del TP máx. (cortar en +$, ≈R), tarjeta amarilla, consistencia alcanzada → hoy se opera la siguiente y mañana vuelve la misma (SL del reemplazo → final de la cola), target con importe en $, fuera "No estoy en reset" de la checklist · v8 (24/10/2026) · v8: alerta de reset del trader (3 días perdedores seguidos → pausa 3 días naturales; 2.º seguido con errores → 1 semana), aviso al registrar en reset (P5), ítem de checklist "No estoy en reset" · v7 (24/10/2026) · v7: P0 "¿Sesión preparada?" automática desde la checklist del día (vigente desde 26/10/2026), checklist guardada por fecha, KPI Sesión preparada · v6 (24/10/2026) · v6: formulario completo de trade (Nasdaq) igual al de la app vieja, editar/completar trades y journal en Trades (sin R plan) · v5 (24/10/2026) · v5: tabla de cuentas: quemadas/pasadas/reserva sin "Poner en turno" · v4 (24/10/2026) · v4: riesgo en rojo si supera el margen; checklist con bots VPS solo para el admin · v3 (23/10/2026) · v3: Cuentas y contabilidad (equity, retiros, compras, resets, reserva, inactividad, caducidad) · v2: consistencia por cuenta
      Misma lógica que la app de Apps Script (Real_Codigo.gs): Tabla maestra para Funded, regla v7 para challenges,
      rotación (SL → siguiente cuenta), plan B y registro rápido. Cada usuario ve solo sus cuentas y trades.
      La Tabla maestra es compartida (config/tablaMaestra) y solo la edita el admin. -->
@@ -278,6 +278,7 @@ td.num,th.num{text-align:right}
       <div class="sec" style="margin-top:0"><h2 id="ctaFormTit">Agregar cuenta</h2><button type="button" class="link" id="ctaPanX" style="margin-left:auto">✕</button></div>
       <div>
         <div class="form">
+          <div class="nfi" id="fFundBox" hidden></div>
           <label>Firma<input id="fFirma" value="Lucid"></label>
           <div class="flab">Monto<span class="seg" id="fTamSeg"></span><input id="fTam" type="number" value="25000" style="margin-top:4px"></div>
           <label>ID cuenta<input id="fId" placeholder="LFE025-…"></label>
@@ -293,7 +294,7 @@ td.num,th.num{text-align:right}
           <label data-nf="objetivo">Profit target ($)<input id="fObj" type="number" value="1250"><small class="chgt"></small></label>
           <label data-nf="maxContratos">Max contracts<input id="fMaxC" type="number"><small class="chgt"></small></label>
           <label data-nf="plataforma">Plataforma<input id="fPlat" placeholder="Tradovate"><small class="chgt"></small></label>
-          <label data-nf="inactividad">Inactivity (días)<input id="fInact" type="number" value="30"><small class="chgt"></small></label>
+          <label data-nf="inactividad">Inactivity (días naturales)<input id="fInact" type="number" min="1" step="1"><small class="chgt"></small></label>
           <label>Expiry (opcional)<input id="fCad" type="date"></label>
           <label id="fVerL" style="grid-column:1/-1;flex-direction:row;align-items:center;gap:8px;text-transform:none;letter-spacing:0;font-size:13px;color:var(--text)"><input type="checkbox" id="fVer" style="width:auto"> He comprobado que las normas son las vigentes</label>
           <div class="nfsep">Otros datos</div>
@@ -637,13 +638,25 @@ function capKv(cap) {
 // v22 · inactividad (mockup 2026-11-16_cortar-en-R_inactividad, aprobado 16/11/2026): cuenta activa con ≥ 75 % de su plazo sin operar
 // (una copia 1:1 cuenta como actividad) → su grupo de copia (o ella sola) pasa a ser el próximo a operar, por encima de la rotación.
 // Con varias, manda la de menos días restantes. Al registrar un trade en esa cuenta deja de estar en riesgo y vuelve la rotación normal.
-const INACT_PCT = 0.75;
+// v34 · RF-29 (mockup RF-29_inactividad, aprobado 26/11/2026): salta al 75 % del límite de la cuenta (días naturales) o cuando quedan
+// ≤ 5 días de sesión (sin sábados, domingos ni festivos de la bolsa de EE. UU.), lo que llegue antes. Fijo, no se edita.
+const INACT_PCT = 0.75, INACT_SES = 5;
+const FEST_EEUU = new Set(['2026-01-01', '2026-01-19', '2026-02-16', '2026-04-03', '2026-05-25', '2026-06-19', '2026-07-03', '2026-09-07', '2026-11-26', '2026-12-25',
+  '2027-01-01', '2027-01-18', '2027-02-15', '2027-03-26', '2027-05-31', '2027-06-18', '2027-07-05', '2027-09-06', '2027-11-25', '2027-12-24']);
+const sumaDias = (f, n) => new Date(Date.parse(f) + n * 86400000).toISOString().slice(0, 10);
+const esSesion = f => { const w = new Date(Date.parse(f)).getUTCDay(); return w > 0 && w < 6 && !FEST_EEUU.has(f); };
+// d = días sin operar, q = días naturales que quedan, fin = último día para operar, ses = días de sesión de hoy a fin (incluidos).
+function inactInfo(c, hoy) {
+  hoy = hoy || hoyES();
+  const u = ultimaActividad(c); if (!u || !(c.inactividad > 0)) return null;
+  const d = diasEntre(u, hoy), q = c.inactividad - d, fin = sumaDias(u, c.inactividad - 1);
+  let ses = 0; for (let f = hoy; f <= fin; f = sumaDias(f, 1)) if (esSesion(f)) ses++;
+  return { c, d, q, fin, ses, alerta: d >= INACT_PCT * c.inactividad || ses <= INACT_SES };
+}
 function inactRiesgo() {
   const hoy = hoyES();
-  return CUENTAS.filter(c => c.estado === 'Activa' && c.inactividad > 0).map(c => {
-    const u = ultimaActividad(c); if (!u) return null;
-    const d = diasEntre(u, hoy); return d >= INACT_PCT * c.inactividad ? { c, d, q: c.inactividad - d } : null;
-  }).filter(Boolean).sort((a, b) => (a.q - b.q) || (a.c.activa - b.c.activa)); // empate: primero la de reserva
+  return CUENTAS.filter(c => c.estado === 'Activa').map(c => inactInfo(c, hoy)).filter(r => r && r.alerta)
+    .sort((a, b) => (a.ses - b.ses) || (a.q - b.q) || (a.c.activa - b.c.activa)); // empate: primero la de reserva
 }
 // Posición de la cola que opera por inactividad (la de la cuenta o la de su grupo); se salta la que no puede operar hoy.
 function inactTurno(E) {
@@ -1957,8 +1970,28 @@ function aplicarNormas(forzar) {
   $('fVer').checked = false; $('btnCta').disabled = true;
   nfMarcar();
 }
-function abrirPanCta(c) { llenarForm(c); $('ctaMsg').textContent = ''; $('ctaPanOv').hidden = false; }
-function cerrarPanCta() { $('ctaPanOv').hidden = true; llenarForm(null); }
+let FUND_ID = null; // v34 · RF-29: panel abierto desde «★ Pasar a funded» (la fase cambia al guardar)
+function abrirPanCta(c) { FUND_ID = null; llenarForm(c); $('ctaMsg').textContent = ''; $('ctaPanOv').hidden = false; }
+function cerrarPanCta() { $('ctaPanOv').hidden = true; FUND_ID = null; llenarForm(null); }
+// Última cuenta de la misma firma que pasó a Funded (por fechaFunded; las dadas de alta ya en Funded, por su alta).
+function ultimaFunded(c) {
+  return CUENTAS.filter(x => x.id !== c.id && firmaKey(x.firma) === firmaKey(c.firma) && (x.fase === 'Funded' || x.fechaFunded))
+    .sort((a, b) => String(b.fechaFunded || b.alta || '').localeCompare(String(a.fechaFunded || a.alta || '')))[0] || null;
+}
+function abrirPasoFunded(c) {
+  llenarForm(c); FUND_ID = c.id;
+  const u = ultimaFunded(c);
+  if (u) $('fInact').value = u.inactividad;
+  $('ctaFormTit').textContent = 'Pasar a Funded · ' + c.nombre;
+  $('fFase').value = 'Funded'; $('fFase').disabled = true;
+  $('fFundBox').hidden = false;
+  $('fFundBox').innerHTML = '<b>Inactividad en Funded</b> (campo «Inactivity», días naturales): '
+    + (u ? 'de <b>' + esc(u.nombre) + '</b>, última de ' + esc(c.firma || 'esa firma') + ' que pasó a Funded' + (u.fechaFunded ? ' (' + fmtF(u.fechaFunded) + ')' : '') + '.' : 'primera de ' + esc(c.firma || 'esa firma') + ' que pasa a Funded: revisa el límite.')
+    + '<label style="display:flex;flex-direction:row;align-items:center;gap:8px;margin-top:8px;text-transform:none;letter-spacing:0;font-size:13px;color:var(--text)"><input type="checkbox" id="fFundOk" style="width:auto"> He comprobado el límite de inactividad de la cuenta funded</label>';
+  $('btnCta').textContent = 'Pasar a Funded y guardar'; $('btnCta').disabled = true;
+  $('ctaMsg').textContent = 'Copiá también balance y mínimo de la firma.'; $('ctaMsg').className = 'msg';
+  $('ctaPanOv').hidden = false; $('fInact').focus();
+}
 function llenarForm(c) {
   EDIT_ID = c ? c.id : null;
   $('ctaFormTit').textContent = c ? 'Editar / sincronizar · ' + c.nombre : 'Agregar cuenta';
@@ -1966,8 +1999,9 @@ function llenarForm(c) {
   const v = (id, x) => { $(id).value = x == null ? '' : x; };
   v('fNombre', c?.nombre ?? ''); v('fId', c?.id ?? ''); v('fFirma', c?.firma ?? 'Lucid'); v('fFase', c?.fase ?? 'Evaluación'); v('fTam', c?.tam ?? 25000); v('fDd', c?.dd ?? 1000);
   v('fDll', c && c.dll ? c.dll : ''); v('fBal', c?.balance ?? ''); v('fMin', c?.minimo ?? ''); v('fTipo', c?.tipoDD ?? 'Trailing EOD'); v('fLockMin', c ? (c.lockMin || '') : 25100); v('fLockCierre', c ? (c.lockCierre || '') : 26100);
-  v('fObj', c ? (c.objetivo || '') : 1250); v('fCons', c ? (c.sinCons ? '' : (c.consistencia || 50)) : 50); consSeg(!!(c && c.sinCons)); v('fOrden', c?.orden ?? (CUENTAS.reduce((m, x) => Math.max(m, x.orden), 0) + 1)); v('fActiva', c && !c.activa ? 'No' : 'Sí'); v('fEstado', c ? c.estado : 'Activa'); v('fAlta', c ? c.alta : hoyES()); v('fCoste', c ? (c.coste || '') : ''); v('fInact', c ? c.inactividad : 30); v('fCad', c ? c.caducidad : '');
+  v('fObj', c ? (c.objetivo || '') : 1250); v('fCons', c ? (c.sinCons ? '' : (c.consistencia || 50)) : 50); consSeg(!!(c && c.sinCons)); v('fOrden', c?.orden ?? (CUENTAS.reduce((m, x) => Math.max(m, x.orden), 0) + 1)); v('fActiva', c && !c.activa ? 'No' : 'Sí'); v('fEstado', c ? c.estado : 'Activa'); v('fAlta', c ? c.alta : hoyES()); v('fCoste', c ? (c.coste || '') : ''); v('fInact', c ? c.inactividad : ''); v('fCad', c ? c.caducidad : '');
   v('fMaxC', c ? c.maxContratos : ''); v('fPlat', c ? c.plataforma : '');
+  $('fFundBox').hidden = true; $('fFundBox').innerHTML = ''; $('fFase').disabled = false; $('btnCta').textContent = 'Guardar cuenta';
   $('fFaseL').hidden = !c; $('fBalL').hidden = !c; $('fEstadoL').hidden = !c; $('fVerL').hidden = !!c; $('fNormInfo').hidden = !!c;
   $('fMinLab').textContent = c ? 'Min balance actual ($)' : 'Min balance inicial ($)'; $('btnCta').disabled = false;
   aplicarNormas(true);
@@ -1986,15 +2020,19 @@ async function guardarCuenta() {
   const nueva = !EDIT_ID;
   if (nueva && !$('fVer').checked) return m('Marcá «He comprobado que las normas son las vigentes».');
   if (nueva && !$('fTipo').value) return m('Elegí el Drawdown type.');
+  const inact = num($('fInact').value);
+  if (!(inact > 0) || inact !== Math.round(inact)) return m('Pon el límite de inactividad de la firma (días naturales).');
+  if (FUND_ID && !($('fFundOk') && $('fFundOk').checked)) return m('Marcá «He comprobado el límite de inactividad de la cuenta funded».');
   if (nueva) { $('fFase').value = 'Evaluación'; $('fEstado').value = 'Activa'; $('fBal').value = $('fTam').value; } // toda cuenta nueva entra como Evaluación
   const tam = num($('fTam').value), dd = num($('fDd').value), bal = num($('fBal').value), min = num($('fMin').value);
   if (!(tam > 0 && dd > 0 && bal > 0 && min > 0)) return m('Completá tamaño, DD inicial, balance y mínimo.');
   const prev = CUENTAS.find(c => c.id === EDIT_ID);
   const d = { id, nombre: $('fNombre').value.trim() || id, firma: $('fFirma').value.trim(), fase: $('fFase').value, tam, dd, dll: num($('fDll').value), balance: bal, minimo: min,
     tipoDD: $('fTipo').value, lockMin: num($('fLockMin').value), lockCierre: num($('fLockCierre').value), objetivo: num($('fObj').value), sinCons: $('fCons').hidden, consistencia: $('fCons').hidden ? 0 : (num($('fCons').value) || 50), orden: num($('fOrden').value), activa: $('fActiva').value === 'Sí' && $('fEstado').value === 'Activa',
-    estado: $('fEstado').value, alta: $('fAlta').value, coste: num($('fCoste').value), inactividad: num($('fInact').value) || 30, caducidad: $('fCad').value,
+    estado: $('fEstado').value, alta: $('fAlta').value, coste: num($('fCoste').value), inactividad: inact, caducidad: $('fCad').value,
     enTurno: prev ? prev.enTurno : !CUENTAS.some(c => c.enTurno), maxContratos: $('fMaxC').value === '' ? '' : num($('fMaxC').value), plataforma: $('fPlat').value.trim() };
   if (nueva) d.normas = { tipoDD: d.tipoDD, dd, minimo: min, sinCons: d.sinCons, consistencia: d.consistencia, objetivo: d.objetivo, maxContratos: d.maxContratos, plataforma: d.plataforma, inactividad: d.inactividad, caducidad: d.caducidad, fecha: d.alta, verificadas: Date.now() };
+  if (FUND_ID) { d.fase = 'Funded'; d.fechaFunded = hoyES(); }
   if (!prev || prev.balance !== bal || prev.minimo !== min || !prev.syncAt) d.syncAt = Date.now(); else d.syncAt = prev.syncAt;
   if (prev && (prev.balance !== bal || prev.minimo !== min)) d.syncAt = Date.now();
   try { await setDoc(uref('cuentas', id), d, { merge: true }); m('Cuenta guardada.', true); cerrarPanCta(); await cargar(); } catch (e) { m('Error: ' + e.message); }
@@ -2019,11 +2057,11 @@ function ultimaActividad(c) {
 function avisosCuentas(z) {
   const out = [], hoy = hoyES();
   CUENTAS.filter(c => c.estado === 'Activa').forEach(c => {
-    const u = ultimaActividad(c);
-    if (u) {
-      const d = diasEntre(u, hoy), q = c.inactividad - d, manda = z && z.c.id === c.id, g = manda && (grupoDeLider(c.id) || grupoDeCopia(c.id));
+    const r = inactInfo(c, hoy);
+    if (r) {
+      const { d, q, fin, ses } = r, manda = z && z.c.id === c.id, g = manda && (grupoDeLider(c.id) || grupoDeCopia(c.id));
       const frase = manda ? ' <b>' + (g ? esc(g.nombre) + ' pasa a ser el próximo' : esc(c.nombre) + ' pasa a ser la próxima') + ' a operar por inactividad.</b>' : '';
-      if (q <= 7 || manda) out.push({ bad: q <= 3, t: '⏳ <b>' + esc(c.nombre) + '</b>: ' + d + ' días sin operar' + (q > 0 ? ' · quedan ' + q + ' para la regla de inactividad (' + c.inactividad + ' días)' : ' · pasó el límite de inactividad (' + c.inactividad + ' días): revisalo en la firma') + (c.activa ? '' : ' · está en reserva') + '.' + frase });
+      if (r.alerta || manda) out.push({ bad: q <= 0 || ses <= 1, t: '⏳ <b>' + esc(c.nombre) + '</b>: ' + d + ' días sin operar' + (q > 0 ? ' · quedan ' + q + ' de ' + c.inactividad + ' · <b>' + ses + ' día' + (ses === 1 ? '' : 's') + ' de sesión</b> (hasta el ' + fmtF(fin) + ')' : ' · pasó el límite de inactividad (' + c.inactividad + ' días): revisalo en la firma') + (c.activa ? '' : ' · está en reserva') + '.' + frase });
     }
     if (c.caducidad && c.fase === 'Evaluación') {
       const q = diasEntre(hoy, c.caducidad);
@@ -2307,9 +2345,7 @@ async function accionCuenta(a, id) {
     b.set(ref, { balance: c.tam, minimo: c.tam - c.dd, syncAt: Date.now() }, { merge: true });
     await b.commit();
   } else if (a === 'fondear') {
-    if (!confirm('¿Pasar ' + c.nombre + ' a Funded? Después sincronizá balance y mínimo con la firma.')) return;
-    await setDoc(ref, { fase: 'Funded', fechaFunded: hoy }, { merge: true });
-    await cargar(); abrirPanCta(CUENTAS.find(x => x.id === id)); return;
+    return abrirPasoFunded(c); // v34 · RF-29: la fase cambia al guardar el panel
   } else if (a === 'retiro') {
     CONTA_TAB = 'ret'; ir('conta'); $('mTipo').value = 'Retiro'; $('mCta').value = id; $('mImp').focus(); return;
   }
@@ -2539,6 +2575,7 @@ document.addEventListener('change', ev => {
   if (tg.id === 'nqSel') { NQ.nuevo = tg.value === '__nuevo'; NQ.sel = NQ.nuevo ? '' : tg.value; return renderChk(); }
   if (tg.id === 'nqHora') { NQ.hora = tg.value; return; }
   if (tg.id === 'fVer') { $('btnCta').disabled = !EDIT_ID && !tg.checked; return; }
+  if (tg.id === 'fFundOk') { $('btnCta').disabled = !tg.checked; return; }
   if (tg.id === 'fTipo') return nfMarcar();
   if (tg.id === 'reMod') { RE_MOD = tg.value; return renderRisk(); }
   if (tg.id === 'reEx') { RE_EX = +tg.value || 0; return renderRisk(); }
