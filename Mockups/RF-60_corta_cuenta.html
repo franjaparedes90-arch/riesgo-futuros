@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><title>RF-60 · «Corta: Cuenta X» (mockup)</title>
+<style>
+:root{--bg:#d4e5fa;--card:#eaf3ff;--card-2:#fff;--line:#c5d8f1;--line-2:#a8c3e8;--text:#12223b;--text-2:#36506f;--muted:#5a6f90;--pos:#0e8a5c;--real:#2f6fd1;--warn:#7a5200;--warn-bg:#fdf1d6;--warn-line:#e6c272;--mono:ui-monospace,Menlo,Consolas,monospace}
+body{margin:0;padding:24px;background:var(--bg);font:14px Inter,system-ui,sans-serif;color:var(--text)}
+h2{font-size:15px;margin:0 0 8px}.cols{display:grid;grid-template-columns:1fr 1fr;gap:18px;max-width:1100px}
+@media(max-width:800px){.cols{grid-template-columns:1fr}}
+.lbl{font:600 11px var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.acc{background:var(--card-2);border:1px solid var(--line-2);border-left:4px solid var(--pos);border-radius:10px;padding:10px 12px}
+.hd{display:flex;justify-content:space-between;align-items:center;font-weight:700}
+.hero{display:flex;gap:18px;margin:8px 0 6px;padding:8px 10px;border-radius:8px;background:var(--card)}
+.hero div{font-size:12px;color:var(--muted)}.hero b{display:block;font-size:20px;color:var(--text)}
+.cpg{margin:8px 0;border:1px solid var(--line-2);border-radius:8px;background:var(--card)}
+.cpg summary{cursor:pointer;padding:6px 10px;font-size:13px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.cpg table{width:100%;font-size:12px;border-collapse:collapse}.cpg th{font:10px var(--mono);color:var(--muted);text-align:left;padding:4px 8px;text-transform:uppercase}.cpg td{padding:4px 8px;border-top:1px solid var(--line-2)}
+.cpm{font-weight:700;color:var(--warn)}
+.tag{font:11px var(--mono);padding:1px 7px;border-radius:99px;border:1px solid var(--line-2);background:var(--card-2);color:var(--text-2)}
+.tag.ld{background:#e5f4e4;color:var(--pos)}.tag.cp{background:#e3eefc;color:#2f6fd1}
+.pill{display:inline-block;font:11px var(--mono);padding:1px 7px;border-radius:99px;border:1px solid var(--line-2);color:var(--text-2);background:var(--card-2)}
+.src{font-size:11px;color:var(--muted);padding:6px 10px}
+.hlp{width:17px;height:17px;padding:0;border:1px solid var(--line-2);border-radius:50%;background:var(--card-2);color:var(--text-2);font-size:11px;line-height:1;cursor:pointer}
+.hlpTx{font-size:12px;margin:0 10px 8px;padding:7px 10px;border-left:2px solid var(--line-2);background:var(--card-2);border-radius:0 6px 6px 0}
+.chg{background:#fff3b0;border-radius:3px;padding:0 2px}
+.old{opacity:.85}
+.note{max-width:1100px;margin-top:16px;font-size:13px;color:var(--text-2)}
+</style></head><body>
+<h2>RF-60 · Tarjeta del grupo en turno (pantalla Hoy) — «manda» → «Corta: Cuenta X»</h2>
+<div class="cols">
+
+<div class="old"><div class="lbl">Ahora (v35)</div>
+<div class="acc"><div class="hd"><span>Grupo B · en turno</span><span class="pill">Funded</span></div>
+<div class="hero"><div>Riesgo<b>$250</b></div><div>Target<b>1,5R</b></div><div>Consistency margin<b>$500</b></div></div>
+<details class="cpg" open><summary><b>Grupo B</b> · 2 cuentas · manda <b>Cuenta 004</b> (TP máx. hoy $500)</summary>
+<table><tr><th>Cuenta</th><th>Rol</th><th>Consistency</th><th>Ganado hoy</th><th>TP máx. hoy</th><th>Broker</th></tr>
+<tr><td><b>PRO001</b> · Funded</td><td><span class="tag ld">Líder</span></td><td>—</td><td>$0</td><td>—</td><td><span class="pill">PDPT $600</span></td></tr>
+<tr><td><b>Cuenta 004</b> · Eval</td><td><span class="tag cp">Copia</span></td><td>40 %</td><td>$0</td><td class="cpm">$500 ◂ manda</td><td><span class="pill">sin PDPT</span></td></tr>
+</table><div class="src">Manda la cuenta más restrictiva (consistency del grupo: 40 %). Mínimo para operar = 0,4 % de la cuenta ($100 en 25K).</div></details>
+</div></div>
+
+<div><div class="lbl">Propuesta</div>
+<div class="acc"><div class="hd"><span>Grupo B · en turno</span><span class="pill">Funded</span></div>
+<div class="hero"><div>Riesgo<b>$250</b></div><div>Target<b>1,5R</b></div><div>Consistency margin<b>$500</b></div></div>
+<details class="cpg"><summary><b>Grupo B</b> · <span class="chg">Líder: <b>PRO001</b></span> · <span class="chg">Corta: <b>Cuenta 004</b></span> ($500) <button class="hlp" onclick="event.preventDefault();var t=document.getElementById('h');t.hidden=!t.hidden">?</button></summary>
+<div class="hlpTx" id="h" hidden>Se corta según la regla de consistencia del <b>40 %</b> de la <b>Cuenta 004</b>.<br>Si el corte baja de $100 (0,4 % de la cuenta), el grupo se bloquea por hoy.<br>Para cambiar el grupo: Cuentas → Gestión de copias.</div>
+<table><tr><th>Cuenta</th><th>Rol</th><th>Consistency</th><th>Ganado hoy</th><th>TP máx. hoy</th><th>Broker</th></tr>
+<tr><td><b>PRO001</b> · Funded</td><td><span class="tag ld">Líder</span></td><td>—</td><td>$0</td><td>—</td><td><span class="pill">PDPT $600</span></td></tr>
+<tr><td><b>Cuenta 004</b> · Eval</td><td><span class="tag cp">Copia</span></td><td>40 %</td><td>$0</td><td class="cpm">$500 <span class="chg">◂ corta</span></td><td><span class="pill">sin PDPT</span></td></tr>
+</table></details>
+</div></div>
+
+</div>
+<p class="note">En amarillo, lo que cambia. Solo cambia el texto, los cálculos no se tocan. El 40 % y la cuenta salen de la ficha de la cuenta que corta. El grupo va plegado, como ahora: pulsa la línea para ver la tabla. «2 cuentas» se sustituye por la líder (la que se elige en el broker). Fuera el texto del pie: todo pasa al «?». Valores de ejemplo.</p>
+</body></html>
