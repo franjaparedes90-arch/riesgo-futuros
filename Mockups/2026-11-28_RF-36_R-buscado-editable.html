@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><title>RF-36 · R de salida obligatorio (mockup v3)</title>
+<style>
+:root{--bg:#d4e5fa;--card:#eaf3ff;--card-2:#fff;--line:#c5d8f1;--line-2:#a8c3e8;--text:#12223b;--text-2:#36506f;--muted:#5a6f90;--pos:#0e8a5c;--neg:#c0392b;--warn:#7a5200;--warn-bg:#fdf1d6;--warn-line:#e6c272;--mono:ui-monospace,Menlo,Consolas,monospace}
+body{margin:0;padding:24px;background:var(--bg);font:14px Inter,system-ui,sans-serif;color:var(--text)}
+h1{font-size:17px;margin:0 0 4px}h2{font-size:15px;margin:22px 0 8px}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:18px;max-width:1100px}
+@media(max-width:800px){.cols{grid-template-columns:1fr}}
+.lbl{font:600 11px var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.bx{background:var(--card-2);border:1px solid var(--line-2);border-radius:10px;padding:12px 14px}
+.kv{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:8px 0}
+.kv div{font-size:11px;color:var(--muted);background:var(--card);border-radius:6px;padding:5px 7px}.kv b{display:block;font-size:13px;color:var(--text)}
+.mut{color:var(--muted);font-size:12px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.btn{border:1px solid var(--line-2);background:var(--card-2);border-radius:7px;padding:5px 12px;font-size:13px}
+.pri{background:#185FA5;color:#fff;border-color:#185FA5}.dis{opacity:.45}
+.fld{margin:10px 0 4px}.fld label{display:block;font-size:12px;color:var(--text-2);margin-bottom:3px}
+input{border:1px solid var(--line-2);border-radius:6px;padding:5px 8px;font-size:13px;width:90px}
+input.req{border-color:var(--neg)}
+.chip{display:inline-block;border:1px solid var(--line-2);border-radius:99px;padding:3px 10px;font-size:12px;background:var(--card-2)}
+.chip.on{background:#185FA5;color:#fff;border-color:#185FA5}
+.warn{margin-top:8px;padding:8px 10px;border-radius:8px;background:var(--warn-bg);border:1px solid var(--warn-line);font-size:12px;color:var(--warn)}
+.err{font-size:12px;color:var(--neg);margin-top:4px}
+.chg{background:#fff3b0;border-radius:6px;padding:6px}
+.hlp{width:17px;height:17px;padding:0;border:1px solid var(--line-2);border-radius:50%;background:var(--card-2);color:var(--text-2);font-size:11px;cursor:pointer}
+.hlpTx{font-size:12px;margin-top:6px;padding:7px 10px;border-left:2px solid var(--line-2);background:var(--card);border-radius:0 6px 6px 0}
+table{border-collapse:collapse;width:100%;max-width:1100px;font-size:13px;background:var(--card-2);border-radius:10px;overflow:hidden}
+th{font:600 11px var(--mono);text-transform:uppercase;color:var(--muted);text-align:left;padding:7px 10px;background:var(--card)}
+td{padding:7px 10px;border-top:1px solid var(--line)}
+.note{max-width:1100px;margin-top:22px;font-size:13px;background:var(--card-2);border:1px solid var(--line-2);border-radius:10px;padding:12px 16px}
+.note li{margin:3px 0}
+</style></head><body>
+<h1>RF-36 · «R de salida» obligatorio en TP (mockup v3)</h1>
+<div class="mut">Sin pantallas nuevas: una fila en la ventana de confirmación del <b>registro rápido</b> y el mismo campo en <b>Editar trade</b>. Regla nueva: % P&amp;L sistema = R al que cerró la operación por precio (lo que marca el dibujo). Ejemplo: trade #45. <span class="chg" style="padding:0 3px">Amarillo</span> = lo nuevo.</div>
+
+<h2>1 · Hoy → Registro rápido · ventana «Registrar TP…» · <span class="chg" style="padding:0 3px">solo si la tarjeta tiene corte</span> (consistencia o pasar la challenge)</h2><div class="mut" style="margin-bottom:8px">Sin corte la ventana queda igual que hoy: se guarda el R recomendado como <b>provisional</b> y se confirma en el post-trade.</div>
+<div class="cols">
+ <div><div class="lbl">Al abrirse (campo vacío, Guardar bloqueado)</div>
+  <div class="bx"><b>Registrar TP +313,00 $ · Cuenta X</b>
+   <div class="kv"><div>Riesgo<b>250 $ · 1 %</b></div><div>Target<b>1,2R (+300 $)</b></div><div>Consistency margin<b>313 $</b></div></div>
+   <div class="fld chg"><label>R de salida * <button class="hlp" onclick="this.closest('.fld').querySelector('.hlpTx').hidden^=1">?</button></label>
+    <div class="row"><input class="req" placeholder="R"> <span class="mut">recomendado 1,2R</span></div>
+    <div class="err">Escribí el R al que cerró la operación.</div>
+    <div class="hlpTx" hidden>El R al que salió el precio (el dibujo), no el que sale del resultado en $: un TP a 1,5R es 1,5 aunque en $ dé 1,06 por comisiones o redondeo. Si no coincide con el recomendado, la app pregunta por qué. Solo en TP: SL = −1 y BE = 0.</div>
+   </div>
+   <div class="row" style="justify-content:flex-end;margin-top:10px"><span class="btn">Cancelar</span><span class="btn pri dis">Guardar</span></div>
+  </div></div>
+ <div><div class="lbl">Escribe 1,41 (≠ recomendado) → pide el motivo</div>
+  <div class="bx"><b>Registrar TP +313,00 $ · Cuenta X</b>
+   <div class="kv"><div>Riesgo<b>250 $ · 1 %</b></div><div>Target<b>1,2R (+300 $)</b></div><div>Consistency margin<b>313 $</b></div></div>
+   <div class="fld chg"><label>R de salida *</label>
+    <div class="row"><input value="1,41"> <span class="mut">recomendado 1,2R</span></div>
+    <div class="warn"><b>¿Por qué difiere del recomendado?</b>
+     <div class="row" style="margin-top:6px"><span class="chip on">Redondeo de lotaje</span><span class="chip">Otro (texto)</span></div></div>
+   </div>
+   <div class="row" style="justify-content:flex-end;margin-top:10px"><span class="btn">Cancelar</span><span class="btn pri">Guardar</span></div>
+  </div></div>
+</div>
+
+<h2>2 · Qué lista de motivos sale en cada caso</h2>
+<table>
+<tr><th>R escrito</th><th>Motivos</th><th>Resultado</th></tr>
+<tr><td>= recomendado</td><td class="mut">no pregunta</td><td>Se guarda</td></tr>
+<tr><td>≠ recomendado, con <b>corte</b> (consistencia o pasar la challenge) y ≤ target vigente</td><td>Redondeo de lotaje · Otro (texto)</td><td>Plan respetado</td></tr>
+<tr><td>&gt; target vigente (p. ej. 2 con target 1,5)</td><td>El precio corrió (sin tiempo a poner el TP / deslizamiento) · Busqué más que el target · Otro (texto)</td><td>«Corrió» → incidencia de ejecución, plan respetado · «Busqué más» → plan No, P2</td></tr>
+<tr><td>&lt; recomendado <b>sin corte</b> (cerró antes)</td><td>Cerré antes · Otro (texto)</td><td>Plan No, P4</td></tr>
+</table>
+<div class="mut" style="margin-top:6px">En todos los casos se guarda el R escrito. Las listas son ampliables (una línea por motivo nuevo).</div>
+
+<h2>3 · Trades → ✎ Completar registro / Editar trade</h2><div class="mut" style="margin-bottom:8px">Si el R es provisional: campo vacío y obligatorio (no deja guardar sin él). Si ya se confirmó en el registro rápido: viene relleno y editable.</div>
+<div class="cols">
+ <div><div class="lbl">Antes</div>
+  <div class="bx"><div class="fld"><label>% P&amp;L sistema (R) · automático desde la captura</label><input readonly value="+1,2" style="background:#f1f4f9;color:var(--muted)"></div></div></div>
+ <div><div class="lbl">Después</div>
+  <div class="bx"><div class="fld chg"><label>% P&amp;L sistema (R) · R de salida * <span class="tag" style="font:11px var(--mono);border:1px solid var(--line-2);border-radius:99px;padding:0 6px">provisional 1,2R</span></label>
+   <div class="row"><input value="1,41"> <span class="mut">recomendado 1,2R (captura 🔒)</span></div>
+   <div class="warn"><b>¿Por qué difiere del recomendado?</b>
+    <div class="row" style="margin-top:6px"><span class="chip on">Redondeo de lotaje</span><span class="chip">Otro (texto)</span></div></div></div></div>
+  <div class="mut" style="margin-top:6px">Mismas reglas que la tabla. La captura del plan no cambia.</div>
+ </div>
+</div>
+
+<div class="note"><b>Qué se guarda</b>
+<ul>
+<li><code>rr</code> = R de salida escrito · <code>captura.targetR</code> = recomendado (sin cambios) · nuevo <code>desvioR = {motivo, texto}</code>.</li>
+<li><code>rrProv: true</code> mientras no se confirme. Cierre de día: solo carga en Tradinverso trades con R confirmado; si hay alguno provisional avisa «trade #N sin completar, R provisional».</li>
+<li>Las gestiones paralelas del Risk engine no cambian (salen del MFE).</li>
+<li>Al publicar: trade #45 → +1,41R con «Redondeo de lotaje». Ajustar la skill cierre-de-dia (hoy copia «R del corte/target» a Tradinverso).</li>
+</ul></div>
+</body></html>
